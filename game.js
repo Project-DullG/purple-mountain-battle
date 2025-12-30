@@ -681,7 +681,7 @@ function getWeaponBonus(character) {
         elf: 'staff'
     };
     const weapon = weaponMap[character];
-    return weapon ? gameState.weapons[weapon] * 5 : 0;
+    return weapon ? gameState.weapons[weapon] * 0.5 : 0;
 }
 
 function getMaxHp() {
@@ -1140,15 +1140,50 @@ function updateShopUI() {
     document.getElementById('btn-upgrade-armor').disabled = gameState.player.gold < armorCost;
 }
 
+function getEnhanceSuccessRate(level) {
+    // 1강: 100%, 100강: 1% (선형 감소)
+    return Math.max(1, 100 - (level - 1));
+}
+
+function showEnhanceResult(weapon, success, level) {
+    const weaponNames = {
+        sword: '대검',
+        shield: '방패',
+        bow: '활',
+        staff: '지팡이'
+    };
+    const resultDiv = document.getElementById('enhance-result');
+    if (resultDiv) {
+        if (success) {
+            resultDiv.className = 'enhance-result success';
+            resultDiv.innerHTML = `✨ ${weaponNames[weapon]} +${level} 강화 성공!`;
+        } else {
+            resultDiv.className = 'enhance-result fail';
+            resultDiv.innerHTML = `💔 ${weaponNames[weapon]} 강화 실패...`;
+        }
+        resultDiv.classList.remove('hidden');
+        setTimeout(() => {
+            resultDiv.classList.add('hidden');
+        }, 1500);
+    }
+}
+
 function updateBlacksmithUI() {
     document.getElementById('blacksmith-stones').textContent = gameState.enhancementStones;
 
     const weaponTypes = ['sword', 'shield', 'bow', 'staff'];
     weaponTypes.forEach(weapon => {
         const level = gameState.weapons[weapon];
+        const successRate = getEnhanceSuccessRate(level);
+        const isMaxLevel = level >= 100;
+
         document.getElementById(`${weapon}-level`).textContent = level;
-        document.getElementById(`${weapon}-bonus`).textContent = level * 5;
-        document.querySelector(`.btn-upgrade[data-weapon="${weapon}"]`).disabled = gameState.enhancementStones < 1;
+        document.getElementById(`${weapon}-bonus`).textContent = (level * 0.5).toFixed(1);
+        document.getElementById(`${weapon}-rate`).textContent = successRate;
+
+        const btn = document.querySelector(`.btn-upgrade[data-weapon="${weapon}"]`);
+        btn.disabled = gameState.enhancementStones < 1 || isMaxLevel;
+        btn.textContent = isMaxLevel ? 'MAX' : `강화 (${successRate}%)`;
     });
 }
 
@@ -2534,13 +2569,25 @@ function initEventListeners() {
         resetStats();
     });
 
-    // 대장간 - 4종 무기 강화 (강화석 사용)
+    // 대장간 - 4종 무기 강화 (강화석 사용, 확률 시스템)
     document.querySelectorAll('.btn-upgrade[data-weapon]').forEach(btn => {
         btn.addEventListener('click', () => {
             const weapon = btn.dataset.weapon;
-            if (gameState.enhancementStones >= 1) {
+            const currentLevel = gameState.weapons[weapon];
+
+            if (gameState.enhancementStones >= 1 && currentLevel < 100) {
                 gameState.enhancementStones--;
-                gameState.weapons[weapon]++;
+                const successRate = getEnhanceSuccessRate(currentLevel);
+                const roll = Math.random() * 100;
+
+                if (roll < successRate) {
+                    // 강화 성공
+                    gameState.weapons[weapon]++;
+                    showEnhanceResult(weapon, true, currentLevel + 1);
+                } else {
+                    // 강화 실패
+                    showEnhanceResult(weapon, false, currentLevel);
+                }
                 updateBlacksmithUI();
             }
         });

@@ -303,7 +303,51 @@ h2 {
 .weapon-effect {
     font-size: 0.8rem;
     color: #8be9fd;
+    margin-bottom: 4px;
+}
+
+.weapon-rate {
+    font-size: 0.75rem;
+    color: #ffd93d;
     margin-bottom: 8px;
+}
+
+/* 강화 결과 표시 */
+.enhance-result {
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    animation: enhance-pop 0.3s ease-out;
+}
+
+.enhance-result.success {
+    background: linear-gradient(135deg, rgba(80, 250, 123, 0.3), rgba(56, 239, 125, 0.1));
+    border: 2px solid #50fa7b;
+    color: #50fa7b;
+}
+
+.enhance-result.fail {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(255, 71, 87, 0.1));
+    border: 2px solid #ff6b6b;
+    color: #ff6b6b;
+}
+
+.enhance-result.hidden {
+    display: none;
+}
+
+@keyframes enhance-pop {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .btn-upgrade {
