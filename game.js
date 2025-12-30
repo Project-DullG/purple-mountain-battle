@@ -1436,6 +1436,7 @@ function updateDungeonUI() {
 
 function updateBattleUI() {
     const enemy = gameState.currentEnemy;
+    if (!enemy) return; // 적이 없으면 업데이트 안함
     const typeIcon = enemy.type ? enemy.type.icon : '';
     document.getElementById('enemy-name').textContent = typeIcon + enemy.name + (enemy.stunned ? ' [스턴]' : '');
     document.getElementById('enemy-hp').textContent = Math.max(0, enemy.hp);
@@ -1548,6 +1549,8 @@ function disableFlee() {
 
 // 적 선제공격 처리
 function checkEnemyPreemptiveAttack() {
+    if (!gameState.dungeon.inBattle || !gameState.currentEnemy) return false;
+
     enemyAttackCounter--;
 
     // 카운터가 0 이하면 선제공격 발동 후 즉시 리셋
