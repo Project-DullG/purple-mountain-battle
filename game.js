@@ -716,11 +716,11 @@ function getWeaponBonus(character) {
 }
 
 function getMaxHp() {
-    const baseHp = 100 + (gameState.player.level - 1) * 10 + (gameState.armorLevel - 1) * 20;
-    const strHp = getEffectiveStat('str') * 2;
-    const dexHp = getEffectiveStat('dex') * 0.5;
-    const intHp = getEffectiveStat('int') * 1;
-    const vitHp = getEffectiveStat('vit') * 4;
+    const baseHp = 35 + (gameState.player.level - 1) * 5 + (gameState.armorLevel - 1) * 10;
+    const strHp = getEffectiveStat('str') * 1;
+    const dexHp = getEffectiveStat('dex') * 0.25;
+    const intHp = getEffectiveStat('int') * 0.5;
+    const vitHp = getEffectiveStat('vit') * 2;
 
     // 잿빛 소녀의 축복 - 수호 (근원석)
     const charHp = gameState.ashBlessings.aegis * 10;
