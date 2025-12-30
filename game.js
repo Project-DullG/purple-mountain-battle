@@ -1435,7 +1435,6 @@ function updateDungeonUI() {
 }
 
 function updateBattleUI() {
-    console.log('>>> updateBattleUI 호출됨');
     // 플레이어 HP/MP 업데이트 (항상)
     document.getElementById('battle-hp').textContent = gameState.player.hp;
     document.getElementById('battle-max-hp').textContent = gameState.player.maxHp;
@@ -1448,11 +1447,11 @@ function updateBattleUI() {
     document.getElementById('mp-bar').style.width = `${mpPercent}%`;
 
     // 왼쪽 스탯 패널 - 기본 스탯
-    document.getElementById('panel-str').textContent = Math.floor(getFinalStat('str'));
-    document.getElementById('panel-dex').textContent = Math.floor(getFinalStat('dex'));
-    document.getElementById('panel-int').textContent = Math.floor(getFinalStat('int'));
-    document.getElementById('panel-vit').textContent = Math.floor(getFinalStat('vit'));
-    document.getElementById('panel-luk').textContent = Math.floor(getFinalStat('luk'));
+    document.getElementById('panel-str').textContent = Math.floor(getEffectiveStat('str'));
+    document.getElementById('panel-dex').textContent = Math.floor(getEffectiveStat('dex'));
+    document.getElementById('panel-int').textContent = Math.floor(getEffectiveStat('int'));
+    document.getElementById('panel-vit').textContent = Math.floor(getEffectiveStat('vit'));
+    document.getElementById('panel-luk').textContent = Math.floor(getEffectiveStat('luk'));
     // 왼쪽 스탯 패널 - 전투 능력
     document.getElementById('panel-atk').textContent = getPlayerAtk();
     document.getElementById('panel-crit').textContent = getCritChance() + '%';
@@ -1465,31 +1464,10 @@ function updateBattleUI() {
     if (!enemy) return;
 
     const typeIcon = enemy.type ? enemy.type.icon : '';
-    console.log('=== 적 정보 ===', enemy.name, 'HP:', enemy.hp + '/' + enemy.maxHp, 'ATK:', enemy.atk);
-
-    const enemyNameEl = document.getElementById('enemy-name');
-    const enemyHpEl = document.getElementById('enemy-hp');
-    const enemyMaxHpEl = document.getElementById('enemy-max-hp');
-    const enemyAtkEl = document.getElementById('enemy-atk');
-
-    console.log('DOM 요소 찾기:', {
-        name: enemyNameEl,
-        hp: enemyHpEl,
-        maxHp: enemyMaxHpEl,
-        atk: enemyAtkEl
-    });
-
-    enemyNameEl.textContent = typeIcon + enemy.name + (enemy.stunned ? ' [스턴]' : '');
-    enemyHpEl.textContent = Math.max(0, Math.floor(enemy.hp));
-    enemyMaxHpEl.textContent = enemy.maxHp;
-    enemyAtkEl.textContent = enemy.atk;
-
-    console.log('DOM 업데이트 후:', {
-        name: enemyNameEl.textContent,
-        hp: enemyHpEl.textContent,
-        maxHp: enemyMaxHpEl.textContent,
-        atk: enemyAtkEl.textContent
-    });
+    document.getElementById('enemy-name').textContent = typeIcon + enemy.name + (enemy.stunned ? ' [스턴]' : '');
+    document.getElementById('enemy-hp').textContent = Math.max(0, Math.floor(enemy.hp));
+    document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
+    document.getElementById('enemy-atk').textContent = enemy.atk;
     document.getElementById('enemy-preempt-counter').textContent = Math.max(0, enemyAttackCounter);
 
     // 선제공격 1턴 남았을 때 경고 표시
@@ -1501,10 +1479,7 @@ function updateBattleUI() {
     }
 
     const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
-    const hpBarElement = document.getElementById('enemy-hp-bar');
-    console.log('HP 바 업데이트:', enemyHpPercent + '%', '요소:', hpBarElement, '현재 width:', hpBarElement?.style.width);
-    hpBarElement.style.width = `${enemyHpPercent}%`;
-    console.log('HP 바 업데이트 후 width:', hpBarElement.style.width);
+    document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
 
     const dungeonScreen = document.getElementById('dungeon-screen');
     dungeonScreen.classList.remove('boss-fight', 'mini-boss-fight');
@@ -1649,7 +1624,6 @@ function playerAttack() {
     } else {
         enemyCounterAttack();
     }
-    console.log('playerAttack 종료 - 최종 적 HP:', gameState.currentEnemy?.hp);
     updateBattleUI();
 }
 
@@ -1694,7 +1668,6 @@ function executePlayerAttack(isSkill = false, skillDamage = 0) {
     if (isEnemyDodge) damage = Math.floor(damage * 0.5);
 
     gameState.currentEnemy.hp -= damage;
-    console.log('적 HP 감소:', damage, '-> 남은 HP:', gameState.currentEnemy.hp);
     const logParts = [`${isSkill ? '' : '공격! '}${damage} 피해!`];
     if (isCrit) logParts.push('(치명타!)');
     if (isEnemyDodge) logParts.push('(적 부분 회피!)');
