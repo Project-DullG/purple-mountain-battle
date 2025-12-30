@@ -865,6 +865,56 @@ h2 {
     margin-top: 12px;
 }
 
+/* 상세 정보 - 현재 스탯 그리드 */
+.info-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.info-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px;
+    background: rgba(179, 136, 255, 0.1);
+    border-radius: 4px;
+}
+
+.info-stat-label {
+    font-size: 0.7rem;
+    color: #aaa;
+}
+
+.info-stat-value {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #b388ff;
+}
+
+/* 상세 정보 - 태그 합성 버튼 */
+.info-combine-section {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.btn-info-tag-combine {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
+
+.btn-info-tag-combine:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 10px rgba(240, 147, 251, 0.5);
+}
+
 .skill-info-item {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 6px;

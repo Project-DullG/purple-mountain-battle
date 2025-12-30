@@ -1848,8 +1848,9 @@ function handleRelicFloorClear() {
         return;
     }
 
-    // 유물 선택지 생성 (3개) - 보스/중간보스는 일반/희귀만 등장
-    generateRelicChoices(true);
+    // 유물 선택지 생성 (3개)
+    // 중간보스(5층): 일반 등급만, 보스(10층): 희귀 등급만
+    generateRelicChoices(isBossFloor ? 'rare' : 'common');
 
     // 보스층(10층 단위)에는 스킬 선택도 제공
     if (isBossFloor) {
@@ -1888,12 +1889,12 @@ function selectRelicByRarity(allowedRarities = null) {
     return relicsOfRarity[Math.floor(Math.random() * relicsOfRarity.length)];
 }
 
-// 유물 선택지 3개 생성 (중복 허용, 등급 확률 적용)
-// limitRarity: true면 일반/희귀만 등장 (보스/중간보스용)
-function generateRelicChoices(limitRarity = false) {
+// 유물 선택지 3개 생성 (중복 허용)
+// fixedRarity: 'common', 'rare' 등 특정 등급만 등장
+function generateRelicChoices(fixedRarity = null) {
     gameState.relicChoices = [];
     const selectedIds = new Set(); // 같은 선택지에서는 중복 방지
-    const allowedRarities = limitRarity ? ['common', 'rare'] : null;
+    const allowedRarities = fixedRarity ? [fixedRarity] : null;
 
     while (gameState.relicChoices.length < 3) {
         const relic = selectRelicByRarity(allowedRarities);
@@ -2504,6 +2505,34 @@ function updateInfoPanel() {
 
     let html = '';
 
+    // 현재 스탯 섹션
+    html += '<div class="info-section-title">📊 현재 스탯</div>';
+    const totalDefReduction = Math.min(
+        getVitDamageReduction() * 100 +
+        gameState.percentBonus.def +
+        Math.min(gameState.ashBlessings.patience * 0.5, 30),
+        80
+    );
+    html += `
+        <div class="info-stats-grid">
+            <div class="info-stat-item"><span class="info-stat-label">공격력</span><span class="info-stat-value">${getPlayerAtk()}</span></div>
+            <div class="info-stat-item"><span class="info-stat-label">최대HP</span><span class="info-stat-value">${gameState.player.maxHp}</span></div>
+            <div class="info-stat-item"><span class="info-stat-label">치명타</span><span class="info-stat-value">${getCritChance()}%</span></div>
+            <div class="info-stat-item"><span class="info-stat-label">크리뎀</span><span class="info-stat-value">${getCritDamage()}%</span></div>
+            <div class="info-stat-item"><span class="info-stat-label">회피율</span><span class="info-stat-value">${getDodgeChance()}%</span></div>
+            <div class="info-stat-item"><span class="info-stat-label">피해감소</span><span class="info-stat-value">${Math.floor(totalDefReduction)}%</span></div>
+        </div>
+    `;
+
+    // 태그 합성 버튼 (전투 중이 아닐 때만)
+    if (!gameState.dungeon.inBattle && gameState.tempRelics.length >= 3) {
+        html += `
+            <div class="info-combine-section">
+                <button id="btn-info-tag-combine" class="btn-info-tag-combine">🔮 태그 합성 열기</button>
+            </div>
+        `;
+    }
+
     // 스킬 정보 섹션
     html += '<div class="info-section-title">🗡️ 스킬</div>';
 
@@ -2569,6 +2598,19 @@ function updateInfoPanel() {
     }
 
     panel.innerHTML = html;
+
+    // 태그 합성 버튼 이벤트 리스너 (동적 생성된 버튼)
+    const tagCombineBtn = document.getElementById('btn-info-tag-combine');
+    if (tagCombineBtn) {
+        tagCombineBtn.addEventListener('click', () => {
+            // 상세 정보 패널 닫기
+            panel.classList.add('hidden');
+            document.getElementById('btn-info-toggle').classList.remove('active');
+            document.getElementById('btn-info-toggle').textContent = '상세 정보';
+            // 태그 합성 열기
+            openTagCombineMode();
+        });
+    }
 }
 
 function updateBuffDisplay() {
