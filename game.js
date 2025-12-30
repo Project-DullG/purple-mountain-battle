@@ -1464,16 +1464,31 @@ function updateBattleUI() {
     if (!enemy) return;
 
     const typeIcon = enemy.type ? enemy.type.icon : '';
-    document.getElementById('enemy-name').textContent = typeIcon + enemy.name + (enemy.stunned ? ' [스턴]' : '');
-    const enemyHpElement = document.getElementById('enemy-hp');
-    const newHp = Math.max(0, Math.floor(enemy.hp));
-    console.log('UI 업데이트 - 적 HP:', enemy.hp, '-> 표시할 값:', newHp, '현재 표시:', enemyHpElement?.textContent);
-    enemyHpElement.textContent = newHp;
-    // 강제 리플로우
-    void enemyHpElement.offsetHeight;
-    console.log('UI 업데이트 후 표시:', enemyHpElement.textContent);
-    document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
-    document.getElementById('enemy-atk').textContent = enemy.atk;
+    console.log('=== 적 정보 ===', enemy.name, 'HP:', enemy.hp + '/' + enemy.maxHp, 'ATK:', enemy.atk);
+
+    const enemyNameEl = document.getElementById('enemy-name');
+    const enemyHpEl = document.getElementById('enemy-hp');
+    const enemyMaxHpEl = document.getElementById('enemy-max-hp');
+    const enemyAtkEl = document.getElementById('enemy-atk');
+
+    console.log('DOM 요소 찾기:', {
+        name: enemyNameEl,
+        hp: enemyHpEl,
+        maxHp: enemyMaxHpEl,
+        atk: enemyAtkEl
+    });
+
+    enemyNameEl.textContent = typeIcon + enemy.name + (enemy.stunned ? ' [스턴]' : '');
+    enemyHpEl.textContent = Math.max(0, Math.floor(enemy.hp));
+    enemyMaxHpEl.textContent = enemy.maxHp;
+    enemyAtkEl.textContent = enemy.atk;
+
+    console.log('DOM 업데이트 후:', {
+        name: enemyNameEl.textContent,
+        hp: enemyHpEl.textContent,
+        maxHp: enemyMaxHpEl.textContent,
+        atk: enemyAtkEl.textContent
+    });
     document.getElementById('enemy-preempt-counter').textContent = Math.max(0, enemyAttackCounter);
 
     // 선제공격 1턴 남았을 때 경고 표시
