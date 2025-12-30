@@ -441,9 +441,9 @@ function onTagCombineClick() {
 
 // 태그 합성 모드 열기
 function openTagCombineMode() {
-    // 전투 중에는 합성 불가
-    if (gameState.dungeon.inBattle) {
-        alert('⚔️ 전투 중에는 합성할 수 없습니다!');
+    // 마을 복귀가 불가능할 때 합성 불가 (전투 중 행동 후)
+    if (gameState.dungeon.inBattle && hasActed) {
+        alert('⚔️ 전투 중에는 합성할 수 없습니다!\n(첫 턴에만 가능)');
         return;
     }
     if (gameState.tempRelics.length < 3) {
