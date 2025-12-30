@@ -1550,18 +1550,21 @@ function disableFlee() {
 function checkEnemyPreemptiveAttack() {
     enemyAttackCounter--;
 
-    if (enemyAttackCounter <= 0) {
+    // 카운터가 0 이하면 선제공격 발동 후 즉시 리셋
+    while (enemyAttackCounter <= 0) {
         addBattleLog(`⚠️ 적의 선제공격!`);
         enemyPreemptiveAttack();
-        enemyAttackCounter = getRandomAttackCounter();
-        addBattleLog(`다음 선제공격까지 ${enemyAttackCounter}턴`);
-        updateBattleUI(); // 카운터 리셋 후 UI 즉시 업데이트
 
         if (gameState.player.hp <= 0) {
+            updateBattleUI();
             return true; // 플레이어 사망
         }
+
+        enemyAttackCounter = getRandomAttackCounter();
+        addBattleLog(`다음 선제공격까지 ${enemyAttackCounter}턴`);
     }
-    updateBattleUI(); // 카운터 변경 후 UI 업데이트
+
+    updateBattleUI();
     return false;
 }
 
