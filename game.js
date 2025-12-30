@@ -1465,8 +1465,10 @@ function updateBattleUI() {
 
     const typeIcon = enemy.type ? enemy.type.icon : '';
     document.getElementById('enemy-name').textContent = typeIcon + enemy.name + (enemy.stunned ? ' [스턴]' : '');
-    console.log('UI 업데이트 - 적 HP:', enemy.hp);
-    document.getElementById('enemy-hp').textContent = Math.max(0, enemy.hp);
+    const enemyHpElement = document.getElementById('enemy-hp');
+    console.log('UI 업데이트 - 적 HP:', enemy.hp, '요소:', enemyHpElement, '현재 표시:', enemyHpElement?.textContent);
+    enemyHpElement.textContent = Math.max(0, enemy.hp);
+    console.log('UI 업데이트 후 표시:', enemyHpElement.textContent);
     document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
     document.getElementById('enemy-atk').textContent = enemy.atk;
     document.getElementById('enemy-preempt-counter').textContent = Math.max(0, enemyAttackCounter);
@@ -1480,6 +1482,7 @@ function updateBattleUI() {
     }
 
     const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
+    console.log('HP 바 업데이트:', enemyHpPercent + '%');
     document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
 
     const dungeonScreen = document.getElementById('dungeon-screen');
