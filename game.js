@@ -125,16 +125,19 @@ const relicsData = [
     // 희귀 등급 - 새 효과
     { id: 'relic_dagger', name: '암살자의 단검', desc: '처치 시 HP 3% 회복', effect: 'killHeal', value: 0.03, icon: '🗡️', rarity: 'rare' },
     { id: 'relic_hourglass', name: '시간의 모래', desc: '스킬 쿨타임 -1턴', effect: 'cooldownReduce', value: 1, icon: '⏳', rarity: 'rare' },
-    { id: 'relic_arrow', name: '관통의 화살', desc: '적 방어력 10% 무시', effect: 'armorPen', value: 0.1, icon: '🏹', rarity: 'rare' },
-    { id: 'relic_rage', name: '분노의 결정', desc: '반격 피해 +15%', effect: 'counterAtk', value: 0.15, icon: '😠', rarity: 'rare' },
+    { id: 'relic_arrow', name: '맹독의 화살', desc: '공격 시 10% 확률로 독 (3턴간 5% 피해)', effect: 'poison', value: 0.1, icon: '🏹', rarity: 'rare' },
+    { id: 'relic_claw', name: '야수의 발톱', desc: '공격 시 10% 확률로 출혈 (3턴간 4% 피해)', effect: 'bleed', value: 0.1, icon: '🐾', rarity: 'rare' },
+    { id: 'relic_rage', name: '분노의 결정', desc: '첫 공격 피해 +40%', effect: 'firstHit', value: 0.4, icon: '😠', rarity: 'rare' },
     { id: 'relic_hunter', name: '사냥꾼의 표식', desc: '보스에게 피해 +10%', effect: 'bossKiller', value: 0.1, icon: '🎯', rarity: 'rare' },
 
     // 영웅 등급 - 새 효과
     { id: 'relic_mirror', name: '반사의 거울', desc: '받은 피해의 10% 반사', effect: 'reflect', value: 0.1, icon: '🪞', rarity: 'epic' },
     { id: 'relic_scroll', name: '고대의 두루마리', desc: 'MP 소모 -20%', effect: 'mpSave', value: 0.2, icon: '📜', rarity: 'epic' },
     { id: 'relic_soul', name: '영혼 수확자', desc: '처치 시 HP 5% 회복', effect: 'killHeal', value: 0.05, icon: '👻', rarity: 'epic' },
-    { id: 'relic_spear', name: '용사의 창', desc: '적 방어력 20% 무시', effect: 'armorPen', value: 0.2, icon: '🔱', rarity: 'epic' },
-    { id: 'relic_fury', name: '광전사의 도끼', desc: '반격 피해 +25%', effect: 'counterAtk', value: 0.25, icon: '🪓', rarity: 'epic' },
+    { id: 'relic_spear', name: '염화의 창', desc: '공격 시 15% 확률로 화상 (3턴간 7% 피해)', effect: 'burn', value: 0.15, icon: '🔱', rarity: 'epic' },
+    { id: 'relic_fang', name: '흡혈박쥐 송곳니', desc: '공격 시 15% 확률로 출혈 (3턴간 4% 피해)', effect: 'bleed', value: 0.15, icon: '🦇', rarity: 'epic' },
+    { id: 'relic_hex', name: '저주받은 인형', desc: '공격 시 12% 확률로 저주 (3턴간 3% + 공격력↓)', effect: 'curse', value: 0.12, icon: '🪆', rarity: 'epic' },
+    { id: 'relic_fury', name: '광전사의 도끼', desc: '적 HP 30% 이하 시 피해 +60%', effect: 'execute', value: 0.6, icon: '🪓', rarity: 'epic' },
     { id: 'relic_slayer', name: '드래곤 슬레이어', desc: '보스에게 피해 +20%', effect: 'bossKiller', value: 0.2, icon: '🐉', rarity: 'epic' },
     { id: 'relic_chain', name: '연쇄의 사슬', desc: '10% 확률로 추가 공격', effect: 'multiHit', value: 0.1, icon: '⛓️', rarity: 'epic' },
     { id: 'relic_skill', name: '마법 증폭기', desc: '스킬 피해 +15%', effect: 'skillDmg', value: 0.15, icon: '✨', rarity: 'epic' },
@@ -142,8 +145,8 @@ const relicsData = [
     // 전설 등급 - 새 효과
     { id: 'relic_phoenix', name: '불사조의 깃털', desc: '처치 시 HP 10% 회복', effect: 'killHeal', value: 0.1, icon: '🔥', rarity: 'legendary' },
     { id: 'relic_void', name: '공허의 수정', desc: '스킬 쿨타임 -2턴', effect: 'cooldownReduce', value: 2, icon: '🌀', rarity: 'legendary' },
-    { id: 'relic_pierce', name: '신의 창', desc: '적 방어력 30% 무시', effect: 'armorPen', value: 0.3, icon: '⚡', rarity: 'legendary' },
-    { id: 'relic_berserk', name: '광기의 가면', desc: '반격 피해 +40%', effect: 'counterAtk', value: 0.4, icon: '🎭', rarity: 'legendary' },
+    { id: 'relic_pierce', name: '역병의 창', desc: '공격 시 20% 확률로 독+화상 (3턴간 10% 피해)', effect: 'plague', value: 0.2, icon: '⚡', rarity: 'legendary' },
+    { id: 'relic_berserk', name: '광기의 가면', desc: '첫 공격 피해 +80%', effect: 'firstHit', value: 0.8, icon: '🎭', rarity: 'legendary' },
     { id: 'relic_godslayer', name: '신 사냥꾼', desc: '보스에게 피해 +35%', effect: 'bossKiller', value: 0.35, icon: '☠️', rarity: 'legendary' },
     { id: 'relic_storm', name: '폭풍의 눈', desc: '20% 확률로 추가 공격', effect: 'multiHit', value: 0.2, icon: '🌪️', rarity: 'legendary' },
     { id: 'relic_arcane', name: '비전의 오브', desc: '스킬 피해 +30%', effect: 'skillDmg', value: 0.3, icon: '🔮', rarity: 'legendary' },
@@ -171,8 +174,8 @@ const relicsData = [
       effects: [{ effect: 'atkMult', value: 0.08 }, { effect: 'def', value: 0.92 }, { effect: 'crit', value: 5 }] },
     { id: 'relic_tactician', name: '전략가의 문장', desc: '스킬 피해 +10%, MP 소모 -12%', icon: '📋', rarity: 'epic',
       effects: [{ effect: 'skillDmg', value: 0.10 }, { effect: 'mpSave', value: 0.12 }] },
-    { id: 'relic_hunter_arm', name: '사냥꾼의 완장', desc: '보스 피해 +12%, 방어 관통 +12%', icon: '🎖️', rarity: 'epic',
-      effects: [{ effect: 'bossKiller', value: 0.12 }, { effect: 'armorPen', value: 0.12 }] },
+    { id: 'relic_hunter_arm', name: '사냥꾼의 완장', desc: '보스 피해 +12%, 독 확률 +12%', icon: '🎖️', rarity: 'epic',
+      effects: [{ effect: 'bossKiller', value: 0.12 }, { effect: 'poison', value: 0.12 }] },
     { id: 'relic_undying', name: '불굴의 심장', desc: '최대 HP +10%, 처치 시 HP 3% 회복', icon: '💗', rarity: 'epic',
       effects: [{ effect: 'hpMult', value: 0.10 }, { effect: 'killHeal', value: 0.03 }] },
     { id: 'relic_assassin', name: '암살자의 비수', desc: '치명타 +8%, 치명타 피해 +12%, 회피 +5%', icon: '🔪', rarity: 'epic',
@@ -183,8 +186,8 @@ const relicsData = [
       effects: [{ effect: 'atkMult', value: 0.12 }, { effect: 'crit', value: 8 }, { effect: 'critDmg', value: 12 }] },
     { id: 'relic_guardian', name: '수호신의 축복', desc: '받는 피해 -12%, 최대 HP +12%, 피해 반사 8%', icon: '🛡️', rarity: 'legendary',
       effects: [{ effect: 'def', value: 0.88 }, { effect: 'hpMult', value: 0.12 }, { effect: 'reflect', value: 0.08 }] },
-    { id: 'relic_conqueror', name: '정복자의 인장', desc: '보스 피해 +18%, 방어 관통 +12%, 스킬 피해 +10%', icon: '👑', rarity: 'legendary',
-      effects: [{ effect: 'bossKiller', value: 0.18 }, { effect: 'armorPen', value: 0.12 }, { effect: 'skillDmg', value: 0.10 }] },
+    { id: 'relic_conqueror', name: '정복자의 인장', desc: '보스 피해 +18%, 화상 확률 +12%, 스킬 피해 +10%', icon: '👑', rarity: 'legendary',
+      effects: [{ effect: 'bossKiller', value: 0.18 }, { effect: 'burn', value: 0.12 }, { effect: 'skillDmg', value: 0.10 }] },
     { id: 'relic_eternal', name: '영원의 성배', desc: '최대 HP +15%, 처치 시 HP 5% 회복, 흡혈 3%', icon: '🏺', rarity: 'legendary',
       effects: [{ effect: 'hpMult', value: 0.15 }, { effect: 'killHeal', value: 0.05 }, { effect: 'lifeSteal', value: 0.03 }] }
 ];
@@ -203,8 +206,9 @@ const RELIC_TAGS = ['공격', '방어', '마법'];
 // 효과별 태그 매핑 (대부분 1개, 일부는 2개 태그)
 const effectToTags = {
     // 공격 전용
-    'atk': ['공격'], 'atkMult': ['공격'], 'armorPen': ['공격'], 'bossKiller': ['공격'],
+    'atk': ['공격'], 'atkMult': ['공격'], 'bossKiller': ['공격'],
     'strMult': ['공격'],
+    'poison': ['공격'], 'burn': ['공격'], 'bleed': ['공격'], 'curse': ['공격', '마법'], 'plague': ['공격'],
     // 방어 전용
     'def': ['방어'], 'hpMult': ['방어'], 'vitMult': ['방어'],
     // 마법 전용
@@ -220,7 +224,8 @@ const effectToTags = {
     'lifeSteal': ['공격', '방어'],      // 흡혈 - 공격+방어
     'killHeal': ['공격', '방어'],       // 처치 회복 - 공격+방어
     'reflect': ['방어', '공격'],        // 반사 - 방어+공격
-    'counterAtk': ['공격', '방어'],     // 반격 - 공격+방어
+    'execute': ['공격'],                // 처형 - 공격
+    'firstHit': ['공격'],               // 첫타 - 공격
     'dexMult': ['공격', '방어'],        // 민첩 - 공격+방어
     'lukMult': ['마법', '공격'],        // 행운 - 마법+공격
     'allStats': ['공격', '방어', '마법'] // 모든 스탯 - 3개 전부
@@ -589,7 +594,14 @@ function generateEnemy(floor) {
         expReward: Math.floor((20 + floor * 10) * tierMult),
         isBoss,
         isMiniBoss,
-        stunned: false
+        stunned: false,
+        // 디버프 상태 (남은 턴 수)
+        debuffs: {
+            poison: 0,      // 독: 턴당 최대HP 5% 피해
+            burn: 0,        // 화상: 턴당 최대HP 7% 피해
+            bleed: 0,       // 출혈: 턴당 최대HP 4% 피해
+            curse: 0        // 저주: 턴당 최대HP 3% + 공격력 20% 감소
+        }
     };
 }
 
@@ -956,21 +968,87 @@ function getCooldownReduce() {
     return reduce;
 }
 
-// 방어력 관통률
-function getArmorPenPercent() {
-    let percent = 0;
+// 디버프 확률 계산
+function getDebuffChance(debuffType) {
+    let chance = 0;
     gameState.tempRelics.forEach(relic => {
-        const val = getRelicEffectValue(relic, 'armorPen');
-        if (val !== null) percent += val;
+        const val = getRelicEffectValue(relic, debuffType);
+        if (val !== null) chance += val;
+        // plague는 독+화상 동시 적용
+        if (debuffType === 'poison' || debuffType === 'burn') {
+            const plagueVal = getRelicEffectValue(relic, 'plague');
+            if (plagueVal !== null) chance += plagueVal;
+        }
     });
-    return Math.min(percent, 0.5); // 최대 50% 관통
+    return Math.min(chance, 0.8); // 최대 80%
 }
 
-// 반격 데미지 증가율
-function getCounterAtkBonus() {
+// 공격 후 디버프 적용 시도
+function tryApplyDebuffs() {
+    const enemy = gameState.currentEnemy;
+    if (!enemy || enemy.hp <= 0) return;
+
+    const debuffTypes = ['poison', 'burn', 'bleed', 'curse'];
+    const debuffNames = { poison: '독', burn: '화상', bleed: '출혈', curse: '저주' };
+    const debuffDuration = 3; // 기본 3턴
+
+    debuffTypes.forEach(type => {
+        const chance = getDebuffChance(type);
+        if (chance > 0 && Math.random() < chance) {
+            if (enemy.debuffs[type] === 0) {
+                addBattleLog(`💀 ${enemy.name}에게 ${debuffNames[type]} 적용!`);
+            }
+            enemy.debuffs[type] = debuffDuration; // 갱신
+        }
+    });
+}
+
+// 턴 시작 시 디버프 피해 처리
+function processDebuffDamage() {
+    const enemy = gameState.currentEnemy;
+    if (!enemy || enemy.hp <= 0) return;
+
+    const debuffDamage = {
+        poison: 0.05,   // 5%
+        burn: 0.07,     // 7%
+        bleed: 0.04,    // 4%
+        curse: 0.03     // 3%
+    };
+    const debuffIcons = { poison: '🟢', burn: '🔥', bleed: '🩸', curse: '💜' };
+
+    let totalDamage = 0;
+    let debuffMessages = [];
+
+    Object.keys(enemy.debuffs).forEach(type => {
+        if (enemy.debuffs[type] > 0) {
+            const damage = Math.floor(enemy.maxHp * debuffDamage[type]);
+            totalDamage += damage;
+            debuffMessages.push(`${debuffIcons[type]}${damage}`);
+            enemy.debuffs[type]--;
+        }
+    });
+
+    if (totalDamage > 0) {
+        enemy.hp -= totalDamage;
+        addBattleLog(`디버프 피해: ${debuffMessages.join(' + ')} = ${totalDamage}`);
+    }
+}
+
+// 처형 보너스 (적 HP 30% 이하 시 추가 피해)
+function getExecuteBonus() {
     let bonus = 0;
     gameState.tempRelics.forEach(relic => {
-        const val = getRelicEffectValue(relic, 'counterAtk');
+        const val = getRelicEffectValue(relic, 'execute');
+        if (val !== null) bonus += val;
+    });
+    return bonus;
+}
+
+// 첫타 보너스 (전투당 첫 공격에 추가 피해)
+function getFirstHitBonus() {
+    let bonus = 0;
+    gameState.tempRelics.forEach(relic => {
+        const val = getRelicEffectValue(relic, 'firstHit');
         if (val !== null) bonus += val;
     });
     return bonus;
@@ -1430,6 +1508,7 @@ function getRandomAttackCounter() {
 function startBattle() {
     gameState.currentEnemy = generateEnemy(gameState.dungeon.currentFloor);
     gameState.dungeon.inBattle = true;
+    gameState.dungeon.firstHitUsed = false; // 첫타 보너스 초기화
     isGuarding = false;
     hasActed = false;
     enemyAttackCounter = getRandomAttackCounter();
@@ -1551,6 +1630,26 @@ function executePlayerAttack(isSkill = false, skillDamage = 0) {
         }
     }
 
+    // 첫타 보너스 (전투당 첫 공격)
+    const isFirstHit = !gameState.dungeon.firstHitUsed;
+    if (isFirstHit) {
+        const firstHitBonus = getFirstHitBonus();
+        if (firstHitBonus > 0) {
+            damage = Math.floor(damage * (1 + firstHitBonus));
+        }
+        gameState.dungeon.firstHitUsed = true;
+    }
+
+    // 처형 보너스 (적 HP 30% 이하)
+    const enemyHpPercent = gameState.currentEnemy.hp / gameState.currentEnemy.maxHp;
+    const isExecute = enemyHpPercent <= 0.3;
+    if (isExecute) {
+        const executeBonus = getExecuteBonus();
+        if (executeBonus > 0) {
+            damage = Math.floor(damage * (1 + executeBonus));
+        }
+    }
+
     if (isCrit) damage = Math.floor(damage * getCritDamage() / 100);
     if (isEnemyDodge) damage = Math.floor(damage * 0.5);
 
@@ -1558,18 +1657,25 @@ function executePlayerAttack(isSkill = false, skillDamage = 0) {
     const logParts = [`${isSkill ? '' : '공격! '}${damage} 피해!`];
     if (isCrit) logParts.push('(치명타!)');
     if (isEnemyDodge) logParts.push('(적 부분 회피!)');
+    if (isFirstHit && getFirstHitBonus() > 0) logParts.push('(첫타!)');
+    if (isExecute && getExecuteBonus() > 0) logParts.push('(처형!)');
     addBattleLog(logParts.join(' '));
 
     // 흡혈 효과
     applyLifeSteal(damage);
 
+    // 디버프 적용 시도
+    tryApplyDebuffs();
+
     return damage;
 }
 
-// 턴 처리 (쿨타임 감소, MP 재생 등)
+// 턴 처리 (쿨타임 감소, MP 재생, 디버프 피해 등)
 function processPlayerTurn() {
     tickCooldowns();
     tickMpRegen();
+    // 적 디버프 피해 처리
+    processDebuffDamage();
 }
 
 // 흡혈 효과
@@ -1992,8 +2098,12 @@ function showBossRewardChoices() {
     // 교체 섹션 숨김
     document.getElementById('relic-replace-section').classList.add('hidden');
 
-    // 유물 설명
-    document.getElementById('relic-choice-desc').textContent = '3개 중 하나를 선택하세요 (같은 유물 합성 가능)';
+    // 유물 설명 (보스층에서는 유물/스킬 중 택1 안내)
+    if (gameState.showSkillChoiceOnReward) {
+        document.getElementById('relic-choice-desc').textContent = '유물을 선택하면 스킬 변경 불가';
+    } else {
+        document.getElementById('relic-choice-desc').textContent = '3개 중 하나를 선택하세요';
+    }
 
     if (gameState.relicChoices.length > 0) {
         gameState.relicChoices.forEach(relic => {
@@ -2166,8 +2276,13 @@ function generateRelicDesc(relic) {
         'mpSave': (v) => `MP 소모 -${Math.floor(v * 100)}%`,
         'killHeal': (v) => `처치 시 HP ${Math.floor(v * 100)}% 회복`,
         'cooldownReduce': (v) => `스킬 쿨타임 -${Math.floor(v)}턴`,
-        'armorPen': (v) => `적 방어력 ${Math.floor(v * 100)}% 무시`,
-        'counterAtk': (v) => `반격 피해 +${Math.floor(v * 100)}%`,
+        'poison': (v) => `독 ${Math.floor(v * 100)}% 확률`,
+        'burn': (v) => `화상 ${Math.floor(v * 100)}% 확률`,
+        'bleed': (v) => `출혈 ${Math.floor(v * 100)}% 확률`,
+        'curse': (v) => `저주 ${Math.floor(v * 100)}% 확률`,
+        'plague': (v) => `역병 ${Math.floor(v * 100)}% 확률`,
+        'execute': (v) => `처형 피해 +${Math.floor(v * 100)}%`,
+        'firstHit': (v) => `첫타 피해 +${Math.floor(v * 100)}%`,
         'bossKiller': (v) => `보스에게 피해 +${Math.floor(v * 100)}%`,
         'multiHit': (v) => `${Math.floor(v * 100)}% 확률로 추가 공격`,
         'skillDmg': (v) => `스킬 피해 +${Math.floor(v * 100)}%`
@@ -2198,7 +2313,7 @@ function confirmCombineResult() {
     proceedAfterRelicChoice();
 }
 
-// 유물 선택 후 처리
+// 유물 선택 후 처리 (유물을 선택하면 스킬 변경 불가)
 function proceedAfterRelicChoice() {
     // MP 회복
     gameState.player.maxMp = getMaxMp();
@@ -2207,16 +2322,8 @@ function proceedAfterRelicChoice() {
     // HP 재계산 (hpMult 유물 적용)
     gameState.player.maxHp = getMaxHp();
 
-    // 스킬 선택이 있으면 기다림 (보스층)
-    if (gameState.showSkillChoiceOnReward && gameState.skillChoices.length > 0) {
-        // 유물 선택 완료 후 스킬 선택으로 이동
-        document.getElementById('relic-choice-section').classList.add('hidden');
-        document.getElementById('relic-combine-section').classList.add('hidden');
-        document.getElementById('skill-rest-section').classList.remove('hidden');
-    } else {
-        // 다음 층으로 진행
-        proceedToNextFloor();
-    }
+    // 유물 선택 시 스킬 선택 건너뛰고 바로 다음 층으로
+    proceedToNextFloor();
 }
 
 // 다음 층으로 이동 처리
