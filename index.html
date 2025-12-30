@@ -251,8 +251,16 @@
             <!-- 옵션 1: 유물 선택 -->
             <div id="relic-choice-section" class="section">
                 <h2>유물 선택</h2>
-                <p class="choice-desc">3개 중 하나를 선택하세요 (최대 4개 보유)</p>
+                <p class="choice-desc" id="relic-choice-desc">3개 중 하나를 선택하세요 (최대 4개 보유)</p>
                 <div id="relic-choice-grid" class="relic-choice-grid"></div>
+            </div>
+
+            <!-- 유물 교체 선택 (4개 보유 시) -->
+            <div id="relic-replace-section" class="section hidden">
+                <h2>교체할 유물 선택</h2>
+                <p class="choice-desc">버릴 유물을 선택하세요</p>
+                <div id="relic-replace-grid" class="relic-replace-grid"></div>
+                <button id="btn-cancel-relic" class="btn-skip-skill">취소</button>
             </div>
 
             <!-- 옵션 2: 스킬 교체 + 휴식 -->

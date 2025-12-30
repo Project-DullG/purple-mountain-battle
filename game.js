@@ -41,7 +41,8 @@ const gameState = {
     armorLevel: 1,
     gameMode: 'normal', // easy, normal, hard, infinite
     relicChoices: [], // 보스 클리어 후 선택 가능한 유물들 (3개)
-    skillChoices: [] // 보스 클리어 후 선택 가능한 스킬들
+    skillChoices: [], // 보스 클리어 후 선택 가능한 스킬들
+    pendingNewRelic: null // 교체 대기 중인 유물
 };
 
 // 유물 데이터
@@ -137,9 +138,9 @@ const skillsData = {
 // 모드별 설정
 // enemyMult: 적 능력치 배율, rewardMult: 보상 배율
 const modeSettings = {
-    easy: { enemyMult: 0.5, rewardMult: 1, maxFloor: 50, name: '이지' },
-    normal: { enemyMult: 5, rewardMult: 3, maxFloor: 50, name: '노말' },
-    hard: { enemyMult: 30, rewardMult: 5, maxFloor: 50, name: '하드' },
+    easy: { enemyMult: 0.5, rewardMult: 1, maxFloor: 100, name: '이지' },
+    normal: { enemyMult: 5, rewardMult: 3, maxFloor: 100, name: '노말' },
+    hard: { enemyMult: 30, rewardMult: 5, maxFloor: 100, name: '하드' },
     infinite: { enemyMult: 10, rewardMult: 4, maxFloor: Infinity, name: '무한' }
 };
 
@@ -1021,10 +1022,16 @@ function showBossClearScreen() {
     const relicGrid = document.getElementById('relic-choice-grid');
     relicGrid.innerHTML = '';
 
-    // 유물 4개 보유 시 선택 불가
-    const canGetRelic = gameState.tempRelics.length < 4;
+    // 교체 섹션 숨김
+    document.getElementById('relic-replace-section').classList.add('hidden');
 
-    if (canGetRelic && gameState.relicChoices.length > 0) {
+    // 유물 4개 보유 시 교체 가능 메시지
+    const isFull = gameState.tempRelics.length >= 4;
+    document.getElementById('relic-choice-desc').textContent = isFull
+        ? '유물 4개 보유 중 - 선택 시 교체할 유물을 선택합니다'
+        : '3개 중 하나를 선택하세요 (최대 4개 보유)';
+
+    if (gameState.relicChoices.length > 0) {
         gameState.relicChoices.forEach(relic => {
             const btn = document.createElement('button');
             btn.className = 'relic-choice-btn';
@@ -1037,7 +1044,7 @@ function showBossClearScreen() {
             relicGrid.appendChild(btn);
         });
     } else {
-        relicGrid.innerHTML = '<p class="no-relic-msg">유물을 이미 4개 보유 중입니다</p>';
+        relicGrid.innerHTML = '<p class="no-relic-msg">획득 가능한 유물이 없습니다</p>';
     }
 
     showScreen('boss-clear-screen');
@@ -1045,8 +1052,51 @@ function showBossClearScreen() {
 
 // 유물 선택
 function selectRelic(relic) {
-    // 유물 추가
-    gameState.tempRelics.push(relic);
+    // 4개 미만이면 바로 추가
+    if (gameState.tempRelics.length < 4) {
+        gameState.tempRelics.push(relic);
+
+        // MP 회복
+        gameState.player.maxMp = getMaxMp();
+        gameState.player.mp = gameState.player.maxMp;
+
+        // 다음 층으로
+        gameState.dungeon.currentFloor++;
+        showScreen('dungeon-screen');
+        startBattle();
+    } else {
+        // 4개 이상이면 교체 화면 표시
+        gameState.pendingNewRelic = relic;
+        showRelicReplaceScreen();
+    }
+}
+
+// 유물 교체 화면 표시
+function showRelicReplaceScreen() {
+    document.getElementById('relic-choice-section').classList.add('hidden');
+    document.getElementById('skill-rest-section').classList.add('hidden');
+    document.getElementById('relic-replace-section').classList.remove('hidden');
+
+    const replaceGrid = document.getElementById('relic-replace-grid');
+    replaceGrid.innerHTML = '';
+
+    gameState.tempRelics.forEach((relic, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'relic-replace-btn';
+        btn.innerHTML = `
+            <div class="relic-icon">${relic.icon}</div>
+            <div class="relic-name">${relic.name}</div>
+        `;
+        btn.addEventListener('click', () => replaceRelic(index));
+        replaceGrid.appendChild(btn);
+    });
+}
+
+// 유물 교체 실행
+function replaceRelic(index) {
+    // 기존 유물 교체
+    gameState.tempRelics[index] = gameState.pendingNewRelic;
+    gameState.pendingNewRelic = null;
 
     // MP 회복
     gameState.player.maxMp = getMaxMp();
@@ -1056,6 +1106,14 @@ function selectRelic(relic) {
     gameState.dungeon.currentFloor++;
     showScreen('dungeon-screen');
     startBattle();
+}
+
+// 유물 교체 취소
+function cancelRelicReplace() {
+    gameState.pendingNewRelic = null;
+    document.getElementById('relic-replace-section').classList.add('hidden');
+    document.getElementById('relic-choice-section').classList.remove('hidden');
+    document.getElementById('skill-rest-section').classList.remove('hidden');
 }
 
 function selectSkill(skill) {
@@ -1501,6 +1559,7 @@ function initEventListeners() {
 
     // 보스 클리어 화면
     document.getElementById('btn-skip-skill').addEventListener('click', skipSkillAndContinue);
+    document.getElementById('btn-cancel-relic').addEventListener('click', cancelRelicReplace);
 }
 
 // 초기화
