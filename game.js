@@ -970,18 +970,15 @@ function generateSkillChoices() {
     }
 }
 
-// 던전 시작 시 기본 스킬 4개 지급 (각 캐릭터에서 1개씩 랜덤)
+// 던전 시작 시 기본 스킬 4개 지급 (각 캐릭터의 고정 액티브 스킬)
 function generateStartingSkills() {
-    const characters = ['cat', 'elf', 'dwarf', 'human'];
-    const startingSkills = [];
-
-    characters.forEach(char => {
-        const charSkills = skillsData[char];
-        const randomSkill = charSkills[Math.floor(Math.random() * charSkills.length)];
-        startingSkills.push({ ...randomSkill, character: char });
-    });
-
-    return startingSkills;
+    // 고정 시작 스킬: 각 캐릭터의 액티브 스킬
+    return [
+        { ...skillsData.cat[1], character: 'cat' },      // 폭렬참 (35 데미지)
+        { ...skillsData.elf[1], character: 'elf' },      // 마나 순환 (MP 회복)
+        { ...skillsData.dwarf[1], character: 'dwarf' },  // 방패 강타 (스턴)
+        { ...skillsData.human[0], character: 'human' }   // 정밀 사격 (반격없음)
+    ];
 }
 
 function showBossClearScreen() {
@@ -1125,23 +1122,29 @@ function updateSkillButtons() {
             continue;
         }
 
+        // 상세 툴팁 생성
+        const charNames = { cat: '묘인', elf: '엘프', dwarf: '드워프', human: '인간' };
+        const charName = charNames[skill.character] || skill.char || '';
+        const cooldown = getCooldown(skill.id);
+
         if (skill.type === 'passive') {
             btn.textContent = `${skill.name} [P]`;
-            btn.title = skill.desc;
+            btn.title = `[${charName}] ${skill.name}\n${skill.desc}`;
             btn.disabled = true;
             btn.classList.remove('on-cooldown');
         } else {
             // active 또는 buff 스킬
-            const cooldown = getCooldown(skill.id);
+            const mpText = skill.mpCost > 0 ? `MP ${skill.mpCost}` : 'MP 0';
+            const cdText = skill.cooldown > 0 ? `쿨타임 ${skill.cooldown}턴` : '쿨타임 없음';
+
             if (cooldown > 0) {
                 btn.textContent = `${skill.name} (${cooldown})`;
-                btn.title = `${skill.desc}\n쿨타임: ${cooldown}턴`;
+                btn.title = `[${charName}] ${skill.name}\n${mpText} | ${cdText}\n\n${skill.desc}\n\n⏳ 남은 쿨타임: ${cooldown}턴`;
                 btn.disabled = true;
                 btn.classList.add('on-cooldown');
             } else {
-                const mpText = skill.mpCost > 0 ? `${skill.mpCost}` : '0';
-                btn.textContent = `${skill.name} (${mpText})`;
-                btn.title = skill.desc;
+                btn.textContent = `${skill.name} (${skill.mpCost})`;
+                btn.title = `[${charName}] ${skill.name}\n${mpText} | ${cdText}\n\n${skill.desc}`;
                 btn.disabled = false;
                 btn.classList.remove('on-cooldown');
             }
