@@ -5,28 +5,29 @@
 }
 
 body {
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    padding: 20px;
     color: #eee;
 }
 
 #game-container {
-    width: 400px;
-    min-height: 600px;
+    width: 100%;
+    max-width: 500px;
     background: rgba(0, 0, 0, 0.7);
     border-radius: 12px;
-    padding: 20px;
+    padding: 15px;
     box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
 }
 
 .screen {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
 .screen.hidden {
@@ -36,109 +37,238 @@ body {
 h1 {
     text-align: center;
     color: #b388ff;
-    margin-bottom: 10px;
+    font-size: 1.5rem;
+    margin-bottom: 5px;
 }
 
 h2 {
-    color: #ff6b6b;
-}
-
-button {
-    padding: 12px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    font-weight: bold;
-}
-
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-button:active {
-    transform: translateY(0);
-}
-
-button:disabled {
-    background: #555;
-    cursor: not-allowed;
-    transform: none;
-}
-
-#village-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-#player-info {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 15px;
-    border-radius: 8px;
-}
-
-#player-info p {
-    margin: 5px 0;
-}
-
-/* Stats Screen */
-.stat-row {
+    color: #b388ff;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+}
+
+/* 플레이어 정보 */
+#player-info {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 12px;
+    border-radius: 8px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin: 3px 0;
+}
+
+/* 섹션 */
+.section {
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
-    margin: 5px 0;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.point-badge {
+    font-size: 0.8rem;
+    background: #667eea;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* 스탯 그리드 */
+#stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.stat-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.stat-name {
+    font-weight: bold;
+    color: #ffd93d;
+    min-width: 30px;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    flex: 1;
+}
+
+.stat-desc {
+    font-size: 0.75rem;
+    color: #aaa;
 }
 
 .btn-stat-up {
-    padding: 5px 15px;
-    font-size: 14px;
+    padding: 2px 10px;
+    font-size: 0.9rem;
+    background: #667eea;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
 }
 
-/* Skills Screen */
-.skill-slot {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 10px;
-    border-radius: 8px;
-    margin: 5px 0;
+.btn-stat-up:hover {
+    background: #764ba2;
 }
 
-.skill-slot h3 {
-    color: #b388ff;
-    margin-bottom: 8px;
+/* 스킬 그리드 */
+#skill-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.skill-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.skill-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.char-name {
+    font-weight: bold;
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    min-width: 40px;
 }
 
 .skill-select {
-    width: 100%;
-    padding: 8px;
+    flex: 1;
+    padding: 4px;
     border-radius: 4px;
     background: #2a2a4a;
     color: white;
     border: 1px solid #667eea;
+    font-size: 0.8rem;
 }
 
-/* Dungeon Screen */
-#dungeon-info {
+.skill-desc {
+    font-size: 0.75rem;
+    color: #8be9fd;
+    min-height: 2.5em;
+    line-height: 1.3;
+}
+
+/* 상점 그리드 */
+#shop-grid {
+    display: flex;
+    gap: 8px;
+}
+
+.shop-item {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.shop-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.shop-level {
+    color: #ffd93d;
+    font-weight: bold;
+}
+
+.shop-desc {
+    color: #8be9fd;
+    font-size: 0.8rem;
+}
+
+.btn-shop {
+    padding: 6px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn-shop:hover {
+    opacity: 0.9;
+}
+
+.btn-shop:disabled {
+    background: #555;
+    cursor: not-allowed;
+}
+
+/* 던전 입장 버튼 */
+.btn-enter {
+    padding: 15px;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.btn-enter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 던전 화면 */
+#dungeon-header {
     display: flex;
     justify-content: space-between;
     background: rgba(255, 255, 255, 0.1);
-    padding: 10px;
+    padding: 10px 15px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 0.9rem;
+}
+
+.floor-info {
+    font-weight: bold;
+    color: #ffd93d;
+    font-size: 1.1rem;
+}
+
+.pending-info {
+    color: #8be9fd;
 }
 
 #battle-area {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 20px 0;
+    gap: 15px;
+    padding: 10px 0;
 }
 
 #enemy-info {
@@ -146,13 +276,67 @@ button:disabled {
     padding: 15px;
     border-radius: 8px;
     border: 1px solid #ff6b6b;
+    text-align: center;
+}
+
+#enemy-info h2 {
+    color: #ff6b6b;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.enemy-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    font-size: 1rem;
 }
 
 #player-battle-info {
     background: rgba(102, 126, 234, 0.2);
-    padding: 15px;
+    padding: 12px;
     border-radius: 8px;
     border: 1px solid #667eea;
+}
+
+.battle-stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0;
+}
+
+.battle-stat .label {
+    min-width: 25px;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.bar-container {
+    flex: 1;
+    height: 16px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.hp-bar {
+    background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+}
+
+.mp-bar {
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+}
+
+.battle-stat .value {
+    min-width: 70px;
+    text-align: right;
+    font-size: 0.85rem;
 }
 
 #battle-log {
@@ -161,7 +345,7 @@ button:disabled {
     border-radius: 8px;
     height: 100px;
     overflow-y: auto;
-    font-size: 14px;
+    font-size: 0.85rem;
 }
 
 #battle-log p {
@@ -177,8 +361,14 @@ button:disabled {
 }
 
 #battle-actions button {
-    padding: 10px;
-    font-size: 14px;
+    padding: 12px 8px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    transition: all 0.2s;
 }
 
 #btn-attack {
@@ -188,6 +378,17 @@ button:disabled {
 
 .btn-skill {
     background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    font-size: 0.8rem !important;
+}
+
+.btn-skill:disabled {
+    background: #444;
+    cursor: not-allowed;
+}
+
+#battle-actions button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    opacity: 0.9;
 }
 
 #floor-clear-actions {
@@ -197,6 +398,17 @@ button:disabled {
 
 #floor-clear-actions button {
     flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+#btn-next-floor {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
 }
 
 #btn-return {
@@ -204,40 +416,72 @@ button:disabled {
     color: #333;
 }
 
-/* Game Over Screen */
+/* 게임오버 화면 */
 #gameover-screen {
     text-align: center;
+    padding: 30px 15px;
 }
 
 #gameover-screen h1 {
     color: #ff6b6b;
-    font-size: 36px;
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.death-msg {
+    color: #aaa;
     margin-bottom: 20px;
 }
 
-/* Shop Screen */
-#shop-items {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.shop-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 10px;
+.death-rewards {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
     border-radius: 8px;
+    margin-bottom: 20px;
 }
 
-/* Boss indicator */
+.death-rewards p {
+    margin: 5px 0;
+    font-size: 1.1rem;
+}
+
+#btn-gameover-return {
+    padding: 12px 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* 보스 스타일 */
 .boss-fight #enemy-info {
     background: rgba(255, 215, 0, 0.2);
     border-color: gold;
 }
 
+.boss-fight #enemy-info h2 {
+    color: gold;
+}
+
 .mini-boss-fight #enemy-info {
     background: rgba(255, 165, 0, 0.2);
     border-color: orange;
+}
+
+.mini-boss-fight #enemy-info h2 {
+    color: orange;
+}
+
+/* 반응형 */
+@media (max-width: 400px) {
+    #stats-grid, #skill-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #shop-grid {
+        flex-direction: column;
+    }
 }

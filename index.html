@@ -8,124 +8,182 @@
 </head>
 <body>
     <div id="game-container">
-        <!-- 마을 화면 -->
+        <!-- 마을 화면 (통합) -->
         <div id="village-screen" class="screen">
-            <h1>마을</h1>
+            <h1>보랏빛 산지의 전투</h1>
+
+            <!-- 플레이어 정보 -->
             <div id="player-info">
-                <p>레벨: <span id="player-level">1</span></p>
-                <p>골드: <span id="player-gold">0</span></p>
-                <p>경험치: <span id="player-exp">0</span> / <span id="player-max-exp">100</span></p>
+                <div class="info-row">
+                    <span>Lv.<span id="player-level">1</span></span>
+                    <span>골드: <span id="player-gold">0</span></span>
+                </div>
+                <div class="info-row">
+                    <span>EXP: <span id="player-exp">0</span>/<span id="player-max-exp">100</span></span>
+                    <span>해금: <span id="unlocked-floor">1</span>층</span>
+                </div>
             </div>
-            <div id="village-menu">
-                <button id="btn-dungeon">던전 입장</button>
-                <button id="btn-shop">상점</button>
-                <button id="btn-stats">스탯</button>
-                <button id="btn-skills">스킬 세팅</button>
-            </div>
-        </div>
 
-        <!-- 상점 화면 -->
-        <div id="shop-screen" class="screen hidden">
-            <h1>상점</h1>
-            <div id="shop-items"></div>
-            <button id="btn-shop-back">돌아가기</button>
-        </div>
-
-        <!-- 스탯 화면 -->
-        <div id="stats-screen" class="screen hidden">
-            <h1>스탯</h1>
-            <p>사용 가능 포인트: <span id="stat-points">0</span></p>
-            <div id="stats-list">
-                <div class="stat-row">
-                    <span>힘: <span id="stat-str">5</span></span>
-                    <button class="btn-stat-up" data-stat="str">+</button>
-                </div>
-                <div class="stat-row">
-                    <span>민첩: <span id="stat-dex">5</span></span>
-                    <button class="btn-stat-up" data-stat="dex">+</button>
-                </div>
-                <div class="stat-row">
-                    <span>지능: <span id="stat-int">5</span></span>
-                    <button class="btn-stat-up" data-stat="int">+</button>
-                </div>
-                <div class="stat-row">
-                    <span>행운: <span id="stat-luk">5</span></span>
-                    <button class="btn-stat-up" data-stat="luk">+</button>
-                </div>
-            </div>
-            <button id="btn-stats-back">돌아가기</button>
-        </div>
-
-        <!-- 스킬 세팅 화면 -->
-        <div id="skills-screen" class="screen hidden">
-            <h1>스킬 세팅</h1>
-            <div id="skill-slots">
-                <div class="skill-slot" data-slot="0">
-                    <h3>묘인</h3>
-                    <select class="skill-select" data-character="cat"></select>
-                </div>
-                <div class="skill-slot" data-slot="1">
-                    <h3>엘프</h3>
-                    <select class="skill-select" data-character="elf"></select>
-                </div>
-                <div class="skill-slot" data-slot="2">
-                    <h3>드워프</h3>
-                    <select class="skill-select" data-character="dwarf"></select>
-                </div>
-                <div class="skill-slot" data-slot="3">
-                    <h3>인간</h3>
-                    <select class="skill-select" data-character="human"></select>
+            <!-- 스탯 섹션 -->
+            <div class="section">
+                <h2>스탯 <span class="point-badge">포인트: <span id="stat-points">0</span></span></h2>
+                <div id="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-header">
+                            <span class="stat-name">힘</span>
+                            <span class="stat-value" id="stat-str">5</span>
+                            <button class="btn-stat-up" data-stat="str">+</button>
+                        </div>
+                        <span class="stat-desc">공격력 증가</span>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-header">
+                            <span class="stat-name">민첩</span>
+                            <span class="stat-value" id="stat-dex">5</span>
+                            <button class="btn-stat-up" data-stat="dex">+</button>
+                        </div>
+                        <span class="stat-desc">회피율 증가</span>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-header">
+                            <span class="stat-name">지능</span>
+                            <span class="stat-value" id="stat-int">5</span>
+                            <button class="btn-stat-up" data-stat="int">+</button>
+                        </div>
+                        <span class="stat-desc">최대 MP 증가</span>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-header">
+                            <span class="stat-name">행운</span>
+                            <span class="stat-value" id="stat-luk">5</span>
+                            <button class="btn-stat-up" data-stat="luk">+</button>
+                        </div>
+                        <span class="stat-desc">크리티컬/드랍률</span>
+                    </div>
                 </div>
             </div>
-            <button id="btn-skills-back">돌아가기</button>
+
+            <!-- 스킬 섹션 -->
+            <div class="section">
+                <h2>스킬 세팅</h2>
+                <div id="skill-grid">
+                    <div class="skill-item" data-character="cat">
+                        <div class="skill-header">
+                            <span class="char-name">묘인</span>
+                            <select class="skill-select" data-character="cat"></select>
+                        </div>
+                        <p class="skill-desc" id="skill-desc-cat">스킬을 선택하세요</p>
+                    </div>
+                    <div class="skill-item" data-character="elf">
+                        <div class="skill-header">
+                            <span class="char-name">엘프</span>
+                            <select class="skill-select" data-character="elf"></select>
+                        </div>
+                        <p class="skill-desc" id="skill-desc-elf">스킬을 선택하세요</p>
+                    </div>
+                    <div class="skill-item" data-character="dwarf">
+                        <div class="skill-header">
+                            <span class="char-name">드워프</span>
+                            <select class="skill-select" data-character="dwarf"></select>
+                        </div>
+                        <p class="skill-desc" id="skill-desc-dwarf">스킬을 선택하세요</p>
+                    </div>
+                    <div class="skill-item" data-character="human">
+                        <div class="skill-header">
+                            <span class="char-name">인간</span>
+                            <select class="skill-select" data-character="human"></select>
+                        </div>
+                        <p class="skill-desc" id="skill-desc-human">스킬을 선택하세요</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 상점 섹션 -->
+            <div class="section">
+                <h2>상점</h2>
+                <div id="shop-grid">
+                    <div class="shop-item">
+                        <div class="shop-info">
+                            <span>무기 강화</span>
+                            <span class="shop-level">Lv.<span id="weapon-level">1</span></span>
+                        </div>
+                        <button id="btn-upgrade-weapon" class="btn-shop">
+                            <span id="weapon-cost">100</span>G
+                        </button>
+                    </div>
+                    <div class="shop-item">
+                        <div class="shop-info">
+                            <span>HP 포션</span>
+                            <span class="shop-desc">HP +50</span>
+                        </div>
+                        <button id="btn-buy-potion" class="btn-shop">50G</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 던전 입장 -->
+            <button id="btn-dungeon" class="btn-enter">던전 입장 (<span id="start-floor">1</span>층~)</button>
         </div>
 
         <!-- 던전 화면 -->
         <div id="dungeon-screen" class="screen hidden">
-            <div id="dungeon-info">
-                <p>층: <span id="current-floor">1</span></p>
-                <p>획득 골드: <span id="pending-gold">0</span></p>
-                <p>획득 경험치: <span id="pending-exp">0</span></p>
+            <div id="dungeon-header">
+                <span class="floor-info"><span id="current-floor">1</span>층</span>
+                <span class="pending-info">+<span id="pending-gold">0</span>G / +<span id="pending-exp">0</span>EXP</span>
             </div>
 
             <div id="battle-area">
                 <div id="enemy-info">
                     <h2 id="enemy-name">고블린</h2>
-                    <p>HP: <span id="enemy-hp">50</span></p>
-                    <p>공격력: <span id="enemy-atk">10</span></p>
+                    <div class="enemy-stats">
+                        <span>HP: <span id="enemy-hp">50</span></span>
+                        <span>공격력: <span id="enemy-atk">10</span></span>
+                    </div>
                 </div>
 
                 <div id="player-battle-info">
-                    <p>HP: <span id="battle-hp">100</span> / <span id="battle-max-hp">100</span></p>
-                    <p>MP: <span id="battle-mp">5</span> / <span id="battle-max-mp">5</span></p>
+                    <div class="battle-stat">
+                        <span class="label">HP</span>
+                        <div class="bar-container">
+                            <div class="bar hp-bar" id="hp-bar"></div>
+                        </div>
+                        <span class="value"><span id="battle-hp">100</span>/<span id="battle-max-hp">100</span></span>
+                    </div>
+                    <div class="battle-stat">
+                        <span class="label">MP</span>
+                        <div class="bar-container">
+                            <div class="bar mp-bar" id="mp-bar"></div>
+                        </div>
+                        <span class="value"><span id="battle-mp">5</span>/<span id="battle-max-mp">5</span></span>
+                    </div>
                 </div>
             </div>
 
-            <div id="battle-log">
-                <p>전투 시작!</p>
-            </div>
+            <div id="battle-log"></div>
 
             <div id="battle-actions">
                 <button id="btn-attack">공격</button>
-                <button id="btn-skill-1" class="btn-skill">스킬1</button>
-                <button id="btn-skill-2" class="btn-skill">스킬2</button>
-                <button id="btn-skill-3" class="btn-skill">스킬3</button>
-                <button id="btn-skill-4" class="btn-skill">스킬4</button>
+                <button id="btn-skill-1" class="btn-skill" title="">스킬1</button>
+                <button id="btn-skill-2" class="btn-skill" title="">스킬2</button>
+                <button id="btn-skill-3" class="btn-skill" title="">스킬3</button>
+                <button id="btn-skill-4" class="btn-skill" title="">스킬4</button>
             </div>
 
             <div id="floor-clear-actions" class="hidden">
-                <button id="btn-next-floor">다음 층으로</button>
-                <button id="btn-return">마을로 복귀</button>
+                <button id="btn-next-floor">다음 층</button>
+                <button id="btn-return">복귀 (100%)</button>
             </div>
         </div>
 
         <!-- 게임 오버 화면 -->
         <div id="gameover-screen" class="screen hidden">
-            <h1>패배...</h1>
-            <p>획득한 보상의 50%를 가져갑니다.</p>
-            <p>골드: <span id="death-gold">0</span></p>
-            <p>경험치: <span id="death-exp">0</span></p>
-            <button id="btn-gameover-return">마을로 돌아가기</button>
+            <h1>패배</h1>
+            <p class="death-msg">획득 보상의 50%를 가져갑니다</p>
+            <div class="death-rewards">
+                <p>+<span id="death-gold">0</span> 골드</p>
+                <p>+<span id="death-exp">0</span> 경험치</p>
+            </div>
+            <button id="btn-gameover-return">마을로</button>
         </div>
     </div>
 
