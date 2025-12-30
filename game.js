@@ -293,7 +293,7 @@ function executeTagCombine(indices) {
     const nextRarityRelics = relicsData.filter(r => r.rarity === nextRarity);
     const randomRelic = { ...nextRarityRelics[Math.floor(Math.random() * nextRarityRelics.length)] };
 
-    // 기존 3개 유물 제거 (인덱스 큰 것부터)
+    // 기존 2개 유물 제거 (인덱스 큰 것부터)
     const sortedIndices = [...indices].sort((a, b) => b - a);
     sortedIndices.forEach(idx => {
         gameState.tempRelics.splice(idx, 1);
@@ -321,7 +321,7 @@ function updateTagCombineUI() {
         }
 
         const tags = getRelicTags(relic);
-        const tagsHtml = tags.map(t => `<span class="tag tag-${t}">${t}</span>`).join('');
+        const tagsHtml = tags.map(t => `<span class="tag tag-${t}">태그 | ${t}</span>`).join('');
 
         card.innerHTML = `
             <div class="relic-icon">${relic.icon}</div>
@@ -346,9 +346,9 @@ function updateCombineButton() {
 
     const selected = gameState.selectedForCombine;
 
-    if (selected.length !== 3) {
+    if (selected.length !== 2) {
         combineBtn.disabled = true;
-        combineBtn.textContent = `합성 (${selected.length}/3)`;
+        combineBtn.textContent = `합성 (${selected.length}/2)`;
         return;
     }
 
@@ -390,7 +390,7 @@ function toggleRelicForCombine(index) {
     const idx = gameState.selectedForCombine.indexOf(index);
     if (idx >= 0) {
         gameState.selectedForCombine.splice(idx, 1);
-    } else if (gameState.selectedForCombine.length < 3) {
+    } else if (gameState.selectedForCombine.length < 2) {
         gameState.selectedForCombine.push(index);
     }
     updateTagCombineUI();
@@ -398,7 +398,7 @@ function toggleRelicForCombine(index) {
 
 // 태그 합성 실행
 function onTagCombineClick() {
-    if (gameState.selectedForCombine.length !== 3) return;
+    if (gameState.selectedForCombine.length !== 2) return;
 
     const relics = gameState.selectedForCombine.map(i => gameState.tempRelics[i]);
     const allTags = relics.map(r => getRelicTags(r));
@@ -2147,7 +2147,7 @@ function showBossRewardChoices() {
             // 같은 유물 보유 개수 확인
             const ownedCount = gameState.tempRelics.filter(r => r.id === relic.id && r.rarity === relic.rarity).length;
             const tags = getRelicTags(relic);
-            const tagsHtml = tags.map(t => `<span class="tag tag-${t}">${t}</span>`).join('');
+            const tagsHtml = tags.map(t => `<span class="tag tag-${t}">태그 | ${t}</span>`).join('');
             const btn = document.createElement('button');
             btn.className = `relic-choice-btn rarity-${relic.rarity}`;
             btn.innerHTML = `
