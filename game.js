@@ -1435,6 +1435,7 @@ function updateDungeonUI() {
 }
 
 function updateBattleUI() {
+    console.log('>>> updateBattleUI 호출됨');
     // 플레이어 HP/MP 업데이트 (항상)
     document.getElementById('battle-hp').textContent = gameState.player.hp;
     document.getElementById('battle-max-hp').textContent = gameState.player.maxHp;
