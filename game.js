@@ -1435,8 +1435,34 @@ function updateDungeonUI() {
 }
 
 function updateBattleUI() {
+    // 플레이어 HP/MP 업데이트 (항상)
+    document.getElementById('battle-hp').textContent = gameState.player.hp;
+    document.getElementById('battle-max-hp').textContent = gameState.player.maxHp;
+    document.getElementById('battle-mp').textContent = gameState.player.mp;
+    document.getElementById('battle-max-mp').textContent = gameState.player.maxMp;
+
+    const hpPercent = (gameState.player.hp / gameState.player.maxHp) * 100;
+    const mpPercent = (gameState.player.mp / gameState.player.maxMp) * 100;
+    document.getElementById('hp-bar').style.width = `${hpPercent}%`;
+    document.getElementById('mp-bar').style.width = `${mpPercent}%`;
+
+    // 왼쪽 스탯 패널 - 기본 스탯
+    document.getElementById('panel-str').textContent = Math.floor(getFinalStat('str'));
+    document.getElementById('panel-dex').textContent = Math.floor(getFinalStat('dex'));
+    document.getElementById('panel-int').textContent = Math.floor(getFinalStat('int'));
+    document.getElementById('panel-vit').textContent = Math.floor(getFinalStat('vit'));
+    document.getElementById('panel-luk').textContent = Math.floor(getFinalStat('luk'));
+    // 왼쪽 스탯 패널 - 전투 능력
+    document.getElementById('panel-atk').textContent = getPlayerAtk();
+    document.getElementById('panel-crit').textContent = getCritChance() + '%';
+    document.getElementById('panel-crit-dmg').textContent = getCritDamage() + '%';
+    document.getElementById('panel-dodge').textContent = getDodgeChance() + '%';
+    document.getElementById('panel-def').textContent = Math.floor(getVitDamageReduction() * 100) + '%';
+
+    // 적 정보 업데이트 (적이 있을 때만)
     const enemy = gameState.currentEnemy;
-    if (!enemy) return; // 적이 없으면 업데이트 안함
+    if (!enemy) return;
+
     const typeIcon = enemy.type ? enemy.type.icon : '';
     document.getElementById('enemy-name').textContent = typeIcon + enemy.name + (enemy.stunned ? ' [스턴]' : '');
     document.getElementById('enemy-hp').textContent = Math.max(0, enemy.hp);
@@ -1454,29 +1480,6 @@ function updateBattleUI() {
 
     const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
     document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
-
-    // 왼쪽 스탯 패널 - 기본 스탯
-    document.getElementById('panel-str').textContent = Math.floor(getFinalStat('str'));
-    document.getElementById('panel-dex').textContent = Math.floor(getFinalStat('dex'));
-    document.getElementById('panel-int').textContent = Math.floor(getFinalStat('int'));
-    document.getElementById('panel-vit').textContent = Math.floor(getFinalStat('vit'));
-    document.getElementById('panel-luk').textContent = Math.floor(getFinalStat('luk'));
-    // 왼쪽 스탯 패널 - 전투 능력
-    document.getElementById('panel-atk').textContent = getPlayerAtk();
-    document.getElementById('panel-crit').textContent = getCritChance() + '%';
-    document.getElementById('panel-crit-dmg').textContent = getCritDamage() + '%';
-    document.getElementById('panel-dodge').textContent = getDodgeChance() + '%';
-    document.getElementById('panel-def').textContent = Math.floor(getVitDamageReduction() * 100) + '%';
-
-    document.getElementById('battle-hp').textContent = gameState.player.hp;
-    document.getElementById('battle-max-hp').textContent = gameState.player.maxHp;
-    document.getElementById('battle-mp').textContent = gameState.player.mp;
-    document.getElementById('battle-max-mp').textContent = gameState.player.maxMp;
-
-    const hpPercent = (gameState.player.hp / gameState.player.maxHp) * 100;
-    const mpPercent = (gameState.player.mp / gameState.player.maxMp) * 100;
-    document.getElementById('hp-bar').style.width = `${hpPercent}%`;
-    document.getElementById('mp-bar').style.width = `${mpPercent}%`;
 
     const dungeonScreen = document.getElementById('dungeon-screen');
     dungeonScreen.classList.remove('boss-fight', 'mini-boss-fight');
