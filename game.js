@@ -970,6 +970,20 @@ function generateSkillChoices() {
     }
 }
 
+// 던전 시작 시 기본 스킬 4개 지급 (각 캐릭터에서 1개씩 랜덤)
+function generateStartingSkills() {
+    const characters = ['cat', 'elf', 'dwarf', 'human'];
+    const startingSkills = [];
+
+    characters.forEach(char => {
+        const charSkills = skillsData[char];
+        const randomSkill = charSkills[Math.floor(Math.random() * charSkills.length)];
+        startingSkills.push({ ...randomSkill, character: char });
+    });
+
+    return startingSkills;
+}
+
 function showBossClearScreen() {
     // 유물 표시
     const relicReward = document.getElementById('relic-reward');
@@ -1002,15 +1016,18 @@ function showBossClearScreen() {
 }
 
 function selectSkill(skill) {
-    // 빈 슬롯 찾기
-    let emptySlot = gameState.equippedSkills.findIndex(s => s === null);
+    // 같은 캐릭터의 스킬 슬롯 찾아서 교체
+    const characterOrder = ['cat', 'elf', 'dwarf', 'human'];
+    const slotIndex = characterOrder.indexOf(skill.character);
 
-    if (emptySlot === -1) {
-        // 빈 슬롯이 없으면 가장 오래된 스킬 교체
-        emptySlot = 0;
+    if (slotIndex !== -1) {
+        gameState.equippedSkills[slotIndex] = skill;
+    } else {
+        // 캐릭터를 찾지 못하면 빈 슬롯 또는 첫 번째 슬롯에
+        const emptySlot = gameState.equippedSkills.findIndex(s => s === null);
+        gameState.equippedSkills[emptySlot !== -1 ? emptySlot : 0] = skill;
     }
 
-    gameState.equippedSkills[emptySlot] = skill;
     updateSkillButtons();
 
     // MP 회복
@@ -1183,7 +1200,7 @@ function initEventListeners() {
     document.getElementById('btn-dungeon').addEventListener('click', () => {
         gameState.dungeon.currentFloor = 1;
         gameState.tempRelics = [];
-        gameState.equippedSkills = [null, null, null, null];
+        gameState.equippedSkills = generateStartingSkills(); // 기본 스킬 4개 지급
         gameState.activeBuffs = []; // 버프 초기화
         gameState.skillCooldowns = {}; // 쿨타임 초기화
         gameState.player.maxHp = getMaxHp();
@@ -1203,7 +1220,7 @@ function initEventListeners() {
 
         gameState.dungeon.currentFloor = skipFloor;
         gameState.tempRelics = [];
-        gameState.equippedSkills = [null, null, null, null];
+        gameState.equippedSkills = generateStartingSkills(); // 기본 스킬 4개 지급
         gameState.activeBuffs = []; // 버프 초기화
         gameState.skillCooldowns = {}; // 쿨타임 초기화
         gameState.player.maxHp = getMaxHp();
