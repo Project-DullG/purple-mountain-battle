@@ -48,6 +48,22 @@ const gameState = {
         patience: 0   // 인내의 축복 - 방어
     },
     armorLevel: 1,
+    // 부적 구매 횟수 (비용 증가용)
+    talismanPurchases: {
+        exp: 0,           // 경험치 부적 구매 횟수
+        gold: 0,          // 골드 부적 구매 횟수
+        stone: 0,         // 강화석 구매 횟수
+        origin: 0         // 근원석 구매 횟수
+    },
+    // 퍼센트 강화 (골드 사용, 각 최대 100% = 2배)
+    percentBonus: {
+        atk: 0,      // 공격력 +%
+        hp: 0,       // 체력 +%
+        crit: 0,     // 치명타 확률 +%
+        critDmg: 0,  // 치명타 데미지 +%
+        dodge: 0,    // 회피율 +%
+        def: 0       // 피해 감소 +%
+    },
     gameMode: 'normal', // easy, normal, hard, infinite
     relicChoices: [], // 보스 클리어 후 선택 가능한 유물들 (3개)
     skillChoices: [], // 보스 클리어 후 선택 가능한 스킬들
@@ -421,7 +437,7 @@ function onTagCombineClick() {
 // 태그 합성 모드 열기
 function openTagCombineMode() {
     // 전투 중에는 합성 불가
-    if (gameState.inBattle) {
+    if (gameState.dungeon.inBattle) {
         alert('⚔️ 전투 중에는 합성할 수 없습니다!');
         return;
     }
@@ -670,6 +686,9 @@ function getPlayerAtk() {
     });
     atk *= atkMult;
 
+    // 퍼센트 강화 (상점)
+    atk *= (1 + gameState.percentBonus.atk / 100);
+
     return Math.floor(atk);
 }
 
@@ -703,6 +722,9 @@ function getMaxHp() {
         if (val !== null) hpMult += val;
     });
     totalHp *= hpMult;
+
+    // 퍼센트 강화 (상점)
+    totalHp *= (1 + gameState.percentBonus.hp / 100);
 
     return Math.floor(totalHp);
 }
@@ -747,6 +769,9 @@ function getDodgeChance() {
     // 모든 스탯 보너스 (5% = 5%p 추가)
     dodge += getAllStatsBonus() * 100;
 
+    // 퍼센트 강화 (상점) - 회피율에 직접 더함
+    dodge += gameState.percentBonus.dodge;
+
     return Math.min(dodge, 80);
 }
 
@@ -782,6 +807,9 @@ function getRawCritChance() {
     // 모든 스탯 보너스 (5% = 5%p 추가)
     chance += getAllStatsBonus() * 100;
 
+    // 퍼센트 강화 (상점) - 치명타 확률에 직접 더함
+    chance += gameState.percentBonus.crit;
+
     return chance;
 }
 
@@ -800,6 +828,9 @@ function getCritDamage() {
     if (rawCrit > 100) {
         critDmg += (rawCrit - 100);
     }
+
+    // 퍼센트 강화 (상점) - 치명타 데미지에 직접 더함
+    critDmg += gameState.percentBonus.critDmg;
 
     return Math.floor(critDmg);
 }
@@ -978,24 +1009,33 @@ function getSkillDmgBonus() {
 function calculateDamageTaken(damage, guarding = false, isCounter = false) {
     let finalDamage = damage;
 
-    // 방어 배율 적용
-    finalDamage *= getDefenseMultiplier();
+    // 총 피해 감소율 계산 (최대 80%)
+    let totalReduction = 0;
 
-    // 활력 스탯 데미지 감소 적용
-    finalDamage *= (1 - getVitDamageReduction());
+    // 방어 배율 (패시브/버프)
+    totalReduction += (1 - getDefenseMultiplier()) * 100;
 
-    // 잿빛 소녀의 축복 - 인내 (근원석) - 0.5% per level
-    const charDefBonus = gameState.ashBlessings.patience * 0.005;
-    finalDamage *= (1 - Math.min(charDefBonus, 0.3)); // 최대 30%
+    // 활력 스탯 데미지 감소
+    totalReduction += getVitDamageReduction() * 100;
 
-    // 반격일 경우 추가 감소
+    // 잿빛 소녀의 축복 - 인내 (0.5% per level)
+    totalReduction += Math.min(gameState.ashBlessings.patience * 0.5, 30);
+
+    // 퍼센트 강화 (상점)
+    totalReduction += gameState.percentBonus.def;
+
+    // 최대 80%로 제한
+    totalReduction = Math.min(totalReduction, 80);
+    finalDamage *= (1 - totalReduction / 100);
+
+    // 반격일 경우 추가 감소 (별도 계산)
     if (isCounter) {
         finalDamage *= getCounterDefenseMultiplier();
     }
 
     if (guarding) finalDamage *= 0.3;
 
-    return Math.floor(finalDamage);
+    return Math.floor(Math.max(1, finalDamage)); // 최소 1 데미지
 }
 
 // === 버프 시스템 ===
@@ -1130,19 +1170,84 @@ function updateVillageUI() {
     }
 }
 
+function getPercentUpgradeCost(currentPercent) {
+    // 비용: 100 + (현재% * 10), 0.5%씩 증가하므로 currentPercent는 0.5 단위
+    return Math.floor(100 + currentPercent * 10);
+}
+
+function getTalismanCost(type, purchases) {
+    // 부적별 기본 비용과 증가율
+    const baseCosts = { exp: 100, gold: 100, stone: 200, origin: 500 };
+    const multiplier = 1 + purchases * 0.1; // 구매할수록 10%씩 증가
+    return Math.floor(baseCosts[type] * multiplier);
+}
+
 function updateShopUI() {
     document.getElementById('shop-gold').textContent = gameState.player.gold;
+    document.getElementById('shop-stones').textContent = gameState.enhancementStones;
+    document.getElementById('shop-origins').textContent = gameState.originStones;
 
+    // 방어구
     document.getElementById('armor-level').textContent = gameState.armorLevel;
     document.getElementById('armor-cost').textContent = gameState.armorLevel * 100;
-
     const armorCost = gameState.armorLevel * 100;
     document.getElementById('btn-upgrade-armor').disabled = gameState.player.gold < armorCost;
+
+    // 부적 (경험치, 골드)
+    const expBonus = gameState.talismanPurchases.exp * 3;
+    const expCost = getTalismanCost('exp', gameState.talismanPurchases.exp);
+    const isExpMax = expBonus >= 99;
+    document.getElementById('exp-bonus').textContent = expBonus;
+    document.getElementById('cost-exp').textContent = isExpMax ? 'MAX' : expCost;
+    const expBtn = document.querySelector('.btn-talisman[data-talisman="exp"]');
+    expBtn.disabled = isExpMax || gameState.player.gold < expCost;
+    if (isExpMax) expBtn.textContent = 'MAX';
+
+    const goldBonus = gameState.talismanPurchases.gold * 3;
+    const goldTalismanCost = getTalismanCost('gold', gameState.talismanPurchases.gold);
+    const isGoldMax = goldBonus >= 99;
+    document.getElementById('gold-bonus').textContent = goldBonus;
+    document.getElementById('cost-gold-talisman').textContent = isGoldMax ? 'MAX' : goldTalismanCost;
+    const goldBtn = document.querySelector('.btn-talisman[data-talisman="gold"]');
+    goldBtn.disabled = isGoldMax || gameState.player.gold < goldTalismanCost;
+    if (isGoldMax) goldBtn.textContent = 'MAX';
+
+    // 재화 교환
+    const stoneCost = getTalismanCost('stone', gameState.talismanPurchases.stone);
+    document.getElementById('cost-stone').textContent = stoneCost;
+    document.querySelector('.btn-talisman[data-talisman="stone"]').disabled = gameState.player.gold < stoneCost;
+
+    const originCost = getTalismanCost('origin', gameState.talismanPurchases.origin);
+    document.getElementById('cost-origin').textContent = originCost;
+    document.querySelector('.btn-talisman[data-talisman="origin"]').disabled = gameState.player.gold < originCost;
+
+    // 능력 부적 (퍼센트 강화) - 0.5%씩 증가, 모든 스탯 100%까지 구매 가능
+    const stats = ['atk', 'hp', 'crit', 'critDmg', 'dodge', 'def'];
+    stats.forEach(stat => {
+        const current = gameState.percentBonus[stat];
+        const cost = getPercentUpgradeCost(current);
+        const isMax = current >= 100;
+
+        document.getElementById(`percent-${stat}`).textContent = current.toFixed(1);
+        document.getElementById(`cost-${stat}`).textContent = isMax ? 'MAX' : cost;
+        document.getElementById(`fill-${stat}`).style.width = `${current}%`;
+
+        const btn = document.querySelector(`.btn-percent-upgrade[data-stat="${stat}"]`);
+        btn.disabled = isMax || gameState.player.gold < cost;
+        if (isMax) {
+            btn.textContent = 'MAX';
+        }
+    });
 }
 
 function getEnhanceSuccessRate(level) {
     // 1강: 100%, 100강: 1% (선형 감소)
     return Math.max(1, 100 - (level - 1));
+}
+
+function getEnhanceGoldCost(level) {
+    // 골드 비용: 현재 레벨 * 50
+    return level * 50;
 }
 
 function showEnhanceResult(weapon, success, level) {
@@ -1170,19 +1275,23 @@ function showEnhanceResult(weapon, success, level) {
 
 function updateBlacksmithUI() {
     document.getElementById('blacksmith-stones').textContent = gameState.enhancementStones;
+    document.getElementById('blacksmith-gold').textContent = gameState.player.gold;
 
     const weaponTypes = ['sword', 'shield', 'bow', 'staff'];
     weaponTypes.forEach(weapon => {
         const level = gameState.weapons[weapon];
         const successRate = getEnhanceSuccessRate(level);
+        const goldCost = getEnhanceGoldCost(level);
         const isMaxLevel = level >= 100;
+        const canAfford = gameState.enhancementStones >= 1 && gameState.player.gold >= goldCost;
 
         document.getElementById(`${weapon}-level`).textContent = level;
         document.getElementById(`${weapon}-bonus`).textContent = (level * 0.5).toFixed(1);
         document.getElementById(`${weapon}-rate`).textContent = successRate;
+        document.getElementById(`${weapon}-gold`).textContent = goldCost;
 
         const btn = document.querySelector(`.btn-upgrade[data-weapon="${weapon}"]`);
-        btn.disabled = gameState.enhancementStones < 1 || isMaxLevel;
+        btn.disabled = !canAfford || isMaxLevel;
         btn.textContent = isMaxLevel ? 'MAX' : `강화 (${successRate}%)`;
     });
 }
@@ -1223,7 +1332,12 @@ function updateDungeonUI() {
     // 전투 중에는 합성 버튼 숨기기
     const combineBtn = document.getElementById('btn-tag-combine-open');
     if (combineBtn) {
-        combineBtn.style.display = gameState.inBattle ? 'none' : 'inline-block';
+        combineBtn.style.display = gameState.dungeon.inBattle ? 'none' : 'inline-block';
+    }
+
+    // 전투 시작 시 합성창이 열려있으면 닫기
+    if (gameState.dungeon.inBattle && gameState.tagCombineMode) {
+        closeTagCombineMode();
     }
 }
 
@@ -1646,6 +1760,12 @@ function enemyDefeated() {
         if (goldVal !== null) goldReward = Math.floor(goldReward * goldVal);
         if (expVal !== null) expReward = Math.floor(expReward * expVal);
     });
+
+    // 부적 효과 (+3% per purchase)
+    const expTalismanBonus = 1 + (gameState.talismanPurchases.exp * 0.03);
+    const goldTalismanBonus = 1 + (gameState.talismanPurchases.gold * 0.03);
+    expReward = Math.floor(expReward * expTalismanBonus);
+    goldReward = Math.floor(goldReward * goldTalismanBonus);
 
     gameState.dungeon.pendingGold += goldReward;
     gameState.dungeon.pendingExp += expReward;
@@ -2569,14 +2689,16 @@ function initEventListeners() {
         resetStats();
     });
 
-    // 대장간 - 4종 무기 강화 (강화석 사용, 확률 시스템)
+    // 대장간 - 4종 무기 강화 (강화석 + 골드 사용, 확률 시스템)
     document.querySelectorAll('.btn-upgrade[data-weapon]').forEach(btn => {
         btn.addEventListener('click', () => {
             const weapon = btn.dataset.weapon;
             const currentLevel = gameState.weapons[weapon];
+            const goldCost = getEnhanceGoldCost(currentLevel);
 
-            if (gameState.enhancementStones >= 1 && currentLevel < 100) {
+            if (gameState.enhancementStones >= 1 && gameState.player.gold >= goldCost && currentLevel < 100) {
                 gameState.enhancementStones--;
+                gameState.player.gold -= goldCost;
                 const successRate = getEnhanceSuccessRate(currentLevel);
                 const roll = Math.random() * 100;
 
@@ -2602,6 +2724,47 @@ function initEventListeners() {
             gameState.player.maxHp = getMaxHp();
             updateShopUI();
         }
+    });
+
+    // 상점 - 부적 구매 (재화 부적)
+    document.querySelectorAll('.btn-talisman').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.talisman;
+            const cost = getTalismanCost(type, gameState.talismanPurchases[type]);
+
+            if (gameState.player.gold >= cost) {
+                gameState.player.gold -= cost;
+                gameState.talismanPurchases[type]++;
+
+                // 재화 지급
+                if (type === 'stone') {
+                    gameState.enhancementStones++;
+                } else if (type === 'origin') {
+                    gameState.originStones++;
+                }
+                updateShopUI();
+            }
+        });
+    });
+
+    // 상점 - 퍼센트 능력 강화 (골드 사용, 0.5%씩)
+    document.querySelectorAll('.btn-percent-upgrade').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const stat = btn.dataset.stat;
+            const current = gameState.percentBonus[stat];
+            const cost = getPercentUpgradeCost(current);
+
+            if (current < 100 && gameState.player.gold >= cost) {
+                gameState.player.gold -= cost;
+                gameState.percentBonus[stat] += 0.5;
+
+                // HP 강화 시 즉시 적용
+                if (stat === 'hp') {
+                    gameState.player.maxHp = getMaxHp();
+                }
+                updateShopUI();
+            }
+        });
     });
 
     // 숙소 - 잿빛 소녀의 축복 (근원석 사용)

@@ -309,6 +309,12 @@ h2 {
 .weapon-rate {
     font-size: 0.75rem;
     color: #ffd93d;
+    margin-bottom: 4px;
+}
+
+.weapon-gold-cost {
+    font-size: 0.75rem;
+    color: #ffd93d;
     margin-bottom: 8px;
 }
 
@@ -2188,4 +2194,160 @@ h2 {
 
 .inn-resource span {
     color: #a29bfe !important;
+}
+
+/* 퍼센트 강화 그리드 */
+.percent-upgrade-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.percent-upgrade-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+.percent-upgrade-card .upgrade-icon {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.percent-upgrade-card .upgrade-name {
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-bottom: 3px;
+}
+
+.percent-upgrade-card .upgrade-percent {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #50fa7b;
+    margin-bottom: 8px;
+}
+
+.upgrade-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.upgrade-cap {
+    font-size: 0.7rem;
+    color: #ff6b6b;
+    margin-bottom: 4px;
+}
+
+.upgrade-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #50fa7b, #38ef7d);
+    transition: width 0.3s ease;
+}
+
+.btn-percent-upgrade {
+    width: 100%;
+    padding: 8px;
+    background: linear-gradient(135deg, #ffd93d, #f0b800);
+    border: none;
+    border-radius: 5px;
+    color: #1a1a2e;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn-percent-upgrade:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ffdf5d, #f0c800);
+}
+
+.btn-percent-upgrade:disabled {
+    background: #444;
+    color: #666;
+    cursor: not-allowed;
+}
+
+@media (max-width: 500px) {
+    .percent-upgrade-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 부적 그리드 */
+.talisman-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.talisman-grid.two-col {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.talisman-card {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(30, 30, 50, 0.9) 100%);
+    border: 1px solid #ffd93d;
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+.talisman-icon {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.talisman-name {
+    font-size: 0.85rem;
+    color: #ffd93d;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.talisman-effect {
+    font-size: 0.9rem;
+    color: #50fa7b;
+    margin-bottom: 3px;
+}
+
+.talisman-desc {
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.btn-talisman {
+    width: 100%;
+    padding: 8px;
+    background: linear-gradient(135deg, #ffd93d, #f0b800);
+    border: none;
+    border-radius: 5px;
+    color: #1a1a2e;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn-talisman:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ffdf5d, #f0c800);
+}
+
+.btn-talisman:disabled {
+    background: #444;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.shop-resources {
+    flex-wrap: wrap;
+}
+
+@media (max-width: 500px) {
+    .talisman-grid {
+        grid-template-columns: 1fr;
+    }
 }
