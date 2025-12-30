@@ -1485,8 +1485,10 @@ function updateBattleUI() {
     }
 
     const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
-    console.log('HP 바 업데이트:', enemyHpPercent + '%');
-    document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
+    const hpBarElement = document.getElementById('enemy-hp-bar');
+    console.log('HP 바 업데이트:', enemyHpPercent + '%', '요소:', hpBarElement, '현재 width:', hpBarElement?.style.width);
+    hpBarElement.style.width = `${enemyHpPercent}%`;
+    console.log('HP 바 업데이트 후 width:', hpBarElement.style.width);
 
     const dungeonScreen = document.getElementById('dungeon-screen');
     dungeonScreen.classList.remove('boss-fight', 'mini-boss-fight');
