@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="game-container">
-        <!-- 마을 화면 (통합) -->
+        <!-- 메인 화면 -->
         <div id="village-screen" class="screen">
             <h1>보랏빛 산지의 전투</h1>
 
@@ -34,7 +34,7 @@
                             <span class="stat-value" id="stat-str">5</span>
                             <button class="btn-stat-up" data-stat="str">+</button>
                         </div>
-                        <span class="stat-desc">공격력 증가</span>
+                        <span class="stat-desc">공격력 +2</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
@@ -42,7 +42,7 @@
                             <span class="stat-value" id="stat-dex">5</span>
                             <button class="btn-stat-up" data-stat="dex">+</button>
                         </div>
-                        <span class="stat-desc">회피율 증가</span>
+                        <span class="stat-desc">회피율 +1%</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
@@ -50,7 +50,7 @@
                             <span class="stat-value" id="stat-int">5</span>
                             <button class="btn-stat-up" data-stat="int">+</button>
                         </div>
-                        <span class="stat-desc">최대 MP 증가</span>
+                        <span class="stat-desc">최대 MP +0.33</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
@@ -58,7 +58,7 @@
                             <span class="stat-value" id="stat-luk">5</span>
                             <button class="btn-stat-up" data-stat="luk">+</button>
                         </div>
-                        <span class="stat-desc">크리티컬/드랍률</span>
+                        <span class="stat-desc">크리티컬 +1%</span>
                     </div>
                 </div>
             </div>
@@ -98,31 +98,83 @@
                 </div>
             </div>
 
-            <!-- 상점 섹션 -->
-            <div class="section">
-                <h2>상점</h2>
-                <div id="shop-grid">
-                    <div class="shop-item">
-                        <div class="shop-info">
-                            <span>무기 강화</span>
-                            <span class="shop-level">Lv.<span id="weapon-level">1</span></span>
-                        </div>
-                        <button id="btn-upgrade-weapon" class="btn-shop">
-                            <span id="weapon-cost">100</span>G
-                        </button>
-                    </div>
-                    <div class="shop-item">
-                        <div class="shop-info">
-                            <span>HP 포션</span>
-                            <span class="shop-desc">HP +50</span>
-                        </div>
-                        <button id="btn-buy-potion" class="btn-shop">50G</button>
-                    </div>
-                </div>
+            <!-- 메뉴 버튼들 -->
+            <div class="menu-buttons">
+                <button id="btn-shop" class="btn-menu">상점</button>
+                <button id="btn-inventory" class="btn-menu">인벤토리</button>
             </div>
 
             <!-- 던전 입장 -->
             <button id="btn-dungeon" class="btn-enter">던전 입장 (<span id="start-floor">1</span>층~)</button>
+        </div>
+
+        <!-- 상점 화면 -->
+        <div id="shop-screen" class="screen hidden">
+            <h1>상점</h1>
+            <p class="gold-display">보유 골드: <span id="shop-gold">0</span>G</p>
+
+            <div class="section">
+                <h2>장비 강화</h2>
+                <div class="shop-item-card">
+                    <div class="shop-item-info">
+                        <span class="item-name">무기 강화</span>
+                        <span class="item-level">Lv.<span id="weapon-level">1</span></span>
+                    </div>
+                    <p class="item-desc">공격력 +5</p>
+                    <button id="btn-upgrade-weapon" class="btn-buy">
+                        <span id="weapon-cost">100</span>G
+                    </button>
+                </div>
+                <div class="shop-item-card">
+                    <div class="shop-item-info">
+                        <span class="item-name">방어구 강화</span>
+                        <span class="item-level">Lv.<span id="armor-level">1</span></span>
+                    </div>
+                    <p class="item-desc">최대 HP +20</p>
+                    <button id="btn-upgrade-armor" class="btn-buy">
+                        <span id="armor-cost">100</span>G
+                    </button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>소모품</h2>
+                <div class="shop-item-card">
+                    <div class="shop-item-info">
+                        <span class="item-name">HP 포션</span>
+                        <span class="item-count">보유: <span id="potion-count">0</span>개</span>
+                    </div>
+                    <p class="item-desc">전투 중 HP 50 회복</p>
+                    <button id="btn-buy-potion" class="btn-buy">50G</button>
+                </div>
+            </div>
+
+            <button id="btn-shop-back" class="btn-back">돌아가기</button>
+        </div>
+
+        <!-- 인벤토리 화면 -->
+        <div id="inventory-screen" class="screen hidden">
+            <h1>인벤토리</h1>
+
+            <div class="section">
+                <h2>보유 유물 (<span id="relic-count">0</span>개)</h2>
+                <div id="relic-list" class="relic-grid">
+                    <p class="empty-msg">보유한 유물이 없습니다.<br>보스 처치 시 낮은 확률로 획득!</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>능력치 요약</h2>
+                <div class="stats-summary">
+                    <p>공격력: <span id="total-atk">25</span></p>
+                    <p>최대 HP: <span id="total-hp">100</span></p>
+                    <p>최대 MP: <span id="total-mp">5</span></p>
+                    <p>크리티컬: <span id="total-crit">5</span>%</p>
+                    <p>회피율: <span id="total-dodge">5</span>%</p>
+                </div>
+            </div>
+
+            <button id="btn-inventory-back" class="btn-back">돌아가기</button>
         </div>
 
         <!-- 던전 화면 -->
@@ -155,6 +207,10 @@
                             <div class="bar mp-bar" id="mp-bar"></div>
                         </div>
                         <span class="value"><span id="battle-mp">5</span>/<span id="battle-max-mp">5</span></span>
+                    </div>
+                    <div class="potion-info">
+                        포션: <span id="battle-potions">0</span>개
+                        <button id="btn-use-potion" class="btn-potion">사용</button>
                     </div>
                 </div>
             </div>
