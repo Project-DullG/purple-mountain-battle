@@ -709,6 +709,45 @@ h2 {
     color: #ffd93d;
 }
 
+/* 스킬 툴팁 */
+.skill-tooltip {
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid #4facfe;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    text-align: left;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.skill-tooltip.hidden {
+    display: none;
+}
+
+.skill-tooltip .tooltip-title {
+    color: #4facfe;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.skill-tooltip .tooltip-char {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+}
+
+.skill-tooltip .tooltip-info {
+    color: #ffd93d;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+}
+
+.skill-tooltip .tooltip-desc {
+    color: #eee;
+}
+
 #battle-actions button:hover:not(:disabled) {
     transform: translateY(-2px);
     opacity: 0.9;

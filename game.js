@@ -989,8 +989,9 @@ function generateStartingSkills() {
 }
 
 function showBossClearScreen() {
-    // 초기 상태: 유물 선택 섹션 표시, 스킬 선택 섹션 숨김
+    // 초기 상태: 유물/휴식 선택 표시, 스킬 선택 숨김
     document.getElementById('relic-choice-section').classList.remove('hidden');
+    document.getElementById('rest-section').classList.remove('hidden');
     document.getElementById('skill-after-rest').classList.add('hidden');
     document.getElementById('btn-rest').disabled = false;
 
@@ -1069,9 +1070,9 @@ function restAndContinue() {
     gameState.player.maxMp = getMaxMp();
     gameState.player.mp = gameState.player.maxMp;
 
-    // 유물 선택 섹션 숨기고 스킬 선택 섹션 표시
+    // 유물/휴식 섹션 숨기고 스킬 선택 섹션 표시
     document.getElementById('relic-choice-section').classList.add('hidden');
-    document.getElementById('btn-rest').disabled = true;
+    document.getElementById('rest-section').classList.add('hidden');
     document.getElementById('skill-after-rest').classList.remove('hidden');
 
     // 스킬 선택지 표시
@@ -1232,6 +1233,47 @@ function updateSkillButtons() {
     updateBuffDisplay();
 }
 
+// 스킬 툴팁 표시
+function showSkillTooltip(slotIndex) {
+    const skill = gameState.equippedSkills[slotIndex];
+    const tooltip = document.getElementById('skill-tooltip');
+
+    if (!skill) {
+        tooltip.classList.add('hidden');
+        return;
+    }
+
+    const charNames = { cat: '묘인', elf: '엘프', dwarf: '드워프', human: '인간' };
+    const charName = charNames[skill.character] || skill.char || '';
+    const cooldown = getCooldown(skill.id);
+
+    let typeText = '';
+    if (skill.type === 'passive') {
+        typeText = '[패시브]';
+    } else if (skill.type === 'buff') {
+        typeText = '[버프]';
+    } else {
+        typeText = '[액티브]';
+    }
+
+    const mpText = skill.mpCost > 0 ? `MP ${skill.mpCost}` : 'MP 0';
+    const cdText = skill.cooldown > 0 ? `쿨타임 ${skill.cooldown}턴` : '쿨타임 없음';
+    const cooldownText = cooldown > 0 ? `<span style="color:#ff6b6b">⏳ 남은 쿨타임: ${cooldown}턴</span>` : '';
+
+    tooltip.innerHTML = `
+        <div class="tooltip-title">${skill.name} ${typeText}</div>
+        <div class="tooltip-char">${charName}</div>
+        <div class="tooltip-info">${mpText} | ${cdText}</div>
+        <div class="tooltip-desc">${skill.desc}</div>
+        ${cooldownText ? `<div style="margin-top:5px">${cooldownText}</div>` : ''}
+    `;
+    tooltip.classList.remove('hidden');
+}
+
+function hideSkillTooltip() {
+    document.getElementById('skill-tooltip').classList.add('hidden');
+}
+
 function updateBuffDisplay() {
     const buffDisplay = document.getElementById('buff-display');
     if (!buffDisplay) return;
@@ -1389,6 +1431,12 @@ function initEventListeners() {
     for (let i = 1; i <= 4; i++) {
         document.getElementById(`btn-skill-${i}`).addEventListener('click', () => useSkill(i - 1));
     }
+
+    // 스킬 툴팁 이벤트
+    document.querySelectorAll('.btn-skill').forEach(btn => {
+        btn.addEventListener('mouseenter', () => showSkillTooltip(parseInt(btn.dataset.slot)));
+        btn.addEventListener('mouseleave', hideSkillTooltip);
+    });
 
     document.getElementById('btn-use-potion').addEventListener('click', usePotion);
 

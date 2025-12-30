@@ -229,12 +229,13 @@
                         <div id="buff-display" class="buff-display"></div>
                     </div>
 
+                    <div id="skill-tooltip" class="skill-tooltip hidden"></div>
                     <div id="battle-actions">
                         <button id="btn-attack">공격</button>
-                        <button id="btn-skill-1" class="btn-skill" title="">스킬1</button>
-                        <button id="btn-skill-2" class="btn-skill" title="">스킬2</button>
-                        <button id="btn-skill-3" class="btn-skill" title="">스킬3</button>
-                        <button id="btn-skill-4" class="btn-skill" title="">스킬4</button>
+                        <button id="btn-skill-1" class="btn-skill" data-slot="0">스킬1</button>
+                        <button id="btn-skill-2" class="btn-skill" data-slot="1">스킬2</button>
+                        <button id="btn-skill-3" class="btn-skill" data-slot="2">스킬3</button>
+                        <button id="btn-skill-4" class="btn-skill" data-slot="3">스킬4</button>
                     </div>
                 </div>
 
@@ -254,7 +255,7 @@
             </div>
 
             <!-- 옵션 2: 휴식 -->
-            <div class="section">
+            <div id="rest-section" class="section">
                 <h2>또는 휴식</h2>
                 <button id="btn-rest" class="btn-rest">HP 30% 회복 + 스킬 변경</button>
             </div>
