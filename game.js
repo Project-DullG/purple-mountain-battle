@@ -595,6 +595,15 @@ function startBattle() {
     // 도주 버튼 활성화
     document.getElementById('btn-return').disabled = false;
 
+    // 스킬 정보 패널 닫기
+    const skillPanel = document.getElementById('skill-info-panel');
+    const skillInfoBtn = document.getElementById('btn-skill-info');
+    if (skillPanel) {
+        skillPanel.classList.add('hidden');
+        skillInfoBtn.classList.remove('active');
+        skillInfoBtn.textContent = '스킬 정보';
+    }
+
     const floorType = gameState.currentEnemy.isBoss ? '보스' : gameState.currentEnemy.isMiniBoss ? '중간보스' : '';
     addBattleLog(`${gameState.dungeon.currentFloor}층 - ${gameState.currentEnemy.name} ${floorType ? `[${floorType}]` : ''}`);
     addBattleLog(`선제공격까지 ${enemyAttackCounter}턴`);
@@ -1231,47 +1240,74 @@ function updateSkillButtons() {
 
     // 버프 표시 업데이트
     updateBuffDisplay();
+
+    // 스킬 정보 패널이 열려있으면 업데이트
+    const panel = document.getElementById('skill-info-panel');
+    if (panel && !panel.classList.contains('hidden')) {
+        updateSkillInfoPanel();
+    }
 }
 
-// 스킬 툴팁 표시
-function showSkillTooltip(slotIndex) {
-    const skill = gameState.equippedSkills[slotIndex];
-    const tooltip = document.getElementById('skill-tooltip');
+// 스킬 정보 패널 토글
+function toggleSkillInfoPanel() {
+    const panel = document.getElementById('skill-info-panel');
+    const btn = document.getElementById('btn-skill-info');
 
-    if (!skill) {
-        tooltip.classList.add('hidden');
-        return;
-    }
-
-    const charNames = { cat: '묘인', elf: '엘프', dwarf: '드워프', human: '인간' };
-    const charName = charNames[skill.character] || skill.char || '';
-    const cooldown = getCooldown(skill.id);
-
-    let typeText = '';
-    if (skill.type === 'passive') {
-        typeText = '[패시브]';
-    } else if (skill.type === 'buff') {
-        typeText = '[버프]';
+    if (panel.classList.contains('hidden')) {
+        updateSkillInfoPanel();
+        panel.classList.remove('hidden');
+        btn.classList.add('active');
+        btn.textContent = '스킬 정보 닫기';
     } else {
-        typeText = '[액티브]';
+        panel.classList.add('hidden');
+        btn.classList.remove('active');
+        btn.textContent = '스킬 정보';
     }
-
-    const mpText = skill.mpCost > 0 ? `MP ${skill.mpCost}` : 'MP 0';
-    const cdText = skill.cooldown > 0 ? `쿨타임 ${skill.cooldown}턴` : '쿨타임 없음';
-    const cooldownText = cooldown > 0 ? `<span style="color:#ff6b6b">⏳ 남은 쿨타임: ${cooldown}턴</span>` : '';
-
-    tooltip.innerHTML = `
-        <div class="tooltip-title">${skill.name} ${typeText}</div>
-        <div class="tooltip-char">${charName}</div>
-        <div class="tooltip-info">${mpText} | ${cdText}</div>
-        <div class="tooltip-desc">${skill.desc}</div>
-        ${cooldownText ? `<div style="margin-top:5px">${cooldownText}</div>` : ''}
-    `;
-    tooltip.classList.remove('hidden');
 }
 
-function hideSkillTooltip() {
-    document.getElementById('skill-tooltip').classList.add('hidden');
+function updateSkillInfoPanel() {
+    const panel = document.getElementById('skill-info-panel');
+    const charNames = { cat: '묘인', elf: '엘프', dwarf: '드워프', human: '인간' };
+
+    let html = '';
+
+    for (let i = 0; i < 4; i++) {
+        const skill = gameState.equippedSkills[i];
+        if (!skill) continue;
+
+        const charName = charNames[skill.character] || skill.char || '';
+        const cooldown = getCooldown(skill.id);
+
+        let typeClass = '';
+        let typeText = '';
+        if (skill.type === 'passive') {
+            typeClass = 'passive';
+            typeText = '패시브';
+        } else if (skill.type === 'buff') {
+            typeClass = 'buff';
+            typeText = '버프';
+        } else {
+            typeText = '액티브';
+        }
+
+        const mpText = skill.type !== 'passive' ? `MP ${skill.mpCost}` : '';
+        const cdText = skill.cooldown > 0 ? `쿨타임 ${skill.cooldown}턴` : '';
+        const metaText = [mpText, cdText].filter(t => t).join(' | ');
+
+        html += `
+            <div class="skill-info-item">
+                <div class="skill-info-header">
+                    <span class="skill-info-name">${charName} - ${skill.name}</span>
+                    <span class="skill-info-type ${typeClass}">${typeText}</span>
+                </div>
+                ${metaText ? `<div class="skill-info-meta">${metaText}</div>` : ''}
+                <div class="skill-info-desc">${skill.desc}</div>
+                ${cooldown > 0 ? `<div class="skill-info-cooldown">⏳ 남은 쿨타임: ${cooldown}턴</div>` : ''}
+            </div>
+        `;
+    }
+
+    panel.innerHTML = html || '<p style="color:#888;text-align:center;">장착된 스킬이 없습니다</p>';
 }
 
 function updateBuffDisplay() {
@@ -1432,11 +1468,8 @@ function initEventListeners() {
         document.getElementById(`btn-skill-${i}`).addEventListener('click', () => useSkill(i - 1));
     }
 
-    // 스킬 툴팁 이벤트
-    document.querySelectorAll('.btn-skill').forEach(btn => {
-        btn.addEventListener('mouseenter', () => showSkillTooltip(parseInt(btn.dataset.slot)));
-        btn.addEventListener('mouseleave', hideSkillTooltip);
-    });
+    // 스킬 정보 버튼
+    document.getElementById('btn-skill-info').addEventListener('click', toggleSkillInfoPanel);
 
     document.getElementById('btn-use-potion').addEventListener('click', usePotion);
 

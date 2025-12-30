@@ -709,43 +709,96 @@ h2 {
     color: #ffd93d;
 }
 
-/* 스킬 툴팁 */
-.skill-tooltip {
-    background: rgba(0, 0, 0, 0.95);
-    border: 2px solid #4facfe;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 10px;
-    text-align: left;
-    font-size: 0.85rem;
-    line-height: 1.5;
+/* 스킬 정보 버튼 */
+.btn-skill-info {
+    grid-column: span 2;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid #667eea !important;
+    color: #b388ff !important;
+    font-size: 0.85rem !important;
+    padding: 8px !important;
 }
 
-.skill-tooltip.hidden {
+.btn-skill-info:hover {
+    background: rgba(102, 126, 234, 0.3) !important;
+}
+
+.btn-skill-info.active {
+    background: rgba(102, 126, 234, 0.4) !important;
+    border-color: #b388ff !important;
+}
+
+/* 스킬 정보 패널 */
+.skill-info-panel {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.skill-info-panel.hidden {
     display: none;
 }
 
-.skill-tooltip .tooltip-title {
-    color: #4facfe;
-    font-weight: bold;
-    font-size: 1rem;
-    margin-bottom: 5px;
-}
-
-.skill-tooltip .tooltip-char {
-    color: #ff6b6b;
-    font-size: 0.8rem;
+.skill-info-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 10px;
     margin-bottom: 8px;
 }
 
-.skill-tooltip .tooltip-info {
-    color: #ffd93d;
-    font-size: 0.8rem;
+.skill-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.skill-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 5px;
 }
 
-.skill-tooltip .tooltip-desc {
-    color: #eee;
+.skill-info-name {
+    color: #4facfe;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+.skill-info-type {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(79, 172, 254, 0.2);
+    color: #4facfe;
+}
+
+.skill-info-type.passive {
+    background: rgba(80, 250, 123, 0.2);
+    color: #50fa7b;
+}
+
+.skill-info-type.buff {
+    background: rgba(255, 217, 61, 0.2);
+    color: #ffd93d;
+}
+
+.skill-info-meta {
+    font-size: 0.8rem;
+    color: #ffd93d;
+    margin-bottom: 5px;
+}
+
+.skill-info-desc {
+    font-size: 0.85rem;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+.skill-info-cooldown {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    margin-top: 5px;
 }
 
 #battle-actions button:hover:not(:disabled) {
