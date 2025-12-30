@@ -36,7 +36,7 @@
                                 <button class="btn-stat-up btn-stat-10" data-stat="str" data-amount="10">+10</button>
                             </div>
                         </div>
-                        <span class="stat-desc">공격력 +1, 체력 +2</span>
+                        <span class="stat-desc">공격력 +1, 체력 +2, 크리뎀 +0.5%</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
@@ -47,7 +47,7 @@
                                 <button class="btn-stat-up btn-stat-10" data-stat="dex" data-amount="10">+10</button>
                             </div>
                         </div>
-                        <span class="stat-desc">치명타 +1.5%, 공격력 +0.5</span>
+                        <span class="stat-desc">치명타 +1%, 공격력 +1, 체력 +0.5</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
@@ -62,6 +62,17 @@
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
+                            <span class="stat-name">활력</span>
+                            <span class="stat-value" id="stat-vit">5</span>
+                            <div class="stat-buttons">
+                                <button class="btn-stat-up" data-stat="vit" data-amount="1">+1</button>
+                                <button class="btn-stat-up btn-stat-10" data-stat="vit" data-amount="10">+10</button>
+                            </div>
+                        </div>
+                        <span class="stat-desc">체력 +4, 피해감소 +0.2%</span>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-header">
                             <span class="stat-name">행운</span>
                             <span class="stat-value" id="stat-luk">5</span>
                             <div class="stat-buttons">
@@ -69,15 +80,26 @@
                                 <button class="btn-stat-up btn-stat-10" data-stat="luk" data-amount="10">+10</button>
                             </div>
                         </div>
-                        <span class="stat-desc">치명타 +1%, 회피 +1%</span>
+                        <span class="stat-desc">치명타 +0.5%, 회피 +0.5%, 골드/경험치 +1%</span>
                     </div>
                 </div>
                 <button id="btn-stat-reset" class="btn-stat-reset">스탯 초기화</button>
             </div>
 
-            <!-- 메뉴 버튼들 -->
-            <div class="menu-buttons">
-                <button id="btn-shop" class="btn-menu">상점</button>
+            <!-- 마을 시설 -->
+            <div class="village-facilities">
+                <button id="btn-shop" class="btn-facility btn-shop">
+                    <span class="facility-icon">🏪</span>
+                    <span class="facility-name">상점</span>
+                </button>
+                <button id="btn-blacksmith" class="btn-facility btn-blacksmith">
+                    <span class="facility-icon">⚒️</span>
+                    <span class="facility-name">대장간</span>
+                </button>
+                <button id="btn-inn" class="btn-facility btn-inn">
+                    <span class="facility-icon">🔮</span>
+                    <span class="facility-name">숙소</span>
+                </button>
             </div>
 
             <!-- 던전 입장 -->
@@ -89,7 +111,7 @@
                     <button class="btn-mode-select" data-mode="hard">하드</button>
                     <button class="btn-mode-select" data-mode="infinite">무한</button>
                 </div>
-                <p class="mode-desc-text" id="mode-desc-text">적 x0.5 / 보상 x1 / 입문용</p>
+                <p class="mode-desc-text" id="mode-desc-text">적 능력치 x0.5 / 보상 x1 / 입문자용</p>
                 <div class="dungeon-entry">
                     <button id="btn-dungeon" class="btn-enter">던전 입장 (1층~)</button>
                     <button id="btn-skip" class="btn-skip">스킵 (50% HP)</button>
@@ -98,16 +120,40 @@
             </div>
         </div>
 
-        <!-- 상점 화면 -->
+        <!-- 상점 화면 (방어구) -->
         <div id="shop-screen" class="screen hidden">
-            <h1>상점</h1>
+            <h1>🏪 상점</h1>
             <div class="resource-display">
                 <span>골드: <span id="shop-gold">0</span></span>
-                <span>강화석: <span id="shop-stones">0</span></span>
             </div>
 
             <div class="section">
-                <h2>무기 강화 (강화석 사용)</h2>
+                <h2>장비 구매</h2>
+                <div class="shop-item-card">
+                    <div class="shop-item-info">
+                        <span class="item-name">🛡️ 방어구</span>
+                        <span class="item-level">Lv.<span id="armor-level">1</span></span>
+                    </div>
+                    <p class="item-desc">최대 HP +20</p>
+                    <button id="btn-upgrade-armor" class="btn-buy">
+                        <span id="armor-cost">100</span>G
+                    </button>
+                </div>
+            </div>
+
+            <button id="btn-shop-back" class="btn-back">돌아가기</button>
+        </div>
+
+        <!-- 대장간 화면 (무기 강화) -->
+        <div id="blacksmith-screen" class="screen hidden">
+            <h1>⚒️ 대장간</h1>
+            <div class="resource-display">
+                <span>강화석 💎: <span id="blacksmith-stones">0</span></span>
+            </div>
+
+            <div class="section">
+                <h2>무기 강화</h2>
+                <p class="section-desc">강화석을 사용하여 캐릭터별 스킬 위력을 강화합니다</p>
                 <div class="weapon-grid">
                     <div class="weapon-card">
                         <div class="weapon-icon">⚔️</div>
@@ -140,33 +186,61 @@
                 </div>
             </div>
 
-            <div class="section">
-                <h2>장비 강화 (골드 사용)</h2>
-                <div class="shop-item-card">
-                    <div class="shop-item-info">
-                        <span class="item-name">방어구</span>
-                        <span class="item-level">Lv.<span id="armor-level">1</span></span>
+            <button id="btn-blacksmith-back" class="btn-back">돌아가기</button>
+        </div>
+
+        <!-- 숙소 화면 (잿빛 소녀의 축복) -->
+        <div id="inn-screen" class="screen hidden">
+            <h1>🔮 숙소 - 잿빛 소녀</h1>
+            <div class="resource-display inn-resource">
+                <span>근원석 🔮: <span id="inn-origin-stones">0</span></span>
+            </div>
+
+            <div class="inn-intro">
+                <p class="inn-dialogue">"안녕, 여행자. 근원석을 가져왔구나..."</p>
+                <p class="inn-dialogue-sub">"내 축복을 받아가렴. 영원히 너와 함께할 것이야."</p>
+            </div>
+
+            <div class="section ash-blessing-section">
+                <h2>잿빛 소녀의 축복</h2>
+                <div class="char-upgrade-grid">
+                    <div class="char-upgrade-card blessing-card">
+                        <div class="upgrade-name">🔥 분노의 축복</div>
+                        <div class="upgrade-level">Lv.<span id="blessing-fury">0</span></div>
+                        <div class="upgrade-effect">기본 공격력 +2</div>
+                        <button class="btn-blessing" data-blessing="fury">축복 (1개)</button>
                     </div>
-                    <p class="item-desc">최대 HP +20</p>
-                    <button id="btn-upgrade-armor" class="btn-buy">
-                        <span id="armor-cost">100</span>G
-                    </button>
+                    <div class="char-upgrade-card blessing-card">
+                        <div class="upgrade-name">💜 수호의 축복</div>
+                        <div class="upgrade-level">Lv.<span id="blessing-aegis">0</span></div>
+                        <div class="upgrade-effect">최대 HP +10</div>
+                        <button class="btn-blessing" data-blessing="aegis">축복 (1개)</button>
+                    </div>
+                    <div class="char-upgrade-card blessing-card">
+                        <div class="upgrade-name">👁️ 통찰의 축복</div>
+                        <div class="upgrade-level">Lv.<span id="blessing-insight">0</span></div>
+                        <div class="upgrade-effect">치명타 확률 +1%</div>
+                        <button class="btn-blessing" data-blessing="insight">축복 (1개)</button>
+                    </div>
+                    <div class="char-upgrade-card blessing-card">
+                        <div class="upgrade-name">🪨 인내의 축복</div>
+                        <div class="upgrade-level">Lv.<span id="blessing-patience">0</span></div>
+                        <div class="upgrade-effect">받는 피해 -0.5%</div>
+                        <button class="btn-blessing" data-blessing="patience">축복 (1개)</button>
+                    </div>
                 </div>
             </div>
 
             <div class="section">
-                <h2>소모품</h2>
-                <div class="shop-item-card">
-                    <div class="shop-item-info">
-                        <span class="item-name">HP 포션</span>
-                        <span class="item-count">보유: <span id="potion-count">0</span>개</span>
-                    </div>
-                    <p class="item-desc">전투 중 HP 50 회복</p>
-                    <button id="btn-buy-potion" class="btn-buy">50G</button>
+                <h2>✨ 능력치 포인트 구매</h2>
+                <p class="purchase-desc">근원석으로 스탯 포인트를 구매합니다 (구매할수록 비용 증가)</p>
+                <div class="purchase-row">
+                    <span>비용: <span id="stat-point-cost">1</span> 근원석</span>
+                    <button id="btn-buy-stat-point" class="btn-buy-stat">+1 포인트 구매</button>
                 </div>
             </div>
 
-            <button id="btn-shop-back" class="btn-back">돌아가기</button>
+            <button id="btn-inn-back" class="btn-back">돌아가기</button>
         </div>
 
         <!-- 던전 화면 -->
@@ -178,10 +252,26 @@
                     <span class="reward-values">
                         <span id="pending-gold">0</span>G |
                         <span id="pending-exp">0</span>EXP |
-                        강화석 <span id="pending-stones">0</span>
+                        💎<span id="pending-stones">0</span> |
+                        🔮<span id="pending-origin-stones">0</span>
                     </span>
                 </div>
-                <button id="btn-return" class="btn-return-village">복귀 (보상 획득)</button>
+                <button id="btn-tag-combine-open" class="btn-tag-combine-open">태그 합성</button>
+                <button id="btn-return" class="btn-return-village">마을 복귀 (보상 획득)</button>
+            </div>
+
+            <!-- 태그 합성 섹션 -->
+            <div id="tag-combine-section" class="tag-combine-section hidden">
+                <div class="tag-combine-header">
+                    <h3>태그 합성</h3>
+                    <p class="tag-combine-desc">같은 태그 + 같은 등급 유물 3개 → 다음 등급 무작위 유물</p>
+                </div>
+                <div id="tag-combine-grid" class="tag-combine-grid"></div>
+                <div id="tag-combine-result" class="tag-combine-result hidden"></div>
+                <div class="tag-combine-buttons">
+                    <button id="btn-tag-combine" class="btn-tag-combine" disabled>합성 (0/3)</button>
+                    <button id="btn-tag-combine-close" class="btn-tag-combine-close">닫기</button>
+                </div>
             </div>
 
             <div id="battle-layout">
@@ -192,14 +282,19 @@
                     </div>
                     <div class="stat-row">
                         <span class="stat-label">CRT</span>
-                        <span class="stat-val" id="panel-crit">5%</span>
+                        <span class="stat-val" id="panel-crit">10%</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">C.DMG</span>
+                        <span class="stat-val" id="panel-crit-dmg">130%</span>
                     </div>
                     <div class="stat-row">
                         <span class="stat-label">DOG</span>
-                        <span class="stat-val" id="panel-dodge">5%</span>
+                        <span class="stat-val" id="panel-dodge">10%</span>
                     </div>
-                    <div class="stat-row relics-row">
-                        <span id="panel-relics"></span>
+                    <div class="stat-row">
+                        <span class="stat-label">DEF</span>
+                        <span class="stat-val" id="panel-def">0%</span>
                     </div>
                 </div>
                 <div id="battle-main">
@@ -235,10 +330,6 @@
                             </div>
                             <span class="value"><span id="battle-mp">5</span>/<span id="battle-max-mp">5</span></span>
                         </div>
-                        <div class="potion-info">
-                            포션: <span id="battle-potions">0</span>개
-                            <button id="btn-use-potion" class="btn-potion">사용</button>
-                        </div>
                         <div id="buff-display" class="buff-display"></div>
                     </div>
 
@@ -257,24 +348,25 @@
             </div>
         </div>
 
-        <!-- 보스 클리어 화면 (유물/휴식 선택) -->
+        <!-- 층 클리어 화면 (유물/휴식 선택) -->
         <div id="boss-clear-screen" class="screen hidden">
-            <h1>보스 클리어!</h1>
+            <h1>층 클리어!</h1>
 
             <!-- 확인 버튼 섹션 -->
             <div id="boss-confirm-section" class="section">
-                <p class="boss-confirm-msg">강력한 보상을 획득합니다!</p>
+                <h2>5층 클리어!</h2>
+                <p class="boss-confirm-msg">유물을 선택하고 휴식을 취하세요!</p>
                 <button id="btn-boss-confirm" class="btn-boss-confirm">확인</button>
             </div>
 
             <!-- 옵션 1: 유물 선택 -->
-            <div id="relic-choice-section" class="section">
+            <div id="relic-choice-section" class="section hidden">
                 <h2>유물 선택</h2>
-                <p class="choice-desc" id="relic-choice-desc">3개 중 하나를 선택하세요 (최대 4개 보유)</p>
+                <p class="choice-desc" id="relic-choice-desc">3개 중 하나를 선택하세요 (같은 유물 합성 가능)</p>
                 <div id="relic-choice-grid" class="relic-choice-grid"></div>
             </div>
 
-            <!-- 유물 교체 선택 (4개 보유 시) -->
+            <!-- 유물 교체 선택 (이전 시스템, 현재 미사용) -->
             <div id="relic-replace-section" class="section hidden">
                 <h2>교체할 유물 선택</h2>
                 <p class="choice-desc">버릴 유물을 선택하세요</p>
@@ -282,23 +374,34 @@
                 <button id="btn-cancel-relic" class="btn-skip-skill">취소</button>
             </div>
 
-            <!-- 옵션 2: 스킬 교체 + 휴식 -->
-            <div id="skill-rest-section" class="section">
-                <h2>또는 스킬 교체</h2>
-                <p class="skill-swap-desc">스킬 선택 시 HP 30% 회복 + 해당 캐릭터의 스킬 교체</p>
+            <!-- 유물 합성 결과 -->
+            <div id="relic-combine-section" class="section hidden">
+                <h2>유물 합성!</h2>
+                <div id="combine-info" class="combine-info"></div>
+                <div class="combine-buttons">
+                    <button id="btn-combine" class="btn-combine hidden">합성</button>
+                    <button id="btn-skip-combine" class="btn-skip-combine">확인</button>
+                </div>
+            </div>
+
+            <!-- 옵션 2: 스킬 교체 + 휴식 (보스층만) -->
+            <div id="skill-rest-section" class="section hidden">
+                <h2>스킬 교체 (보스층 전용)</h2>
+                <p class="skill-swap-desc">스킬을 선택하면 HP 30% 회복 + 해당 캐릭터의 스킬이 교체됩니다</p>
                 <div id="skill-choice-grid" class="skill-choice-grid"></div>
-                <button id="btn-skip-skill" class="btn-skip-skill">스킬 유지 + HP 30% 회복</button>
+                <button id="btn-skip-skill" class="btn-skip-skill">스킬 유지하고 HP 30% 회복</button>
             </div>
         </div>
 
         <!-- 게임 오버 화면 -->
         <div id="gameover-screen" class="screen hidden">
             <h1>패배</h1>
-            <p class="death-msg">획득 보상의 50%를 가져갑니다</p>
+            <p class="death-msg">획득한 보상의 50%만 가져갑니다</p>
             <div class="death-rewards">
                 <p>+<span id="death-gold">0</span> 골드</p>
                 <p>+<span id="death-exp">0</span> 경험치</p>
-                <p>+<span id="death-stones">0</span> 강화석</p>
+                <p>+<span id="death-stones">0</span> 강화석 💎</p>
+                <p>+<span id="death-origin-stones">0</span> 근원석 🔮</p>
             </div>
             <button id="btn-gameover-return">마을로</button>
         </div>
@@ -311,7 +414,8 @@
                 <p>최종 층: <span id="clear-floor">50</span>층</p>
                 <p>+<span id="clear-gold">0</span> 골드</p>
                 <p>+<span id="clear-exp">0</span> 경험치</p>
-                <p>+<span id="clear-stones">0</span> 강화석</p>
+                <p>+<span id="clear-stones">0</span> 강화석 💎</p>
+                <p>+<span id="clear-origin-stones">0</span> 근원석 🔮</p>
             </div>
             <button id="btn-clear-return">마을로</button>
         </div>
