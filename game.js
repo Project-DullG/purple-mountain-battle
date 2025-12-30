@@ -528,6 +528,14 @@ function updateBattleUI() {
     document.getElementById('enemy-atk').textContent = enemy.atk;
     document.getElementById('enemy-preempt-counter').textContent = enemyAttackCounter;
 
+    // 선제공격 1턴 남았을 때 경고 표시
+    const preemptDisplay = document.querySelector('.enemy-preempt-display');
+    if (enemyAttackCounter <= 1) {
+        preemptDisplay.classList.add('warning');
+    } else {
+        preemptDisplay.classList.remove('warning');
+    }
+
     const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
     document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
 
