@@ -109,10 +109,19 @@ h2 {
 }
 
 .point-badge {
-    font-size: 0.8rem;
-    background: #667eea;
-    padding: 2px 8px;
-    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 6px 14px;
+    border-radius: 15px;
+    margin-left: 10px;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    animation: point-pulse 2s ease-in-out infinite;
+}
+
+@keyframes point-pulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4); }
+    50% { box-shadow: 0 2px 15px rgba(102, 126, 234, 0.7); }
 }
 
 /* 스탯 그리드 */

@@ -11,11 +11,11 @@ const gameState = {
         maxMp: 5,
         baseAtk: 5,
         stats: {
-            str: 4,
-            dex: 4,
-            int: 4,
-            vit: 4,
-            luk: 4
+            str: 0,
+            dex: 0,
+            int: 0,
+            vit: 0,
+            luk: 0
         }
     },
     dungeon: {
@@ -740,7 +740,7 @@ function getWeaponBonus(character) {
 }
 
 function getMaxHp() {
-    const baseHp = 35 + (gameState.player.level - 1) * 5 + (gameState.armorLevel - 1) * 10;
+    const baseHp = 50 + (gameState.player.level - 1) * 5 + (gameState.armorLevel - 1) * 10;
     const strHp = getEffectiveStat('str') * 1;
     const dexHp = getEffectiveStat('dex') * 0.25;
     const intHp = getEffectiveStat('int') * 0.5;
@@ -3014,12 +3014,12 @@ function initEventListeners() {
     document.getElementById('btn-tag-combine-close').addEventListener('click', closeTagCombineMode);
 }
 
-// 스탯 초기화 (모든 스탯을 5로 되돌리고 포인트 환불)
+// 스탯 초기화 (모든 스탯을 0으로 되돌리고 포인트 환불)
 function resetStats() {
-    const baseStats = 4;
+    const baseStats = 0;
     const currentTotal = gameState.player.stats.str + gameState.player.stats.dex +
                         gameState.player.stats.int + gameState.player.stats.vit + gameState.player.stats.luk;
-    const baseTotal = baseStats * 5; // 20 (5개 스탯)
+    const baseTotal = baseStats * 5; // 0 (초기 스탯 없음)
 
     // 투자한 포인트 환불
     const refund = currentTotal - baseTotal;
