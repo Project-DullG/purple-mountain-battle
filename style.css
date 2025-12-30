@@ -68,6 +68,39 @@ h2 {
     margin: 3px 0;
 }
 
+/* 현재 스펙 */
+.current-spec-section {
+    background: rgba(179, 136, 255, 0.1);
+    border: 1px solid rgba(179, 136, 255, 0.3);
+}
+
+.current-spec-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.spec-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+}
+
+.spec-label {
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-bottom: 2px;
+}
+
+.spec-value {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #b388ff;
+}
+
 /* 섹션 */
 .section {
     background: rgba(255, 255, 255, 0.05);
@@ -1314,6 +1347,14 @@ h2 {
 .relic-choice-btn .relic-desc {
     font-size: 0.8rem;
     color: #ccc;
+}
+
+.relic-choice-btn .relic-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 8px;
 }
 
 .choice-desc {

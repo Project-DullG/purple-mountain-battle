@@ -1156,6 +1156,21 @@ function updateVillageUI() {
     document.getElementById('stat-vit').textContent = gameState.player.stats.vit;
     document.getElementById('stat-luk').textContent = gameState.player.stats.luk;
 
+    // 현재 스펙 업데이트
+    document.getElementById('spec-atk').textContent = getPlayerAtk();
+    document.getElementById('spec-hp').textContent = getMaxHp();
+    document.getElementById('spec-crit').textContent = getCritChance() + '%';
+    document.getElementById('spec-critdmg').textContent = getCritDamage() + '%';
+    document.getElementById('spec-dodge').textContent = getDodgeChance() + '%';
+    // 피해감소: 활력 기반 + 상점 보너스 + 인내의 축복 (최대 80%)
+    const totalDefReduction = Math.min(
+        getVitDamageReduction() * 100 +
+        gameState.percentBonus.def +
+        Math.min(gameState.ashBlessings.patience * 0.5, 30),
+        80
+    );
+    document.getElementById('spec-def').textContent = Math.floor(totalDefReduction) + '%';
+
     // 스킵 버튼 업데이트
     const skipFloor = getSkipFloor();
     const skipBtn = document.getElementById('btn-skip');
@@ -1934,6 +1949,8 @@ function showBossClearScreen(showSkillChoice = true) {
     const floorType = showSkillChoice ? '보스' : '중간';
     document.getElementById('boss-confirm-section').querySelector('h2').textContent =
         `${gameState.dungeon.currentFloor}층 ${floorType} 클리어!`;
+    document.getElementById('boss-confirm-section').querySelector('.boss-confirm-msg').textContent =
+        '특별한 보상을 선택하세요!';
 
     showScreen('boss-clear-screen');
 }
@@ -1981,6 +1998,8 @@ function showBossRewardChoices() {
         gameState.relicChoices.forEach(relic => {
             // 같은 유물 보유 개수 확인
             const ownedCount = gameState.tempRelics.filter(r => r.id === relic.id && r.rarity === relic.rarity).length;
+            const tags = getRelicTags(relic);
+            const tagsHtml = tags.map(t => `<span class="tag tag-${t}">${t}</span>`).join('');
             const btn = document.createElement('button');
             btn.className = `relic-choice-btn rarity-${relic.rarity}`;
             btn.innerHTML = `
@@ -1988,6 +2007,7 @@ function showBossRewardChoices() {
                 <div class="relic-icon">${relic.icon}</div>
                 <div class="relic-name">${relic.name}</div>
                 <div class="relic-desc">${relic.desc}</div>
+                <div class="relic-tags">${tagsHtml}</div>
                 ${ownedCount > 0 ? `<div class="relic-owned">보유: ${ownedCount}개</div>` : ''}
             `;
             btn.addEventListener('click', () => selectRelic(relic));
