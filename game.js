@@ -23,6 +23,7 @@ const gameState = {
         highestFloor: 0,
         pendingGold: 0,
         pendingExp: 0,
+        pendingStones: 0,
         inBattle: false
     },
     currentEnemy: null,
@@ -39,7 +40,7 @@ const gameState = {
     enhancementStones: 0,
     armorLevel: 1,
     gameMode: 'normal', // easy, normal, hard, infinite
-    pendingRelic: null, // 보스 클리어 후 획득한 유물
+    relicChoices: [], // 보스 클리어 후 선택 가능한 유물들 (3개)
     skillChoices: [] // 보스 클리어 후 선택 가능한 스킬들
 };
 
@@ -515,6 +516,7 @@ function updateDungeonUI() {
     document.getElementById('current-floor').textContent = gameState.dungeon.currentFloor;
     document.getElementById('pending-gold').textContent = gameState.dungeon.pendingGold;
     document.getElementById('pending-exp').textContent = gameState.dungeon.pendingExp;
+    document.getElementById('pending-stones').textContent = gameState.dungeon.pendingStones;
 }
 
 function updateBattleUI() {
@@ -904,7 +906,7 @@ function enemyDefeated() {
     if (gameState.gameMode === 'normal') stoneAmount = Math.ceil(stoneAmount * 1.5);
 
     if (Math.random() < stoneDropChance) {
-        gameState.enhancementStones += stoneAmount;
+        gameState.dungeon.pendingStones += stoneAmount;
         addBattleLog(`강화석 +${stoneAmount}개 획득!`);
     }
 
@@ -935,20 +937,25 @@ function handleBossClear() {
         return;
     }
 
-    // 유물 드랍 (최대 4개까지)
-    gameState.pendingRelic = null;
-    if (gameState.tempRelics.length < 4 && Math.random() < 0.3) {
-        const availableRelics = relicsData.filter(r => !gameState.tempRelics.find(owned => owned.id === r.id));
-        if (availableRelics.length > 0) {
-            gameState.pendingRelic = availableRelics[Math.floor(Math.random() * availableRelics.length)];
-        }
-    }
+    // 유물 선택지 생성 (3개)
+    generateRelicChoices();
 
-    // 스킬 선택지 생성
+    // 스킬 선택지 생성 (휴식 후 사용)
     generateSkillChoices();
 
     // 보스 클리어 화면 표시
     showBossClearScreen();
+}
+
+// 유물 선택지 3개 생성
+function generateRelicChoices() {
+    const availableRelics = relicsData.filter(r => !gameState.tempRelics.find(owned => owned.id === r.id));
+
+    gameState.relicChoices = [];
+    while (gameState.relicChoices.length < 3 && availableRelics.length > 0) {
+        const idx = Math.floor(Math.random() * availableRelics.length);
+        gameState.relicChoices.push(availableRelics.splice(idx, 1)[0]);
+    }
 }
 
 function generateSkillChoices() {
@@ -982,34 +989,50 @@ function generateStartingSkills() {
 }
 
 function showBossClearScreen() {
-    // 유물 표시
-    const relicReward = document.getElementById('relic-reward');
-    if (gameState.pendingRelic) {
-        relicReward.classList.remove('hidden');
-        document.getElementById('new-relic-name').textContent = gameState.pendingRelic.icon + ' ' + gameState.pendingRelic.name;
-        document.getElementById('new-relic-desc').textContent = gameState.pendingRelic.desc;
-        gameState.tempRelics.push(gameState.pendingRelic);
+    // 초기 상태: 유물 선택 섹션 표시, 스킬 선택 섹션 숨김
+    document.getElementById('relic-choice-section').classList.remove('hidden');
+    document.getElementById('skill-after-rest').classList.add('hidden');
+    document.getElementById('btn-rest').disabled = false;
+
+    // 유물 선택지 표시 (3개)
+    const relicGrid = document.getElementById('relic-choice-grid');
+    relicGrid.innerHTML = '';
+
+    // 유물 4개 보유 시 선택 불가
+    const canGetRelic = gameState.tempRelics.length < 4;
+
+    if (canGetRelic && gameState.relicChoices.length > 0) {
+        gameState.relicChoices.forEach(relic => {
+            const btn = document.createElement('button');
+            btn.className = 'relic-choice-btn';
+            btn.innerHTML = `
+                <div class="relic-icon">${relic.icon}</div>
+                <div class="relic-name">${relic.name}</div>
+                <div class="relic-desc">${relic.desc}</div>
+            `;
+            btn.addEventListener('click', () => selectRelic(relic));
+            relicGrid.appendChild(btn);
+        });
     } else {
-        relicReward.classList.add('hidden');
+        relicGrid.innerHTML = '<p class="no-relic-msg">유물을 이미 4개 보유 중입니다</p>';
     }
 
-    // 스킬 선택지 표시
-    const skillGrid = document.getElementById('skill-choice-grid');
-    skillGrid.innerHTML = '';
-
-    gameState.skillChoices.forEach(skill => {
-        const btn = document.createElement('button');
-        btn.className = 'skill-choice-btn';
-        btn.innerHTML = `
-            <div class="skill-choice-name">${skill.name} ${skill.type === 'passive' ? '[패시브]' : `(MP ${skill.mpCost})`}</div>
-            <div class="skill-choice-char">${skill.char}</div>
-            <div class="skill-choice-desc">${skill.desc}</div>
-        `;
-        btn.addEventListener('click', () => selectSkill(skill));
-        skillGrid.appendChild(btn);
-    });
-
     showScreen('boss-clear-screen');
+}
+
+// 유물 선택
+function selectRelic(relic) {
+    // 유물 추가
+    gameState.tempRelics.push(relic);
+
+    // MP 회복
+    gameState.player.maxMp = getMaxMp();
+    gameState.player.mp = gameState.player.maxMp;
+
+    // 다음 층으로
+    gameState.dungeon.currentFloor++;
+    showScreen('dungeon-screen');
+    startBattle();
 }
 
 function selectSkill(skill) {
@@ -1046,6 +1069,51 @@ function restAndContinue() {
     gameState.player.maxMp = getMaxMp();
     gameState.player.mp = gameState.player.maxMp;
 
+    // 유물 선택 섹션 숨기고 스킬 선택 섹션 표시
+    document.getElementById('relic-choice-section').classList.add('hidden');
+    document.getElementById('btn-rest').disabled = true;
+    document.getElementById('skill-after-rest').classList.remove('hidden');
+
+    // 스킬 선택지 표시
+    const skillGrid = document.getElementById('skill-choice-grid');
+    skillGrid.innerHTML = '';
+
+    gameState.skillChoices.forEach(skill => {
+        const btn = document.createElement('button');
+        btn.className = 'skill-choice-btn';
+        btn.innerHTML = `
+            <div class="skill-choice-name">${skill.name} ${skill.type === 'passive' ? '[패시브]' : `(MP ${skill.mpCost})`}</div>
+            <div class="skill-choice-char">${skill.char}</div>
+            <div class="skill-choice-desc">${skill.desc}</div>
+        `;
+        btn.addEventListener('click', () => selectSkillAndContinue(skill));
+        skillGrid.appendChild(btn);
+    });
+}
+
+// 스킬 선택 후 다음 층으로 (휴식 후 스킬 선택용)
+function selectSkillAndContinue(skill) {
+    // 같은 캐릭터의 스킬 슬롯 찾아서 교체
+    const characterOrder = ['cat', 'elf', 'dwarf', 'human'];
+    const slotIndex = characterOrder.indexOf(skill.character);
+
+    if (slotIndex !== -1) {
+        gameState.equippedSkills[slotIndex] = skill;
+    } else {
+        const emptySlot = gameState.equippedSkills.findIndex(s => s === null);
+        gameState.equippedSkills[emptySlot !== -1 ? emptySlot : 0] = skill;
+    }
+
+    updateSkillButtons();
+
+    // 다음 층으로
+    gameState.dungeon.currentFloor++;
+    showScreen('dungeon-screen');
+    startBattle();
+}
+
+// 스킬 유지하고 진행 (휴식 후 스킬 선택 스킵)
+function skipSkillAndContinue() {
     // 다음 층으로
     gameState.dungeon.currentFloor++;
     showScreen('dungeon-screen');
@@ -1055,12 +1123,14 @@ function restAndContinue() {
 function handleGameClear() {
     gameState.player.gold += gameState.dungeon.pendingGold;
     gameState.player.exp += gameState.dungeon.pendingExp;
+    gameState.enhancementStones += gameState.dungeon.pendingStones;
     checkLevelUp();
 
     document.getElementById('clear-mode').textContent = modeSettings[gameState.gameMode].name;
     document.getElementById('clear-floor').textContent = gameState.dungeon.currentFloor;
     document.getElementById('clear-gold').textContent = gameState.dungeon.pendingGold;
     document.getElementById('clear-exp').textContent = gameState.dungeon.pendingExp;
+    document.getElementById('clear-stones').textContent = gameState.dungeon.pendingStones;
 
     showScreen('clear-screen');
 }
@@ -1070,9 +1140,11 @@ function playerDefeated() {
 
     const halfGold = Math.floor(gameState.dungeon.pendingGold / 2);
     const halfExp = Math.floor(gameState.dungeon.pendingExp / 2);
+    const halfStones = Math.floor(gameState.dungeon.pendingStones / 2);
 
     document.getElementById('death-gold').textContent = halfGold;
     document.getElementById('death-exp').textContent = halfExp;
+    document.getElementById('death-stones').textContent = halfStones;
 
     gameState.player.gold += halfGold;
     gameState.player.exp += halfExp;
@@ -1085,12 +1157,17 @@ function returnToVillage(fromDeath = false) {
     if (!fromDeath) {
         gameState.player.gold += gameState.dungeon.pendingGold;
         gameState.player.exp += gameState.dungeon.pendingExp;
+        gameState.enhancementStones += gameState.dungeon.pendingStones;
         checkLevelUp();
+    } else {
+        // 사망 시에도 강화석은 50%만 획득
+        gameState.enhancementStones += Math.floor(gameState.dungeon.pendingStones / 2);
     }
 
     // 던전 상태 초기화
     gameState.dungeon.pendingGold = 0;
     gameState.dungeon.pendingExp = 0;
+    gameState.dungeon.pendingStones = 0;
     gameState.dungeon.currentFloor = 1;
     gameState.tempRelics = []; // 유물 초기화
     gameState.equippedSkills = [null, null, null, null]; // 스킬 초기화
@@ -1164,19 +1241,37 @@ function updateBuffDisplay() {
         return;
     }
 
-    // 같은 이름의 버프는 한 번만 표시
-    const uniqueBuffs = [];
-    const seenNames = new Set();
+    // 버프 효과 설명
+    const effectDescriptions = {
+        atkBoost: (v) => `공격력 +${Math.round(v * 100)}%`,
+        critBoost: (v) => `치명타 +${v}%`,
+        defBoost: (v) => `받는 피해 -${Math.round(v * 100)}%`,
+        counterDef: (v) => `반격 피해 -${Math.round(v * 100)}%`,
+        dodgeBoost: (v) => `회피율 +${v}%`
+    };
+
+    // 같은 이름의 버프는 한 번만 표시 (효과들을 모아서)
+    const buffGroups = {};
     gameState.activeBuffs.forEach(buff => {
-        if (!seenNames.has(buff.name)) {
-            seenNames.add(buff.name);
-            uniqueBuffs.push(buff);
+        if (!buffGroups[buff.name]) {
+            buffGroups[buff.name] = {
+                name: buff.name,
+                icon: buff.icon,
+                turns: buff.turns,
+                effects: []
+            };
+        }
+        const desc = effectDescriptions[buff.effect];
+        if (desc) {
+            buffGroups[buff.name].effects.push(desc(buff.value));
         }
     });
 
-    buffDisplay.innerHTML = uniqueBuffs.map(b =>
-        `<span class="buff-icon" title="${b.name} (${b.turns}턴)">${b.icon}${b.turns}</span>`
-    ).join('');
+    buffDisplay.innerHTML = Object.values(buffGroups).map(b => {
+        const effectText = b.effects.join(', ');
+        const tooltip = `${b.name}\n${effectText}\n남은 턴: ${b.turns}`;
+        return `<span class="buff-icon" title="${tooltip}">${b.icon}${b.turns}</span>`;
+    }).join('');
 }
 
 // 모드 설명 텍스트
@@ -1303,6 +1398,7 @@ function initEventListeners() {
 
     // 보스 클리어 화면
     document.getElementById('btn-rest').addEventListener('click', restAndContinue);
+    document.getElementById('btn-skip-skill').addEventListener('click', skipSkillAndContinue);
 }
 
 // 초기화
