@@ -997,11 +997,25 @@ function generateStartingSkills() {
 }
 
 function showBossClearScreen() {
-    // 초기 상태: 유물/휴식 선택 표시, 스킬 선택 숨김
+    // 유물 선택과 스킬 교체 섹션 모두 표시
     document.getElementById('relic-choice-section').classList.remove('hidden');
-    document.getElementById('rest-section').classList.remove('hidden');
-    document.getElementById('skill-after-rest').classList.add('hidden');
-    document.getElementById('btn-rest').disabled = false;
+    document.getElementById('skill-rest-section').classList.remove('hidden');
+
+    // 스킬 선택지 표시
+    const skillGrid = document.getElementById('skill-choice-grid');
+    skillGrid.innerHTML = '';
+
+    gameState.skillChoices.forEach(skill => {
+        const btn = document.createElement('button');
+        btn.className = 'skill-choice-btn';
+        btn.innerHTML = `
+            <div class="skill-choice-name">${skill.name} ${skill.type === 'passive' ? '[패시브]' : `(MP ${skill.mpCost})`}</div>
+            <div class="skill-choice-char">${skill.char}</div>
+            <div class="skill-choice-desc">${skill.desc}</div>
+        `;
+        btn.addEventListener('click', () => selectSkillAndContinue(skill));
+        skillGrid.appendChild(btn);
+    });
 
     // 유물 선택지 표시 (3개)
     const relicGrid = document.getElementById('relic-choice-grid');
@@ -1069,7 +1083,8 @@ function selectSkill(skill) {
     startBattle();
 }
 
-function restAndContinue() {
+// 스킬 선택 + HP 30% 회복 후 다음 층으로
+function selectSkillAndContinue(skill) {
     // HP 30% 회복
     const healAmount = Math.floor(gameState.player.maxHp * 0.3);
     gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
@@ -1078,30 +1093,6 @@ function restAndContinue() {
     gameState.player.maxMp = getMaxMp();
     gameState.player.mp = gameState.player.maxMp;
 
-    // 유물/휴식 섹션 숨기고 스킬 선택 섹션 표시
-    document.getElementById('relic-choice-section').classList.add('hidden');
-    document.getElementById('rest-section').classList.add('hidden');
-    document.getElementById('skill-after-rest').classList.remove('hidden');
-
-    // 스킬 선택지 표시
-    const skillGrid = document.getElementById('skill-choice-grid');
-    skillGrid.innerHTML = '';
-
-    gameState.skillChoices.forEach(skill => {
-        const btn = document.createElement('button');
-        btn.className = 'skill-choice-btn';
-        btn.innerHTML = `
-            <div class="skill-choice-name">${skill.name} ${skill.type === 'passive' ? '[패시브]' : `(MP ${skill.mpCost})`}</div>
-            <div class="skill-choice-char">${skill.char}</div>
-            <div class="skill-choice-desc">${skill.desc}</div>
-        `;
-        btn.addEventListener('click', () => selectSkillAndContinue(skill));
-        skillGrid.appendChild(btn);
-    });
-}
-
-// 스킬 선택 후 다음 층으로 (휴식 후 스킬 선택용)
-function selectSkillAndContinue(skill) {
     // 같은 캐릭터의 스킬 슬롯 찾아서 교체
     const characterOrder = ['cat', 'elf', 'dwarf', 'human'];
     const slotIndex = characterOrder.indexOf(skill.character);
@@ -1121,8 +1112,16 @@ function selectSkillAndContinue(skill) {
     startBattle();
 }
 
-// 스킬 유지하고 진행 (휴식 후 스킬 선택 스킵)
+// 스킬 유지 + HP 30% 회복 후 다음 층으로
 function skipSkillAndContinue() {
+    // HP 30% 회복
+    const healAmount = Math.floor(gameState.player.maxHp * 0.3);
+    gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
+
+    // MP 회복
+    gameState.player.maxMp = getMaxMp();
+    gameState.player.mp = gameState.player.maxMp;
+
     // 다음 층으로
     gameState.dungeon.currentFloor++;
     showScreen('dungeon-screen');
@@ -1501,7 +1500,6 @@ function initEventListeners() {
     document.getElementById('btn-clear-return').addEventListener('click', () => returnToVillage(false));
 
     // 보스 클리어 화면
-    document.getElementById('btn-rest').addEventListener('click', restAndContinue);
     document.getElementById('btn-skip-skill').addEventListener('click', skipSkillAndContinue);
 }
 
