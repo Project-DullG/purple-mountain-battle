@@ -221,6 +221,82 @@ h2 {
     margin-bottom: 10px;
 }
 
+.resource-display {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.resource-display span:first-child {
+    color: #ffd93d;
+}
+
+.resource-display span:last-child {
+    color: #8be9fd;
+}
+
+.weapon-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.weapon-card {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.weapon-icon {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.weapon-name {
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 3px;
+}
+
+.weapon-level {
+    color: #ffd93d;
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+}
+
+.weapon-effect {
+    font-size: 0.8rem;
+    color: #8be9fd;
+    margin-bottom: 8px;
+}
+
+.btn-upgrade {
+    width: 100%;
+    padding: 8px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn-upgrade:hover {
+    opacity: 0.9;
+}
+
+.btn-upgrade:disabled {
+    background: #555;
+    cursor: not-allowed;
+}
+
 .shop-item-card {
     background: rgba(0, 0, 0, 0.3);
     padding: 12px;
@@ -374,6 +450,20 @@ h2 {
     color: #ff6b6b;
     justify-content: center;
     margin-bottom: 10px;
+}
+
+.enemy-hp-stat {
+    max-width: 280px;
+    margin: 0 auto 8px auto;
+}
+
+.enemy-hp-bar {
+    background: linear-gradient(90deg, #ff6b6b, #ff4757);
+}
+
+.enemy-atk-display {
+    font-size: 0.9rem;
+    color: #ff8e8e;
 }
 
 .enemy-stats {

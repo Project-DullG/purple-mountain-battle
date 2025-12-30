@@ -28,7 +28,13 @@ const gameState = {
     currentEnemy: null,
     equippedSkills: [null, null, null, null],
     relics: [],
-    weaponLevel: 1,
+    weapons: {
+        sword: 1,   // 대검 - 묘인 스킬
+        shield: 1,  // 방패 - 드워프 스킬
+        bow: 1,     // 활 - 인간 스킬
+        staff: 1    // 지팡이 - 엘프 스킬
+    },
+    enhancementStones: 0,
     armorLevel: 1
 };
 
@@ -101,7 +107,7 @@ function getEnemyName(floor, isBoss, isMiniBoss) {
 
 // 스탯 계산 (유물 효과 포함)
 function getPlayerAtk() {
-    let atk = gameState.player.baseAtk + (gameState.player.stats.str * 2) + (gameState.weaponLevel * 5);
+    let atk = gameState.player.baseAtk + (gameState.player.stats.str * 2);
 
     // 패시브 효과
     gameState.equippedSkills.forEach(skill => {
@@ -116,6 +122,18 @@ function getPlayerAtk() {
     });
 
     return Math.floor(atk);
+}
+
+// 무기 보너스 계산 (캐릭터별)
+function getWeaponBonus(character) {
+    const weaponMap = {
+        cat: 'sword',
+        dwarf: 'shield',
+        human: 'bow',
+        elf: 'staff'
+    };
+    const weapon = weaponMap[character];
+    return weapon ? gameState.weapons[weapon] * 5 : 0; // 레벨당 5% 보너스
 }
 
 function getMaxHp() {
@@ -217,15 +235,23 @@ function updateVillageUI() {
 
 function updateShopUI() {
     document.getElementById('shop-gold').textContent = gameState.player.gold;
-    document.getElementById('weapon-level').textContent = gameState.weaponLevel;
-    document.getElementById('weapon-cost').textContent = gameState.weaponLevel * 100;
+    document.getElementById('shop-stones').textContent = gameState.enhancementStones;
+
+    // 4종 무기 강화
+    const weaponTypes = ['sword', 'shield', 'bow', 'staff'];
+    weaponTypes.forEach(weapon => {
+        const level = gameState.weapons[weapon];
+        document.getElementById(`${weapon}-level`).textContent = level;
+        document.getElementById(`${weapon}-bonus`).textContent = level * 5;
+        document.querySelector(`.btn-upgrade[data-weapon="${weapon}"]`).disabled = gameState.enhancementStones < 1;
+    });
+
+    // 방어구
     document.getElementById('armor-level').textContent = gameState.armorLevel;
     document.getElementById('armor-cost').textContent = gameState.armorLevel * 100;
     document.getElementById('potion-count').textContent = gameState.player.potions;
 
-    const weaponCost = gameState.weaponLevel * 100;
     const armorCost = gameState.armorLevel * 100;
-    document.getElementById('btn-upgrade-weapon').disabled = gameState.player.gold < weaponCost;
     document.getElementById('btn-upgrade-armor').disabled = gameState.player.gold < armorCost;
     document.getElementById('btn-buy-potion').disabled = gameState.player.gold < 50;
 }
@@ -263,7 +289,12 @@ function updateBattleUI() {
     const enemy = gameState.currentEnemy;
     document.getElementById('enemy-name').textContent = enemy.name + (enemy.stunned ? ' [스턴]' : '');
     document.getElementById('enemy-hp').textContent = Math.max(0, enemy.hp);
+    document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
     document.getElementById('enemy-atk').textContent = enemy.atk;
+
+    // 적 HP 바
+    const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
+    document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
 
     document.getElementById('battle-hp').textContent = gameState.player.hp;
     document.getElementById('battle-max-hp').textContent = gameState.player.maxHp;
@@ -372,6 +403,16 @@ function useSkill(slotIndex) {
         return;
     }
 
+    // 스킬의 캐릭터 타입 찾기
+    const characters = ['cat', 'elf', 'dwarf', 'human'];
+    let skillCharacter = null;
+    for (const char of characters) {
+        if (skillsData[char].some(s => s.id === skill.id)) {
+            skillCharacter = char;
+            break;
+        }
+    }
+
     gameState.player.mp -= skill.mpCost;
     addBattleLog(`[${skill.name}] 사용!`);
 
@@ -384,21 +425,25 @@ function useSkill(slotIndex) {
         return;
     }
 
-    // 힐 스킬 - 반격 없음
+    // 힐 스킬 - 반격 없음 (무기 보너스 적용)
     if (skill.heal) {
-        gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + skill.heal);
-        addBattleLog(`HP ${skill.heal} 회복!`);
+        const weaponBonus = getWeaponBonus(skillCharacter);
+        const healAmount = Math.floor(skill.heal * (1 + weaponBonus / 100));
+        gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
+        addBattleLog(`HP ${healAmount} 회복!`);
         updateBattleUI();
         return;
     }
 
-    // 공격 스킬
+    // 공격 스킬 (무기 보너스 적용)
     if (skill.damage) {
         const hits = skill.hits || 1;
+        const weaponBonus = getWeaponBonus(skillCharacter);
 
         for (let i = 0; i < hits; i++) {
             const isCrit = Math.random() * 100 < getCritChance();
-            const damage = isCrit ? Math.floor(skill.damage * 1.5) : skill.damage;
+            const baseDamage = Math.floor(skill.damage * (1 + weaponBonus / 100));
+            const damage = isCrit ? Math.floor(baseDamage * 1.5) : baseDamage;
             gameState.currentEnemy.hp -= damage;
             addBattleLog(`${damage} 데미지${isCrit ? ' (크리티컬!)' : ''}`);
         }
@@ -447,6 +492,15 @@ function enemyDefeated() {
 
     addBattleLog(`${enemy.name} 처치!`);
     addBattleLog(`+${goldReward}G, +${expReward}EXP`);
+
+    // 강화석 드랍 (일반: 30%, 중간보스: 50%, 보스: 100%)
+    let stoneDropChance = enemy.isBoss ? 1.0 : enemy.isMiniBoss ? 0.5 : 0.3;
+    let stoneAmount = enemy.isBoss ? 3 : enemy.isMiniBoss ? 2 : 1;
+
+    if (Math.random() < stoneDropChance) {
+        gameState.enhancementStones += stoneAmount;
+        addBattleLog(`강화석 +${stoneAmount}개 획득!`);
+    }
 
     // 보스 유물 드랍
     if (enemy.isBoss) {
@@ -611,14 +665,16 @@ function initEventListeners() {
         });
     });
 
-    // 상점
-    document.getElementById('btn-upgrade-weapon').addEventListener('click', () => {
-        const cost = gameState.weaponLevel * 100;
-        if (gameState.player.gold >= cost) {
-            gameState.player.gold -= cost;
-            gameState.weaponLevel++;
-            updateShopUI();
-        }
+    // 상점 - 4종 무기 강화
+    document.querySelectorAll('.btn-upgrade[data-weapon]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const weapon = btn.dataset.weapon;
+            if (gameState.enhancementStones >= 1) {
+                gameState.enhancementStones--;
+                gameState.weapons[weapon]++;
+                updateShopUI();
+            }
+        });
     });
 
     document.getElementById('btn-upgrade-armor').addEventListener('click', () => {
