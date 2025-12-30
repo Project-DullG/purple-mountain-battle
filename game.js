@@ -230,8 +230,12 @@ function getAllStatsBonus() {
 }
 
 // 스탯 계산
+// 힘: 공격력 +1, 체력 +2
+// 민첩: 치명타 확률 +1%, 공격력 +0.5
+// 지능: 치명타 데미지 +2%, 마나 +0.5, 체력 +1
+// 행운: 치명타 확률 +1%, 회피 +1%
 function getPlayerAtk() {
-    let atk = gameState.player.baseAtk + (gameState.player.stats.str * 2);
+    let atk = gameState.player.baseAtk + (gameState.player.stats.str * 1) + (gameState.player.stats.dex * 0.5);
 
     gameState.equippedSkills.forEach(skill => {
         if (skill?.type === 'passive' && skill.effect === 'atkUp') {
@@ -261,11 +265,14 @@ function getWeaponBonus(character) {
 }
 
 function getMaxHp() {
-    return 100 + (gameState.player.level - 1) * 10 + (gameState.armorLevel - 1) * 20;
+    const baseHp = 100 + (gameState.player.level - 1) * 10 + (gameState.armorLevel - 1) * 20;
+    const strHp = gameState.player.stats.str * 2;
+    const intHp = gameState.player.stats.int * 1;
+    return baseHp + strHp + intHp;
 }
 
 function getMaxMp() {
-    let mp = 5 + Math.floor(gameState.player.stats.int / 3);
+    let mp = 5 + Math.floor(gameState.player.stats.int * 0.5);
 
     gameState.equippedSkills.forEach(skill => {
         if (skill?.type === 'passive' && skill.effect === 'mpUp') {
@@ -281,7 +288,8 @@ function getMaxMp() {
 }
 
 function getDodgeChance() {
-    let dodge = gameState.player.stats.dex * 1;
+    // 기본 10% + 행운으로 회피율 증가
+    let dodge = 10 + gameState.player.stats.luk * 1;
 
     gameState.tempRelics.forEach(relic => {
         if (relic.effect === 'dodge') dodge += relic.value;
@@ -295,11 +303,18 @@ function getDodgeChance() {
     // 모든 스탯 보너스 (5% = 5%p 추가)
     dodge += getAllStatsBonus() * 100;
 
-    return Math.min(dodge, 70);
+    return Math.min(dodge, 80);
 }
 
+// 실제 치명타 확률 (100% 상한)
 function getCritChance() {
-    let chance = 5 + (gameState.player.stats.luk * 1);
+    return Math.min(getRawCritChance(), 100);
+}
+
+// 치명타 확률 원본값 (초과분은 데미지로 전환)
+function getRawCritChance() {
+    // 기본 10% + 행운 + 민첩으로 치명타 확률 증가 (민첩 1.5%)
+    let chance = 10 + (gameState.player.stats.luk * 1) + (gameState.player.stats.dex * 1.5);
 
     gameState.equippedSkills.forEach(skill => {
         if (skill?.type === 'passive' && skill.effect === 'critUp') {
@@ -319,7 +334,20 @@ function getCritChance() {
     // 모든 스탯 보너스 (5% = 5%p 추가)
     chance += getAllStatsBonus() * 100;
 
-    return Math.min(chance, 70);
+    return chance;
+}
+
+// 치명타 데미지 배율 (기본 130%, 100% 초과 확률은 데미지로 전환)
+function getCritDamage() {
+    let critDmg = 130 + (gameState.player.stats.int * 2);
+
+    // 100% 초과 치명타 확률은 치명타 데미지로 전환
+    const rawCrit = getRawCritChance();
+    if (rawCrit > 100) {
+        critDmg += (rawCrit - 100);
+    }
+
+    return critDmg;
 }
 
 // 가하는 피해 배율 (버프 포함)
@@ -709,7 +737,7 @@ function enemyPreemptiveAttack() {
     const isCrit = Math.random() * 100 < enemyCrit;
     const isDodge = Math.random() * 100 < getDodgeChance();
 
-    let baseDamage = isCrit ? Math.floor(enemyAtk * 1.3) : enemyAtk;
+    let baseDamage = isCrit ? Math.floor(enemyAtk * 1.5) : enemyAtk;
     if (isDodge) baseDamage = Math.floor(baseDamage * 0.5);
     const damage = calculateDamageTaken(baseDamage, false);
 
@@ -741,7 +769,7 @@ function playerAttack() {
     const isEnemyDodge = gameState.currentEnemy.dodge && Math.random() * 100 < gameState.currentEnemy.dodge;
 
     let damage = Math.floor(playerAtk * damageMultiplier);
-    if (isCrit) damage = Math.floor(damage * 1.3);
+    if (isCrit) damage = Math.floor(damage * getCritDamage() / 100);
     if (isEnemyDodge) damage = Math.floor(damage * 0.5);
 
     gameState.currentEnemy.hp -= damage;
@@ -792,7 +820,7 @@ function enemyCounterAttack() {
     const isCrit = Math.random() * 100 < enemyCrit;
     const isDodge = Math.random() * 100 < getDodgeChance();
 
-    let baseDamage = isCrit ? Math.floor(enemyAtk * 1.3) : enemyAtk;
+    let baseDamage = isCrit ? Math.floor(enemyAtk * 1.5) : enemyAtk;
     if (isDodge) baseDamage = Math.floor(baseDamage * 0.5);
     const damage = calculateDamageTaken(baseDamage, isGuarding, true); // isCounter = true
 
@@ -887,7 +915,7 @@ function useSkill(slotIndex) {
             const isEnemyDodge = gameState.currentEnemy.dodge && Math.random() * 100 < gameState.currentEnemy.dodge;
 
             let baseDamage = Math.floor(skill.damage * (1 + weaponBonus / 100) * damageMultiplier);
-            if (isCrit) baseDamage = Math.floor(baseDamage * 1.3);
+            if (isCrit) baseDamage = Math.floor(baseDamage * getCritDamage() / 100);
             if (isEnemyDodge) baseDamage = Math.floor(baseDamage * 0.5);
 
             gameState.currentEnemy.hp -= baseDamage;
@@ -1585,16 +1613,24 @@ function initEventListeners() {
         showScreen('shop-screen');
     });
 
-    // 스탯 올리기
+    // 스탯 올리기 (+1, +10)
     document.querySelectorAll('.btn-stat-up').forEach(btn => {
         btn.addEventListener('click', () => {
-            if (gameState.player.statPoints > 0) {
-                const stat = btn.dataset.stat;
-                gameState.player.stats[stat]++;
-                gameState.player.statPoints--;
+            const stat = btn.dataset.stat;
+            const amount = parseInt(btn.dataset.amount) || 1;
+            const actualAmount = Math.min(amount, gameState.player.statPoints);
+
+            if (actualAmount > 0) {
+                gameState.player.stats[stat] += actualAmount;
+                gameState.player.statPoints -= actualAmount;
                 updateVillageUI();
             }
         });
+    });
+
+    // 스탯 초기화
+    document.getElementById('btn-stat-reset').addEventListener('click', () => {
+        resetStats();
     });
 
     // 상점 - 4종 무기 강화
@@ -1652,6 +1688,29 @@ function initEventListeners() {
     document.getElementById('btn-boss-confirm').addEventListener('click', showBossRewardChoices);
     document.getElementById('btn-skip-skill').addEventListener('click', skipSkillAndContinue);
     document.getElementById('btn-cancel-relic').addEventListener('click', cancelRelicReplace);
+}
+
+// 스탯 초기화 (모든 스탯을 5로 되돌리고 포인트 환불)
+function resetStats() {
+    const baseStats = 5;
+    const currentTotal = gameState.player.stats.str + gameState.player.stats.dex +
+                        gameState.player.stats.int + gameState.player.stats.luk;
+    const baseTotal = baseStats * 4; // 20
+
+    // 투자한 포인트 환불
+    const refund = currentTotal - baseTotal;
+
+    gameState.player.stats.str = baseStats;
+    gameState.player.stats.dex = baseStats;
+    gameState.player.stats.int = baseStats;
+    gameState.player.stats.luk = baseStats;
+    gameState.player.statPoints += refund;
+
+    // HP/MP 재계산
+    gameState.player.maxHp = getMaxHp();
+    gameState.player.maxMp = getMaxMp();
+
+    updateVillageUI();
 }
 
 // 초기화

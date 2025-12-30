@@ -31,35 +31,48 @@
                         <div class="stat-header">
                             <span class="stat-name">힘</span>
                             <span class="stat-value" id="stat-str">5</span>
-                            <button class="btn-stat-up" data-stat="str">+</button>
+                            <div class="stat-buttons">
+                                <button class="btn-stat-up" data-stat="str" data-amount="1">+1</button>
+                                <button class="btn-stat-up btn-stat-10" data-stat="str" data-amount="10">+10</button>
+                            </div>
                         </div>
-                        <span class="stat-desc">공격력 +2</span>
+                        <span class="stat-desc">공격력 +1, 체력 +2</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
                             <span class="stat-name">민첩</span>
                             <span class="stat-value" id="stat-dex">5</span>
-                            <button class="btn-stat-up" data-stat="dex">+</button>
+                            <div class="stat-buttons">
+                                <button class="btn-stat-up" data-stat="dex" data-amount="1">+1</button>
+                                <button class="btn-stat-up btn-stat-10" data-stat="dex" data-amount="10">+10</button>
+                            </div>
                         </div>
-                        <span class="stat-desc">회피율 +1%</span>
+                        <span class="stat-desc">치명타 +1.5%, 공격력 +0.5</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
                             <span class="stat-name">지능</span>
                             <span class="stat-value" id="stat-int">5</span>
-                            <button class="btn-stat-up" data-stat="int">+</button>
+                            <div class="stat-buttons">
+                                <button class="btn-stat-up" data-stat="int" data-amount="1">+1</button>
+                                <button class="btn-stat-up btn-stat-10" data-stat="int" data-amount="10">+10</button>
+                            </div>
                         </div>
-                        <span class="stat-desc">최대 MP +0.33</span>
+                        <span class="stat-desc">크리뎀 +2%, MP +0.5, 체력 +1</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
                             <span class="stat-name">행운</span>
                             <span class="stat-value" id="stat-luk">5</span>
-                            <button class="btn-stat-up" data-stat="luk">+</button>
+                            <div class="stat-buttons">
+                                <button class="btn-stat-up" data-stat="luk" data-amount="1">+1</button>
+                                <button class="btn-stat-up btn-stat-10" data-stat="luk" data-amount="10">+10</button>
+                            </div>
                         </div>
-                        <span class="stat-desc">크리티컬 +1%</span>
+                        <span class="stat-desc">치명타 +1%, 회피 +1%</span>
                     </div>
                 </div>
+                <button id="btn-stat-reset" class="btn-stat-reset">스탯 초기화</button>
             </div>
 
             <!-- 메뉴 버튼들 -->
