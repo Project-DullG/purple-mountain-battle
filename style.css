@@ -1307,6 +1307,131 @@ h2 {
     font-size: 0.85rem;
 }
 
+/* 유물 등급 표시 */
+.relic-rarity {
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+/* 등급별 색상 */
+.rarity-common {
+    color: #b0b0b0;
+    border-color: #808080;
+}
+.relic-choice-btn.rarity-common,
+.relic-replace-btn.rarity-common {
+    border-color: #808080;
+    background: rgba(128, 128, 128, 0.1);
+}
+.relic-choice-btn.rarity-common:hover,
+.relic-replace-btn.rarity-common:hover {
+    background: rgba(128, 128, 128, 0.3);
+}
+.relic-choice-btn.rarity-common .relic-name {
+    color: #b0b0b0;
+}
+.relic-rarity.rarity-common {
+    background: rgba(128, 128, 128, 0.3);
+    color: #d0d0d0;
+}
+
+.rarity-rare {
+    color: #5dade2;
+    border-color: #5dade2;
+}
+.relic-choice-btn.rarity-rare,
+.relic-replace-btn.rarity-rare {
+    border-color: #5dade2;
+    background: rgba(93, 173, 226, 0.1);
+}
+.relic-choice-btn.rarity-rare:hover,
+.relic-replace-btn.rarity-rare:hover {
+    background: rgba(93, 173, 226, 0.3);
+}
+.relic-choice-btn.rarity-rare .relic-name {
+    color: #5dade2;
+}
+.relic-rarity.rarity-rare {
+    background: rgba(93, 173, 226, 0.3);
+    color: #5dade2;
+}
+
+.rarity-epic {
+    color: #af7ac5;
+    border-color: #af7ac5;
+}
+.relic-choice-btn.rarity-epic,
+.relic-replace-btn.rarity-epic {
+    border-color: #af7ac5;
+    background: rgba(175, 122, 197, 0.1);
+}
+.relic-choice-btn.rarity-epic:hover,
+.relic-replace-btn.rarity-epic:hover {
+    background: rgba(175, 122, 197, 0.3);
+}
+.relic-choice-btn.rarity-epic .relic-name {
+    color: #af7ac5;
+}
+.relic-rarity.rarity-epic {
+    background: rgba(175, 122, 197, 0.3);
+    color: #af7ac5;
+}
+
+.rarity-legendary {
+    color: #f39c12;
+    border-color: #f39c12;
+}
+.relic-choice-btn.rarity-legendary,
+.relic-replace-btn.rarity-legendary {
+    border-color: #f39c12;
+    background: rgba(243, 156, 18, 0.15);
+    box-shadow: 0 0 8px rgba(243, 156, 18, 0.3);
+}
+.relic-choice-btn.rarity-legendary:hover,
+.relic-replace-btn.rarity-legendary:hover {
+    background: rgba(243, 156, 18, 0.35);
+    box-shadow: 0 0 12px rgba(243, 156, 18, 0.5);
+}
+.relic-choice-btn.rarity-legendary .relic-name {
+    color: #f39c12;
+}
+.relic-rarity.rarity-legendary {
+    background: rgba(243, 156, 18, 0.3);
+    color: #f39c12;
+}
+
+/* 상세 정보 패널 유물 등급 */
+.relic-info-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.relic-info-rarity {
+    font-size: 0.65rem;
+    padding: 1px 5px;
+    border-radius: 3px;
+}
+
+.relic-info-item.rarity-legendary {
+    border-left: 2px solid #f39c12;
+    padding-left: 8px;
+}
+
+.relic-info-item.rarity-epic {
+    border-left: 2px solid #af7ac5;
+    padding-left: 8px;
+}
+
+.relic-info-item.rarity-rare {
+    border-left: 2px solid #5dade2;
+    padding-left: 8px;
+}
+
 /* 보스 클리어 확인 섹션 */
 #boss-confirm-section {
     text-align: center;

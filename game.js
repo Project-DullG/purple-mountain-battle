@@ -46,16 +46,44 @@ const gameState = {
 };
 
 // 유물 데이터
+// 등급: common(일반), rare(희귀), epic(영웅), legendary(전설)
 const relicsData = [
-    { id: 'relic_sword', name: '고대의 검날', desc: '공격력 +10', effect: 'atk', value: 10, icon: '⚔️' },
-    { id: 'relic_shield', name: '수호의 방패', desc: '받는 피해 -10%', effect: 'def', value: 0.9, icon: '🛡️' },
-    { id: 'relic_ring', name: '마력의 반지', desc: '최대 MP +5', effect: 'mp', value: 5, icon: '💍' },
-    { id: 'relic_cloak', name: '그림자 망토', desc: '회피율 +10%', effect: 'dodge', value: 10, icon: '🧥' },
-    { id: 'relic_amulet', name: '행운의 부적', desc: '크리티컬 +10%', effect: 'crit', value: 10, icon: '🔮' },
-    { id: 'relic_boots', name: '신속의 장화', desc: '선제공격 확률 +20%', effect: 'first', value: 20, icon: '👢' },
-    { id: 'relic_crown', name: '왕의 왕관', desc: '경험치 획득 +20%', effect: 'exp', value: 1.2, icon: '👑' },
-    { id: 'relic_coin', name: '황금 동전', desc: '골드 획득 +20%', effect: 'gold', value: 1.2, icon: '🪙' }
+    // 일반 등급
+    { id: 'relic_sword', name: '고대의 검날', desc: '공격력 +10', effect: 'atk', value: 10, icon: '⚔️', rarity: 'common' },
+    { id: 'relic_ring', name: '마력의 반지', desc: '최대 MP +3', effect: 'mp', value: 3, icon: '💍', rarity: 'common' },
+    { id: 'relic_coin', name: '황금 동전', desc: '골드 획득 +15%', effect: 'gold', value: 1.15, icon: '🪙', rarity: 'common' },
+    { id: 'relic_feather', name: '깃털 장식', desc: '회피율 +5%', effect: 'dodge', value: 5, icon: '🪶', rarity: 'common' },
+    // 희귀 등급
+    { id: 'relic_shield', name: '수호의 방패', desc: '받는 피해 -10%', effect: 'def', value: 0.9, icon: '🛡️', rarity: 'rare' },
+    { id: 'relic_cloak', name: '그림자 망토', desc: '회피율 +10%', effect: 'dodge', value: 10, icon: '🧥', rarity: 'rare' },
+    { id: 'relic_amulet', name: '행운의 부적', desc: '크리티컬 +10%', effect: 'crit', value: 10, icon: '🔮', rarity: 'rare' },
+    { id: 'relic_boots', name: '신속의 장화', desc: '선제공격 확률 +15%', effect: 'first', value: 15, icon: '👢', rarity: 'rare' },
+    // 영웅 등급
+    { id: 'relic_crown', name: '왕의 왕관', desc: '경험치 획득 +25%', effect: 'exp', value: 1.25, icon: '👑', rarity: 'epic' },
+    { id: 'relic_orb', name: '마력의 오브', desc: '최대 MP +5', effect: 'mp', value: 5, icon: '🔵', rarity: 'epic' },
+    { id: 'relic_fang', name: '흡혈의 송곳니', desc: '공격 시 피해의 5% 회복', effect: 'lifeSteal', value: 0.05, icon: '🦷', rarity: 'epic' },
+    { id: 'relic_horn', name: '전쟁의 뿔피리', desc: '공격력 +20', effect: 'atk', value: 20, icon: '📯', rarity: 'epic' },
+    // 전설 등급
+    { id: 'relic_heart', name: '드래곤의 심장', desc: '받는 피해 -20%', effect: 'def', value: 0.8, icon: '❤️‍🔥', rarity: 'legendary' },
+    { id: 'relic_eye', name: '예언자의 눈', desc: '크리티컬 +20%', effect: 'crit', value: 20, icon: '👁️', rarity: 'legendary' },
+    { id: 'relic_star', name: '별의 파편', desc: '모든 스탯 +5%', effect: 'allStats', value: 0.05, icon: '⭐', rarity: 'legendary' }
 ];
+
+// 등급별 출현 확률
+const rarityWeights = {
+    common: 50,
+    rare: 30,
+    epic: 15,
+    legendary: 5
+};
+
+// 등급별 표시명
+const rarityNames = {
+    common: '일반',
+    rare: '희귀',
+    epic: '영웅',
+    legendary: '전설'
+};
 
 // 스킬 데이터
 // type: 'active'(액티브), 'buff'(버프), 'passive'(패시브)
@@ -192,6 +220,15 @@ function getEnemyName(floor, isBoss, isMiniBoss) {
     return normalEnemies[tier];
 }
 
+// 모든 스탯 보너스 계산
+function getAllStatsBonus() {
+    let bonus = 0;
+    gameState.tempRelics.forEach(relic => {
+        if (relic.effect === 'allStats') bonus += relic.value;
+    });
+    return bonus;
+}
+
 // 스탯 계산
 function getPlayerAtk() {
     let atk = gameState.player.baseAtk + (gameState.player.stats.str * 2);
@@ -205,6 +242,9 @@ function getPlayerAtk() {
     gameState.tempRelics.forEach(relic => {
         if (relic.effect === 'atk') atk += relic.value;
     });
+
+    // 모든 스탯 보너스
+    atk *= (1 + getAllStatsBonus());
 
     return Math.floor(atk);
 }
@@ -252,6 +292,9 @@ function getDodgeChance() {
         if (buff.effect === 'dodgeBoost') dodge += buff.value;
     });
 
+    // 모든 스탯 보너스 (5% = 5%p 추가)
+    dodge += getAllStatsBonus() * 100;
+
     return Math.min(dodge, 70);
 }
 
@@ -272,6 +315,9 @@ function getCritChance() {
     gameState.activeBuffs.forEach(buff => {
         if (buff.effect === 'critBoost') chance += buff.value;
     });
+
+    // 모든 스탯 보너스 (5% = 5%p 추가)
+    chance += getAllStatsBonus() * 100;
 
     return Math.min(chance, 70);
 }
@@ -329,6 +375,13 @@ function getLifeStealPercent() {
     gameState.equippedSkills.forEach(skill => {
         if (skill?.type === 'passive' && skill.effect === 'lifeSteal') {
             percent += skill.value;
+        }
+    });
+
+    // 유물 흡혈 효과
+    gameState.tempRelics.forEach(relic => {
+        if (relic.effect === 'lifeSteal') {
+            percent += relic.value;
         }
     });
 
@@ -956,14 +1009,37 @@ function handleBossClear() {
     showBossClearScreen();
 }
 
-// 유물 선택지 3개 생성
-function generateRelicChoices() {
-    const availableRelics = relicsData.filter(r => !gameState.tempRelics.find(owned => owned.id === r.id));
+// 등급별 유물 선택 (확률 기반)
+function selectRelicByRarity() {
+    const totalWeight = Object.values(rarityWeights).reduce((a, b) => a + b, 0);
+    let random = Math.random() * totalWeight;
 
+    let selectedRarity = 'common';
+    for (const [rarity, weight] of Object.entries(rarityWeights)) {
+        random -= weight;
+        if (random <= 0) {
+            selectedRarity = rarity;
+            break;
+        }
+    }
+
+    // 해당 등급의 유물 중 랜덤 선택
+    const relicsOfRarity = relicsData.filter(r => r.rarity === selectedRarity);
+    return relicsOfRarity[Math.floor(Math.random() * relicsOfRarity.length)];
+}
+
+// 유물 선택지 3개 생성 (중복 허용, 등급 확률 적용)
+function generateRelicChoices() {
     gameState.relicChoices = [];
-    while (gameState.relicChoices.length < 3 && availableRelics.length > 0) {
-        const idx = Math.floor(Math.random() * availableRelics.length);
-        gameState.relicChoices.push(availableRelics.splice(idx, 1)[0]);
+    const selectedIds = new Set(); // 같은 선택지에서는 중복 방지
+
+    while (gameState.relicChoices.length < 3) {
+        const relic = selectRelicByRarity();
+        // 이번 선택지에서 같은 유물이 나오지 않도록
+        if (!selectedIds.has(relic.id)) {
+            selectedIds.add(relic.id);
+            gameState.relicChoices.push({ ...relic }); // 복사본 저장
+        }
     }
 }
 
@@ -1045,8 +1121,9 @@ function showBossRewardChoices() {
     if (gameState.relicChoices.length > 0) {
         gameState.relicChoices.forEach(relic => {
             const btn = document.createElement('button');
-            btn.className = 'relic-choice-btn';
+            btn.className = `relic-choice-btn rarity-${relic.rarity}`;
             btn.innerHTML = `
+                <div class="relic-rarity rarity-${relic.rarity}">${rarityNames[relic.rarity]}</div>
                 <div class="relic-icon">${relic.icon}</div>
                 <div class="relic-name">${relic.name}</div>
                 <div class="relic-desc">${relic.desc}</div>
@@ -1091,8 +1168,9 @@ function showRelicReplaceScreen() {
 
     gameState.tempRelics.forEach((relic, index) => {
         const btn = document.createElement('button');
-        btn.className = 'relic-replace-btn';
+        btn.className = `relic-replace-btn rarity-${relic.rarity}`;
         btn.innerHTML = `
+            <div class="relic-rarity rarity-${relic.rarity}">${rarityNames[relic.rarity]}</div>
             <div class="relic-icon">${relic.icon}</div>
             <div class="relic-name">${relic.name}</div>
         `;
@@ -1382,11 +1460,15 @@ function updateInfoPanel() {
 
     if (gameState.tempRelics.length > 0) {
         gameState.tempRelics.forEach(relic => {
+            const rarityName = rarityNames[relic.rarity] || '일반';
             html += `
-                <div class="relic-info-item">
+                <div class="relic-info-item rarity-${relic.rarity}">
                     <span class="relic-info-icon">${relic.icon}</span>
                     <div class="relic-info-content">
-                        <div class="relic-info-name">${relic.name}</div>
+                        <div class="relic-info-header">
+                            <span class="relic-info-name">${relic.name}</span>
+                            <span class="relic-info-rarity rarity-${relic.rarity}">${rarityName}</span>
+                        </div>
                         <div class="relic-info-desc">${relic.desc}</div>
                     </div>
                 </div>
