@@ -1555,11 +1555,13 @@ function checkEnemyPreemptiveAttack() {
         enemyPreemptiveAttack();
         enemyAttackCounter = getRandomAttackCounter();
         addBattleLog(`다음 선제공격까지 ${enemyAttackCounter}턴`);
+        updateBattleUI(); // 카운터 리셋 후 UI 즉시 업데이트
 
         if (gameState.player.hp <= 0) {
             return true; // 플레이어 사망
         }
     }
+    updateBattleUI(); // 카운터 변경 후 UI 업데이트
     return false;
 }
 
