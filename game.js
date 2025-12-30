@@ -27,6 +27,8 @@ const gameState = {
     },
     currentEnemy: null,
     equippedSkills: [null, null, null, null],
+    skillCooldowns: {}, // 스킬 ID -> 남은 쿨타임
+    activeBuffs: [], // { id, name, icon, turns, effect, value }
     tempRelics: [], // 던전 내 임시 유물
     weapons: {
         sword: 1,
@@ -54,36 +56,98 @@ const relicsData = [
 ];
 
 // 스킬 데이터
+// type: 'active'(액티브), 'buff'(버프), 'passive'(패시브)
+// cooldown: 사용 후 쿨타임 (턴)
+// buffEffect: 버프 효과 종류, buffValue: 버프 수치, buffTurns: 버프 지속 턴
 const skillsData = {
     cat: [
-        { id: 'cat_slash', name: '강타', mpCost: 2, damage: 25, type: 'active', desc: '25 데미지. 반격 받음', char: '묘인' },
-        { id: 'cat_fury', name: '연속베기', mpCost: 4, damage: 15, hits: 3, type: 'active', desc: '15 데미지 x3. 반격 1회', char: '묘인' },
-        { id: 'cat_rage', name: '광폭화', mpCost: 0, type: 'passive', effect: 'atkUp', value: 1.2, desc: '패시브: 공격력 20% 증가', char: '묘인' }
+        {
+            id: 'cat_rage', name: '광폭화', mpCost: 2, type: 'buff', cooldown: 4,
+            buffEffect: 'atkBoost', buffValue: 0.25, buffTurns: 3, buffIcon: '🔥',
+            desc: '3턴간 가하는 피해 +25% (쿨 4턴)', char: '묘인'
+        },
+        {
+            id: 'cat_slash', name: '폭렬참', mpCost: 3, damage: 35, type: 'active', cooldown: 2,
+            desc: '35 데미지. 반격 받음 (쿨 2턴)', char: '묘인'
+        },
+        {
+            id: 'cat_bleed', name: '피의 갈증', mpCost: 0, type: 'passive',
+            effect: 'lifeSteal', value: 0.1,
+            desc: '패시브: 공격 시 피해량의 10% HP 회복', char: '묘인'
+        }
     ],
     elf: [
-        { id: 'elf_fire', name: '화염', mpCost: 3, damage: 30, type: 'active', desc: '30 데미지. 반격 받음', char: '엘프' },
-        { id: 'elf_heal', name: '치유', mpCost: 2, heal: 40, type: 'active', desc: 'HP 40 회복. 반격 없음', char: '엘프' },
-        { id: 'elf_mana', name: '마력증폭', mpCost: 0, type: 'passive', effect: 'mpUp', value: 3, desc: '패시브: 최대 MP +3', char: '엘프' }
+        {
+            id: 'elf_focus', name: '정신 집중', mpCost: 1, type: 'buff', cooldown: 3,
+            buffEffect: 'critBoost', buffValue: 20, buffTurns: 3, buffIcon: '🎯',
+            desc: '3턴간 치명타 확률 +20% (쿨 3턴)', char: '엘프'
+        },
+        {
+            id: 'elf_mana', name: '마나 순환', mpCost: 0, type: 'active', cooldown: 2,
+            effect: 'mpRecover', value: 3,
+            desc: 'MP 3 회복 (쿨 2턴)', char: '엘프'
+        },
+        {
+            id: 'elf_nature', name: '자연의 축복', mpCost: 0, type: 'passive',
+            effect: 'mpRegen', value: 1,
+            desc: '패시브: 매 턴 MP 1 자동 회복', char: '엘프'
+        }
     ],
     dwarf: [
-        { id: 'dwarf_guard', name: '방어', mpCost: 1, type: 'active', effect: 'guard', desc: '적 공격 유도 + 피해 70% 감소', char: '드워프' },
-        { id: 'dwarf_bash', name: '방패치기', mpCost: 2, damage: 15, type: 'active', effect: 'stun', desc: '15 데미지 + 적 1턴 스턴', char: '드워프' },
-        { id: 'dwarf_wall', name: '철벽', mpCost: 0, type: 'passive', effect: 'defUp', value: 0.85, desc: '패시브: 받는 피해 15% 감소', char: '드워프' }
+        {
+            id: 'dwarf_iron', name: '철벽 방어', mpCost: 2, type: 'buff', cooldown: 3,
+            buffEffect: 'defBoost', buffValue: 0.3, buffTurns: 2, buffIcon: '🛡️',
+            multiEffect: [
+                { effect: 'defBoost', value: 0.3 },
+                { effect: 'counterDef', value: 0.4 }
+            ],
+            desc: '2턴간 받는 피해 -30%, 반격 피해 -40% (쿨 3턴)', char: '드워프'
+        },
+        {
+            id: 'dwarf_bash', name: '방패 강타', mpCost: 2, damage: 20, type: 'active', cooldown: 2,
+            effect: 'stun',
+            desc: '20 데미지 + 적 1턴 스턴 (쿨 2턴)', char: '드워프'
+        },
+        {
+            id: 'dwarf_endure', name: '불굴', mpCost: 0, type: 'passive',
+            effect: 'endure', value: 0.15,
+            desc: '패시브: 받는 모든 피해 -15%', char: '드워프'
+        }
     ],
     human: [
-        { id: 'human_snipe', name: '저격', mpCost: 2, damage: 20, type: 'active', effect: 'noCounter', desc: '20 데미지. 반격 없음!', char: '인간' },
-        { id: 'human_double', name: '속사', mpCost: 3, damage: 12, type: 'active', hits: 2, desc: '12 데미지 x2. 반격 1회', char: '인간' },
-        { id: 'human_focus', name: '집중', mpCost: 0, type: 'passive', effect: 'critUp', value: 0.15, desc: '패시브: 크리티컬 +15%', char: '인간' }
+        {
+            id: 'human_snipe', name: '정밀 사격', mpCost: 2, damage: 25, type: 'active', cooldown: 0,
+            effect: 'noCounter',
+            desc: '25 데미지. 반격 없음', char: '인간'
+        },
+        {
+            id: 'human_evasion', name: '회피 기동', mpCost: 2, type: 'buff', cooldown: 3,
+            buffEffect: 'dodgeBoost', buffValue: 25, buffTurns: 2, buffIcon: '💨',
+            desc: '2턴간 회피율 +25% (쿨 3턴)', char: '인간'
+        },
+        {
+            id: 'human_tactics', name: '전술적 우위', mpCost: 0, type: 'passive',
+            effect: 'firstStrike', value: 1,
+            desc: '패시브: 선제공격 카운터 +1 (늦게 옴)', char: '인간'
+        }
     ]
 };
 
 // 모드별 설정
+// enemyMult: 적 능력치 배율, rewardMult: 보상 배율
 const modeSettings = {
-    easy: { enemyMult: 0.8, maxFloor: 50, name: '이지' },
-    normal: { enemyMult: 1.0, maxFloor: 50, name: '노말' },
-    hard: { enemyMult: 1.3, maxFloor: 50, name: '하드' },
-    infinite: { enemyMult: 1.0, maxFloor: Infinity, name: '무한' }
+    easy: { enemyMult: 0.5, rewardMult: 1, maxFloor: 50, name: '이지' },
+    normal: { enemyMult: 5, rewardMult: 3, maxFloor: 50, name: '노말' },
+    hard: { enemyMult: 30, rewardMult: 5, maxFloor: 50, name: '하드' },
+    infinite: { enemyMult: 10, rewardMult: 4, maxFloor: Infinity, name: '무한' }
 };
+
+// 적 타입
+const enemyTypes = [
+    { id: 'power', name: '파워', icon: '💪', hpMult: 0.8, atkMult: 1.4, dodge: 0, crit: 5 },
+    { id: 'tank', name: '탱커', icon: '🛡️', hpMult: 1.5, atkMult: 0.8, dodge: 0, crit: 0 },
+    { id: 'lucky', name: '행운', icon: '🍀', hpMult: 0.9, atkMult: 1.0, dodge: 20, crit: 20 }
+];
 
 // 적 생성
 function generateEnemy(floor) {
@@ -91,16 +155,25 @@ function generateEnemy(floor) {
     const isMiniBoss = floor % 5 === 0 && !isBoss;
     const modeMult = modeSettings[gameState.gameMode].enemyMult;
 
+    // 랜덤 타입 선택
+    const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+
     const baseHp = 30 + floor * 10;
     const baseAtk = 5 + floor * 2;
 
+    const tierMult = isBoss ? 3 : isMiniBoss ? 2 : 1;
+    const atkTierMult = isBoss ? 2 : isMiniBoss ? 1.5 : 1;
+
     return {
         name: getEnemyName(floor, isBoss, isMiniBoss),
-        hp: Math.floor((isBoss ? baseHp * 3 : isMiniBoss ? baseHp * 2 : baseHp) * modeMult),
-        maxHp: Math.floor((isBoss ? baseHp * 3 : isMiniBoss ? baseHp * 2 : baseHp) * modeMult),
-        atk: Math.floor((isBoss ? baseAtk * 2 : isMiniBoss ? baseAtk * 1.5 : baseAtk) * modeMult),
-        goldReward: Math.floor((10 + floor * 5) * (isBoss ? 3 : isMiniBoss ? 2 : 1)),
-        expReward: Math.floor((20 + floor * 10) * (isBoss ? 3 : isMiniBoss ? 2 : 1)),
+        type: type,
+        hp: Math.floor(baseHp * tierMult * type.hpMult * modeMult),
+        maxHp: Math.floor(baseHp * tierMult * type.hpMult * modeMult),
+        atk: Math.floor(baseAtk * atkTierMult * type.atkMult * modeMult),
+        dodge: type.dodge,
+        crit: type.crit,
+        goldReward: Math.floor((10 + floor * 5) * tierMult),
+        expReward: Math.floor((20 + floor * 10) * tierMult),
         isBoss,
         isMiniBoss,
         stunned: false
@@ -172,7 +245,12 @@ function getDodgeChance() {
         if (relic.effect === 'dodge') dodge += relic.value;
     });
 
-    return Math.min(dodge, 50);
+    // 버프 효과
+    gameState.activeBuffs.forEach(buff => {
+        if (buff.effect === 'dodgeBoost') dodge += buff.value;
+    });
+
+    return Math.min(dodge, 70);
 }
 
 function getCritChance() {
@@ -188,25 +266,177 @@ function getCritChance() {
         if (relic.effect === 'crit') chance += relic.value;
     });
 
-    return Math.min(chance, 50);
+    // 버프 효과
+    gameState.activeBuffs.forEach(buff => {
+        if (buff.effect === 'critBoost') chance += buff.value;
+    });
+
+    return Math.min(chance, 70);
 }
 
-function calculateDamageTaken(damage, guarding = false) {
-    let finalDamage = damage;
+// 가하는 피해 배율 (버프 포함)
+function getDamageMultiplier() {
+    let mult = 1.0;
 
+    gameState.activeBuffs.forEach(buff => {
+        if (buff.effect === 'atkBoost') mult += buff.value;
+    });
+
+    return mult;
+}
+
+// 받는 피해 감소 (패시브 + 버프)
+function getDefenseMultiplier() {
+    let mult = 1.0;
+
+    // 패시브: 불굴 (드워프)
     gameState.equippedSkills.forEach(skill => {
-        if (skill?.type === 'passive' && skill.effect === 'defUp') {
-            finalDamage *= skill.value;
+        if (skill?.type === 'passive' && skill.effect === 'endure') {
+            mult *= (1 - skill.value);
         }
     });
 
-    gameState.tempRelics.forEach(relic => {
-        if (relic.effect === 'def') finalDamage *= relic.value;
+    // 버프 효과
+    gameState.activeBuffs.forEach(buff => {
+        if (buff.effect === 'defBoost') mult *= (1 - buff.value);
     });
+
+    // 유물 효과
+    gameState.tempRelics.forEach(relic => {
+        if (relic.effect === 'def') mult *= relic.value;
+    });
+
+    return mult;
+}
+
+// 반격 피해 감소 (버프)
+function getCounterDefenseMultiplier() {
+    let mult = 1.0;
+
+    gameState.activeBuffs.forEach(buff => {
+        if (buff.effect === 'counterDef') mult *= (1 - buff.value);
+    });
+
+    return mult;
+}
+
+// 흡혈 효과 체크
+function getLifeStealPercent() {
+    let percent = 0;
+
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'lifeSteal') {
+            percent += skill.value;
+        }
+    });
+
+    return percent;
+}
+
+// 선제공격 보너스 체크
+function getFirstStrikeBonus() {
+    let bonus = 0;
+
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'firstStrike') {
+            bonus += skill.value;
+        }
+    });
+
+    return bonus;
+}
+
+function calculateDamageTaken(damage, guarding = false, isCounter = false) {
+    let finalDamage = damage;
+
+    // 방어 배율 적용
+    finalDamage *= getDefenseMultiplier();
+
+    // 반격일 경우 추가 감소
+    if (isCounter) {
+        finalDamage *= getCounterDefenseMultiplier();
+    }
 
     if (guarding) finalDamage *= 0.3;
 
     return Math.floor(finalDamage);
+}
+
+// === 버프 시스템 ===
+function applyBuff(skill) {
+    // 기존 같은 버프 제거
+    gameState.activeBuffs = gameState.activeBuffs.filter(b => b.id !== skill.id);
+
+    if (skill.multiEffect) {
+        // 다중 효과 버프
+        skill.multiEffect.forEach(eff => {
+            gameState.activeBuffs.push({
+                id: skill.id + '_' + eff.effect,
+                name: skill.name,
+                icon: skill.buffIcon,
+                turns: skill.buffTurns,
+                effect: eff.effect,
+                value: eff.value
+            });
+        });
+    } else {
+        gameState.activeBuffs.push({
+            id: skill.id,
+            name: skill.name,
+            icon: skill.buffIcon,
+            turns: skill.buffTurns,
+            effect: skill.buffEffect,
+            value: skill.buffValue
+        });
+    }
+
+    addBattleLog(`${skill.buffIcon} ${skill.name} 발동! (${skill.buffTurns}턴)`);
+}
+
+function tickBuffs() {
+    gameState.activeBuffs.forEach(buff => {
+        buff.turns--;
+    });
+
+    const expired = gameState.activeBuffs.filter(b => b.turns <= 0);
+    expired.forEach(buff => {
+        addBattleLog(`${buff.icon} ${buff.name} 효과 종료`);
+    });
+
+    gameState.activeBuffs = gameState.activeBuffs.filter(b => b.turns > 0);
+}
+
+function tickCooldowns() {
+    Object.keys(gameState.skillCooldowns).forEach(skillId => {
+        if (gameState.skillCooldowns[skillId] > 0) {
+            gameState.skillCooldowns[skillId]--;
+        }
+    });
+}
+
+function applyCooldown(skill) {
+    if (skill.cooldown && skill.cooldown > 0) {
+        gameState.skillCooldowns[skill.id] = skill.cooldown;
+    }
+}
+
+function isOnCooldown(skillId) {
+    return gameState.skillCooldowns[skillId] > 0;
+}
+
+function getCooldown(skillId) {
+    return gameState.skillCooldowns[skillId] || 0;
+}
+
+// MP 자동 회복 (엘프 패시브)
+function tickMpRegen() {
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'mpRegen') {
+            const regen = skill.value;
+            gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + regen);
+            if (regen > 0) addBattleLog(`MP +${regen} (자연의 축복)`);
+        }
+    });
 }
 
 function getExpForLevel(level) {
@@ -239,7 +469,6 @@ function updateVillageUI() {
     document.getElementById('player-gold').textContent = gameState.player.gold;
     document.getElementById('player-exp').textContent = gameState.player.exp;
     document.getElementById('player-max-exp').textContent = getExpForLevel(gameState.player.level);
-    document.getElementById('current-mode').textContent = modeSettings[gameState.gameMode].name;
 
     document.getElementById('stat-points').textContent = gameState.player.statPoints;
     document.getElementById('stat-str').textContent = gameState.player.stats.str;
@@ -286,28 +515,25 @@ function updateDungeonUI() {
     document.getElementById('current-floor').textContent = gameState.dungeon.currentFloor;
     document.getElementById('pending-gold').textContent = gameState.dungeon.pendingGold;
     document.getElementById('pending-exp').textContent = gameState.dungeon.pendingExp;
-
-    // 유물 표시
-    const relicsContainer = document.getElementById('current-relics');
-    const relicIcons = document.getElementById('relic-icons');
-
-    if (gameState.tempRelics.length > 0) {
-        relicsContainer.classList.remove('hidden');
-        relicIcons.textContent = gameState.tempRelics.map(r => r.icon).join(' ');
-    } else {
-        relicsContainer.classList.add('hidden');
-    }
 }
 
 function updateBattleUI() {
     const enemy = gameState.currentEnemy;
-    document.getElementById('enemy-name').textContent = enemy.name + (enemy.stunned ? ' [스턴]' : '');
+    const typeIcon = enemy.type ? enemy.type.icon : '';
+    document.getElementById('enemy-name').textContent = typeIcon + enemy.name + (enemy.stunned ? ' [스턴]' : '');
     document.getElementById('enemy-hp').textContent = Math.max(0, enemy.hp);
     document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
     document.getElementById('enemy-atk').textContent = enemy.atk;
+    document.getElementById('enemy-preempt-counter').textContent = enemyAttackCounter;
 
     const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
     document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
+
+    // 왼쪽 스탯 패널
+    document.getElementById('panel-atk').textContent = getPlayerAtk();
+    document.getElementById('panel-crit').textContent = getCritChance() + '%';
+    document.getElementById('panel-dodge').textContent = getDodgeChance() + '%';
+    document.getElementById('panel-relics').textContent = gameState.tempRelics.map(r => r.icon).join('');
 
     document.getElementById('battle-hp').textContent = gameState.player.hp;
     document.getElementById('battle-max-hp').textContent = gameState.player.maxHp;
@@ -347,31 +573,121 @@ function showScreen(screenId) {
 
 // 전투 시스템
 let isGuarding = false;
+let hasActed = false; // 행동 여부 (도주 가능 여부)
+let enemyAttackCounter = 0; // 적 선제공격까지 남은 턴
+
+function getRandomAttackCounter() {
+    const base = Math.floor(Math.random() * 4) + 3; // 3-6
+    const bonus = getFirstStrikeBonus(); // 인간 패시브
+    return base + bonus;
+}
 
 function startBattle() {
     gameState.currentEnemy = generateEnemy(gameState.dungeon.currentFloor);
     gameState.dungeon.inBattle = true;
     isGuarding = false;
+    hasActed = false;
+    enemyAttackCounter = getRandomAttackCounter();
     clearBattleLog();
+
+    // 도주 버튼 활성화
+    document.getElementById('btn-return').disabled = false;
 
     const floorType = gameState.currentEnemy.isBoss ? '보스' : gameState.currentEnemy.isMiniBoss ? '중간보스' : '';
     addBattleLog(`${gameState.dungeon.currentFloor}층 - ${gameState.currentEnemy.name} ${floorType ? `[${floorType}]` : ''}`);
+    addBattleLog(`선제공격까지 ${enemyAttackCounter}턴`);
+
+    // 활성 버프 표시
+    if (gameState.activeBuffs.length > 0) {
+        const buffIcons = gameState.activeBuffs.map(b => b.icon).join('');
+        addBattleLog(`활성 버프: ${buffIcons}`);
+    }
 
     updateBattleUI();
     updateDungeonUI();
-    document.getElementById('battle-actions').classList.remove('hidden');
-    document.getElementById('floor-clear-actions').classList.add('hidden');
+    updateSkillButtons();
+}
+
+// 행동 시 도주 불가
+function disableFlee() {
+    if (!hasActed) {
+        hasActed = true;
+        document.getElementById('btn-return').disabled = true;
+    }
+}
+
+// 적 선제공격 처리
+function checkEnemyPreemptiveAttack() {
+    enemyAttackCounter--;
+
+    if (enemyAttackCounter <= 0) {
+        addBattleLog(`⚠️ 적 선제공격!`);
+        enemyPreemptiveAttack();
+        enemyAttackCounter = getRandomAttackCounter();
+        addBattleLog(`다음 선제공격까지 ${enemyAttackCounter}턴`);
+
+        if (gameState.player.hp <= 0) {
+            return true; // 플레이어 사망
+        }
+    }
+    return false;
+}
+
+function enemyPreemptiveAttack() {
+    if (gameState.currentEnemy.stunned) {
+        addBattleLog(`${gameState.currentEnemy.name}은(는) 스턴 상태! 선제공격 실패`);
+        gameState.currentEnemy.stunned = false;
+        return;
+    }
+
+    const enemyAtk = gameState.currentEnemy.atk;
+    const enemyCrit = gameState.currentEnemy.crit || 0;
+    const isCrit = Math.random() * 100 < enemyCrit;
+    const isDodge = Math.random() * 100 < getDodgeChance();
+
+    let baseDamage = isCrit ? Math.floor(enemyAtk * 1.3) : enemyAtk;
+    if (isDodge) baseDamage = Math.floor(baseDamage * 0.5);
+    const damage = calculateDamageTaken(baseDamage, false);
+
+    gameState.player.hp -= damage;
+    const logParts = [`선제공격! ${damage} 피해`];
+    if (isCrit) logParts.push('(크리티컬!)');
+    if (isDodge) logParts.push('(회피!)');
+    addBattleLog(logParts.join(' '));
+
+    if (gameState.player.hp <= 0) {
+        playerDefeated();
+    }
+    updateBattleUI();
 }
 
 function playerAttack() {
     if (!gameState.dungeon.inBattle) return;
+    disableFlee();
+
+    // 적 선제공격 체크
+    if (checkEnemyPreemptiveAttack()) return;
+
+    // 턴 시작 처리
+    processPlayerTurn();
 
     const playerAtk = getPlayerAtk();
+    const damageMultiplier = getDamageMultiplier();
     const isCrit = Math.random() * 100 < getCritChance();
-    const damage = isCrit ? Math.floor(playerAtk * 1.5) : playerAtk;
+    const isEnemyDodge = gameState.currentEnemy.dodge && Math.random() * 100 < gameState.currentEnemy.dodge;
+
+    let damage = Math.floor(playerAtk * damageMultiplier);
+    if (isCrit) damage = Math.floor(damage * 1.3);
+    if (isEnemyDodge) damage = Math.floor(damage * 0.5);
 
     gameState.currentEnemy.hp -= damage;
-    addBattleLog(`공격! ${damage} 데미지${isCrit ? ' (크리티컬!)' : ''}`);
+    const logParts = [`공격! ${damage} 데미지`];
+    if (isCrit) logParts.push('(크리티컬!)');
+    if (isEnemyDodge) logParts.push('(적 회피!)');
+    addBattleLog(logParts.join(' '));
+
+    // 흡혈 효과
+    applyLifeSteal(damage);
 
     if (gameState.currentEnemy.hp <= 0) {
         enemyDefeated();
@@ -381,28 +697,60 @@ function playerAttack() {
     updateBattleUI();
 }
 
+// 턴 처리 (쿨타임 감소, MP 재생 등)
+function processPlayerTurn() {
+    tickCooldowns();
+    tickMpRegen();
+}
+
+// 흡혈 효과
+function applyLifeSteal(damage) {
+    const lifeSteal = getLifeStealPercent();
+    if (lifeSteal > 0) {
+        const heal = Math.floor(damage * lifeSteal);
+        if (heal > 0) {
+            gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + heal);
+            addBattleLog(`HP +${heal} (흡혈)`);
+        }
+    }
+}
+
 function enemyCounterAttack() {
     if (gameState.currentEnemy.stunned) {
         addBattleLog(`${gameState.currentEnemy.name}은(는) 스턴 상태!`);
         gameState.currentEnemy.stunned = false;
-        return;
-    }
-
-    if (Math.random() * 100 < getDodgeChance()) {
-        addBattleLog('회피 성공!');
-        isGuarding = false;
+        endPlayerTurn();
         return;
     }
 
     const enemyAtk = gameState.currentEnemy.atk;
-    const damage = calculateDamageTaken(enemyAtk, isGuarding);
+    const enemyCrit = gameState.currentEnemy.crit || 0;
+    const isCrit = Math.random() * 100 < enemyCrit;
+    const isDodge = Math.random() * 100 < getDodgeChance();
+
+    let baseDamage = isCrit ? Math.floor(enemyAtk * 1.3) : enemyAtk;
+    if (isDodge) baseDamage = Math.floor(baseDamage * 0.5);
+    const damage = calculateDamageTaken(baseDamage, isGuarding, true); // isCounter = true
+
     gameState.player.hp -= damage;
-    addBattleLog(`반격! ${damage} 피해${isGuarding ? ' (방어!)' : ''}`);
+    const logParts = [`반격! ${damage} 피해`];
+    if (isCrit) logParts.push('(크리티컬!)');
+    if (isDodge) logParts.push('(회피!)');
+    if (isGuarding) logParts.push('(방어!)');
+    addBattleLog(logParts.join(' '));
     isGuarding = false;
+
+    endPlayerTurn();
 
     if (gameState.player.hp <= 0) {
         playerDefeated();
     }
+}
+
+// 턴 종료 처리 (버프 틱)
+function endPlayerTurn() {
+    tickBuffs();
+    updateSkillButtons();
 }
 
 function useSkill(slotIndex) {
@@ -410,11 +758,25 @@ function useSkill(slotIndex) {
     if (!skill || skill.type === 'passive') return;
     if (!gameState.dungeon.inBattle) return;
 
+    // 쿨타임 체크
+    if (isOnCooldown(skill.id)) {
+        addBattleLog(`쿨타임 ${getCooldown(skill.id)}턴 남음!`);
+        return;
+    }
+
     if (gameState.player.mp < skill.mpCost) {
         addBattleLog('MP 부족!');
         return;
     }
+    disableFlee();
 
+    // 적 선제공격 체크
+    if (checkEnemyPreemptiveAttack()) return;
+
+    // 턴 시작 처리
+    processPlayerTurn();
+
+    // 캐릭터 및 무기 보너스 찾기
     const characters = ['cat', 'elf', 'dwarf', 'human'];
     let skillCharacter = null;
     for (const char of characters) {
@@ -425,37 +787,58 @@ function useSkill(slotIndex) {
     }
 
     gameState.player.mp -= skill.mpCost;
+    const weaponBonus = getWeaponBonus(skillCharacter);
+
+    // 쿨타임 적용
+    applyCooldown(skill);
+
     addBattleLog(`[${skill.name}] 사용!`);
 
-    if (skill.effect === 'guard') {
-        isGuarding = true;
-        addBattleLog('방어 태세!');
-        enemyCounterAttack();
+    // === 버프 스킬 ===
+    if (skill.type === 'buff') {
+        applyBuff(skill);
+        endPlayerTurn();
         updateBattleUI();
         return;
     }
 
-    if (skill.heal) {
-        const weaponBonus = getWeaponBonus(skillCharacter);
-        const healAmount = Math.floor(skill.heal * (1 + weaponBonus / 100));
-        gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
-        addBattleLog(`HP ${healAmount} 회복!`);
+    // === MP 회복 스킬 ===
+    if (skill.effect === 'mpRecover') {
+        const recoverAmount = Math.floor(skill.value * (1 + weaponBonus / 100));
+        gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + recoverAmount);
+        addBattleLog(`MP +${recoverAmount} 회복!`);
+        endPlayerTurn();
         updateBattleUI();
         return;
     }
 
+    // === 데미지 스킬 ===
     if (skill.damage) {
         const hits = skill.hits || 1;
-        const weaponBonus = getWeaponBonus(skillCharacter);
+        const damageMultiplier = getDamageMultiplier();
+        let totalDamage = 0;
 
         for (let i = 0; i < hits; i++) {
             const isCrit = Math.random() * 100 < getCritChance();
-            const baseDamage = Math.floor(skill.damage * (1 + weaponBonus / 100));
-            const damage = isCrit ? Math.floor(baseDamage * 1.5) : baseDamage;
-            gameState.currentEnemy.hp -= damage;
-            addBattleLog(`${damage} 데미지${isCrit ? ' (크리티컬!)' : ''}`);
+            const isEnemyDodge = gameState.currentEnemy.dodge && Math.random() * 100 < gameState.currentEnemy.dodge;
+
+            let baseDamage = Math.floor(skill.damage * (1 + weaponBonus / 100) * damageMultiplier);
+            if (isCrit) baseDamage = Math.floor(baseDamage * 1.3);
+            if (isEnemyDodge) baseDamage = Math.floor(baseDamage * 0.5);
+
+            gameState.currentEnemy.hp -= baseDamage;
+            totalDamage += baseDamage;
+
+            const logParts = [`${baseDamage} 데미지`];
+            if (isCrit) logParts.push('(크리티컬!)');
+            if (isEnemyDodge) logParts.push('(적 회피!)');
+            addBattleLog(logParts.join(' '));
         }
 
+        // 흡혈 효과
+        applyLifeSteal(totalDamage);
+
+        // 스턴 효과
         if (skill.effect === 'stun') {
             gameState.currentEnemy.stunned = true;
             addBattleLog('적 스턴!');
@@ -463,7 +846,10 @@ function useSkill(slotIndex) {
 
         if (gameState.currentEnemy.hp <= 0) {
             enemyDefeated();
-        } else if (skill.effect !== 'noCounter') {
+        } else if (skill.effect === 'noCounter') {
+            // 반격 없음
+            endPlayerTurn();
+        } else {
             enemyCounterAttack();
         }
     }
@@ -473,11 +859,20 @@ function useSkill(slotIndex) {
 
 function usePotion() {
     if (gameState.player.potions <= 0 || !gameState.dungeon.inBattle) return;
+    disableFlee();
+
+    // 적 선제공격 체크
+    if (checkEnemyPreemptiveAttack()) return;
+
+    // 턴 처리
+    processPlayerTurn();
 
     gameState.player.potions--;
     const healAmount = 50;
     gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
     addBattleLog(`포션 사용! HP ${healAmount} 회복`);
+
+    endPlayerTurn();
     updateBattleUI();
 }
 
@@ -485,9 +880,12 @@ function enemyDefeated() {
     const enemy = gameState.currentEnemy;
     gameState.dungeon.inBattle = false;
 
-    let goldReward = enemy.goldReward;
-    let expReward = enemy.expReward;
+    // 모드별 보상 배율 적용
+    const rewardMult = modeSettings[gameState.gameMode].rewardMult;
+    let goldReward = Math.floor(enemy.goldReward * rewardMult);
+    let expReward = Math.floor(enemy.expReward * rewardMult);
 
+    // 유물 효과 추가 적용
     gameState.tempRelics.forEach(relic => {
         if (relic.effect === 'gold') goldReward = Math.floor(goldReward * relic.value);
         if (relic.effect === 'exp') expReward = Math.floor(expReward * relic.value);
@@ -499,9 +897,11 @@ function enemyDefeated() {
     addBattleLog(`${enemy.name} 처치!`);
     addBattleLog(`+${goldReward}G, +${expReward}EXP`);
 
-    // 강화석 드랍
+    // 강화석 드랍 (하드 모드에서 더 많이)
     let stoneDropChance = enemy.isBoss ? 1.0 : enemy.isMiniBoss ? 0.5 : 0.3;
     let stoneAmount = enemy.isBoss ? 3 : enemy.isMiniBoss ? 2 : 1;
+    if (gameState.gameMode === 'hard') stoneAmount *= 2;
+    if (gameState.gameMode === 'normal') stoneAmount = Math.ceil(stoneAmount * 1.5);
 
     if (Math.random() < stoneDropChance) {
         gameState.enhancementStones += stoneAmount;
@@ -520,11 +920,10 @@ function enemyDefeated() {
     }
 
     updateDungeonUI();
-    document.getElementById('battle-actions').classList.add('hidden');
-    document.getElementById('floor-clear-actions').classList.remove('hidden');
 
-    // 전투 종료 후에만 복귀 가능
-    document.getElementById('btn-return').disabled = false;
+    // 바로 다음 층 이동
+    gameState.dungeon.currentFloor++;
+    startBattle();
 }
 
 function handleBossClear() {
@@ -681,6 +1080,8 @@ function returnToVillage(fromDeath = false) {
     gameState.dungeon.currentFloor = 1;
     gameState.tempRelics = []; // 유물 초기화
     gameState.equippedSkills = [null, null, null, null]; // 스킬 초기화
+    gameState.activeBuffs = []; // 버프 초기화
+    gameState.skillCooldowns = {}; // 쿨타임 초기화
 
     // HP/MP 회복
     gameState.player.maxHp = getMaxHp();
@@ -693,44 +1094,88 @@ function returnToVillage(fromDeath = false) {
     showScreen('village-screen');
 }
 
-function nextFloor() {
-    // 복귀 버튼 비활성화
-    document.getElementById('btn-return').disabled = true;
-
-    gameState.dungeon.currentFloor++;
-    updateDungeonUI();
-    startBattle();
-}
-
 // 스킬 UI
 function updateSkillButtons() {
     for (let i = 0; i < 4; i++) {
         const btn = document.getElementById(`btn-skill-${i + 1}`);
         const skill = gameState.equippedSkills[i];
-        if (skill && skill.type === 'active') {
-            btn.textContent = `${skill.name} (${skill.mpCost})`;
-            btn.title = skill.desc;
-            btn.disabled = false;
-        } else if (skill && skill.type === 'passive') {
-            btn.textContent = `${skill.name} [P]`;
-            btn.title = skill.desc;
-            btn.disabled = true;
-        } else {
+
+        if (!skill) {
             btn.textContent = '-';
             btn.title = '';
             btn.disabled = true;
+            btn.classList.remove('on-cooldown');
+            continue;
+        }
+
+        if (skill.type === 'passive') {
+            btn.textContent = `${skill.name} [P]`;
+            btn.title = skill.desc;
+            btn.disabled = true;
+            btn.classList.remove('on-cooldown');
+        } else {
+            // active 또는 buff 스킬
+            const cooldown = getCooldown(skill.id);
+            if (cooldown > 0) {
+                btn.textContent = `${skill.name} (${cooldown})`;
+                btn.title = `${skill.desc}\n쿨타임: ${cooldown}턴`;
+                btn.disabled = true;
+                btn.classList.add('on-cooldown');
+            } else {
+                const mpText = skill.mpCost > 0 ? `${skill.mpCost}` : '0';
+                btn.textContent = `${skill.name} (${mpText})`;
+                btn.title = skill.desc;
+                btn.disabled = false;
+                btn.classList.remove('on-cooldown');
+            }
         }
     }
+
+    // 버프 표시 업데이트
+    updateBuffDisplay();
 }
+
+function updateBuffDisplay() {
+    const buffDisplay = document.getElementById('buff-display');
+    if (!buffDisplay) return;
+
+    if (gameState.activeBuffs.length === 0) {
+        buffDisplay.innerHTML = '';
+        return;
+    }
+
+    // 같은 이름의 버프는 한 번만 표시
+    const uniqueBuffs = [];
+    const seenNames = new Set();
+    gameState.activeBuffs.forEach(buff => {
+        if (!seenNames.has(buff.name)) {
+            seenNames.add(buff.name);
+            uniqueBuffs.push(buff);
+        }
+    });
+
+    buffDisplay.innerHTML = uniqueBuffs.map(b =>
+        `<span class="buff-icon" title="${b.name} (${b.turns}턴)">${b.icon}${b.turns}</span>`
+    ).join('');
+}
+
+// 모드 설명 텍스트
+const modeDescriptions = {
+    easy: '적 x0.5 / 보상 x1 / 입문용',
+    normal: '적 x5 / 보상 x3 / 성장 필요',
+    hard: '적 x30 / 보상 x5 / 고성장 필수',
+    infinite: '적 x10 / 보상 x4 / 무한 도전'
+};
 
 // 이벤트
 function initEventListeners() {
-    // 모드 선택
-    document.querySelectorAll('.btn-mode').forEach(btn => {
+    // 모드 선택 (마을에서)
+    document.querySelectorAll('.btn-mode-select').forEach(btn => {
         btn.addEventListener('click', () => {
+            document.querySelectorAll('.btn-mode-select').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
             gameState.gameMode = btn.dataset.mode;
-            updateVillageUI();
-            showScreen('village-screen');
+            document.getElementById('mode-desc-text').textContent = modeDescriptions[gameState.gameMode];
         });
     });
 
@@ -739,6 +1184,8 @@ function initEventListeners() {
         gameState.dungeon.currentFloor = 1;
         gameState.tempRelics = [];
         gameState.equippedSkills = [null, null, null, null];
+        gameState.activeBuffs = []; // 버프 초기화
+        gameState.skillCooldowns = {}; // 쿨타임 초기화
         gameState.player.maxHp = getMaxHp();
         gameState.player.maxMp = getMaxMp();
         gameState.player.hp = gameState.player.maxHp;
@@ -757,6 +1204,8 @@ function initEventListeners() {
         gameState.dungeon.currentFloor = skipFloor;
         gameState.tempRelics = [];
         gameState.equippedSkills = [null, null, null, null];
+        gameState.activeBuffs = []; // 버프 초기화
+        gameState.skillCooldowns = {}; // 쿨타임 초기화
         gameState.player.maxHp = getMaxHp();
         gameState.player.maxMp = getMaxMp();
         gameState.player.hp = Math.floor(gameState.player.maxHp * 0.5); // 50% HP
@@ -828,7 +1277,6 @@ function initEventListeners() {
 
     document.getElementById('btn-use-potion').addEventListener('click', usePotion);
 
-    document.getElementById('btn-next-floor').addEventListener('click', nextFloor);
     document.getElementById('btn-return').addEventListener('click', () => returnToVillage(false));
     document.getElementById('btn-gameover-return').addEventListener('click', () => returnToVillage(true));
     document.getElementById('btn-clear-return').addEventListener('click', () => returnToVillage(false));
@@ -843,10 +1291,12 @@ function initGame() {
     gameState.player.maxMp = getMaxMp();
     gameState.player.hp = gameState.player.maxHp;
     gameState.player.mp = gameState.player.maxMp;
+    gameState.gameMode = 'easy'; // 기본 모드
 
     initEventListeners();
     updateSkillButtons();
-    showScreen('mode-screen');
+    updateVillageUI();
+    showScreen('village-screen');
 }
 
 document.addEventListener('DOMContentLoaded', initGame);

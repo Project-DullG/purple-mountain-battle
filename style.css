@@ -415,6 +415,7 @@ h2 {
 #dungeon-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     background: rgba(255, 255, 255, 0.1);
     padding: 10px 15px;
     border-radius: 8px;
@@ -429,13 +430,79 @@ h2 {
 
 .pending-info {
     color: #8be9fd;
+    flex: 1;
+    text-align: center;
 }
 
-#battle-area {
+.btn-flee {
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    border: none;
+    border-radius: 4px;
+    color: #333;
+    font-weight: bold;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.btn-flee:disabled {
+    background: #555;
+    color: #888;
+    cursor: not-allowed;
+}
+
+#battle-layout {
+    display: flex;
+    gap: 10px;
+    min-height: 350px;
+}
+
+#player-stats-panel {
+    width: 60px;
+    background: rgba(102, 126, 234, 0.2);
+    border: 1px solid #667eea;
+    border-radius: 8px;
+    padding: 10px 8px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    padding: 10px 0;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.stat-row {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.65rem;
+    color: #8be9fd;
+    margin-bottom: 2px;
+}
+
+.stat-val {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.relics-row {
+    margin-top: auto;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+#panel-relics {
+    display: block;
+    word-break: break-all;
+}
+
+#battle-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 #enemy-info {
@@ -464,6 +531,13 @@ h2 {
 .enemy-atk-display {
     font-size: 0.9rem;
     color: #ff8e8e;
+}
+
+.enemy-preempt-display {
+    font-size: 0.85rem;
+    color: #ffd93d;
+    margin-top: 5px;
+    font-weight: bold;
 }
 
 .enemy-stats {
@@ -547,18 +621,20 @@ h2 {
 }
 
 #battle-log {
+    width: 140px;
     background: rgba(0, 0, 0, 0.5);
     padding: 10px;
     border-radius: 8px;
-    height: 100px;
     overflow-y: auto;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
+    flex-shrink: 0;
 }
 
 #battle-log p {
     margin: 3px 0;
     padding: 2px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    line-height: 1.3;
 }
 
 #battle-actions {
@@ -593,34 +669,36 @@ h2 {
     cursor: not-allowed;
 }
 
+.btn-skill.on-cooldown {
+    background: linear-gradient(135deg, #8b5a00 0%, #a66b00 100%);
+    color: #ffd93d;
+}
+
 #battle-actions button:hover:not(:disabled) {
     transform: translateY(-2px);
     opacity: 0.9;
 }
 
-#floor-clear-actions {
+/* 버프 표시 */
+.buff-display {
     display: flex;
-    gap: 10px;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+    min-height: 24px;
 }
 
-#floor-clear-actions button {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 0.95rem;
-}
-
-#btn-next-floor {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-#btn-return {
-    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-    color: #333;
+.buff-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: rgba(255, 215, 0, 0.2);
+    border: 1px solid gold;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.85rem;
+    color: #ffd93d;
+    cursor: default;
 }
 
 /* 게임오버 화면 */
@@ -733,6 +811,48 @@ h2 {
     color: #aaa;
     text-align: center;
     line-height: 1.4;
+}
+
+/* 모드 선택 (마을) */
+.mode-select-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.btn-mode-select {
+    padding: 10px 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #555;
+    border-radius: 6px;
+    color: #aaa;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-mode-select:hover {
+    border-color: #888;
+    color: #fff;
+}
+
+.btn-mode-select.selected {
+    border-color: #667eea;
+    color: #fff;
+    background: rgba(102, 126, 234, 0.2);
+}
+
+.btn-mode-select[data-mode="easy"].selected { border-color: #50fa7b; background: rgba(80, 250, 123, 0.2); }
+.btn-mode-select[data-mode="hard"].selected { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.2); }
+.btn-mode-select[data-mode="infinite"].selected { border-color: #ffd93d; background: rgba(255, 217, 61, 0.2); }
+
+.mode-desc-text {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-bottom: 10px;
 }
 
 /* 던전 입장 버튼 그룹 */
@@ -925,16 +1045,42 @@ h2 {
     cursor: pointer;
 }
 
-/* 복귀 버튼 비활성화 */
-#btn-return:disabled {
-    background: #555;
-    color: #888;
-    cursor: not-allowed;
+/* 반응형 */
+@media (max-width: 500px) {
+    #battle-layout {
+        flex-direction: column;
+    }
+
+    #player-stats-panel {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 8px;
+    }
+
+    .stat-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .stat-label {
+        display: inline;
+        margin-bottom: 0;
+    }
+
+    .relics-row {
+        margin-top: 0;
+    }
+
+    #battle-log {
+        width: 100%;
+        height: 80px;
+    }
 }
 
-/* 반응형 */
 @media (max-width: 400px) {
-    #stats-grid, #skill-grid, .mode-grid {
-        grid-template-columns: 1fr;
+    #stats-grid, #skill-grid, .mode-grid, .mode-select-grid {
+        grid-template-columns: 1fr 1fr;
     }
 }

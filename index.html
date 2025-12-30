@@ -8,33 +8,8 @@
 </head>
 <body>
     <div id="game-container">
-        <!-- 모드 선택 화면 -->
-        <div id="mode-screen" class="screen">
-            <h1>보랏빛 산지의 전투</h1>
-            <p class="mode-subtitle">게임 모드를 선택하세요</p>
-
-            <div class="mode-grid">
-                <button class="btn-mode" data-mode="easy">
-                    <span class="mode-name">이지 모드</span>
-                    <span class="mode-desc">적 능력치 -20%<br>50층 클리어</span>
-                </button>
-                <button class="btn-mode" data-mode="normal">
-                    <span class="mode-name">노말 모드</span>
-                    <span class="mode-desc">기본 난이도<br>50층 클리어</span>
-                </button>
-                <button class="btn-mode" data-mode="hard">
-                    <span class="mode-name">하드 모드</span>
-                    <span class="mode-desc">적 능력치 +30%<br>50층 클리어</span>
-                </button>
-                <button class="btn-mode" data-mode="infinite">
-                    <span class="mode-name">무한 모드</span>
-                    <span class="mode-desc">끝없는 도전<br>최고 기록 갱신</span>
-                </button>
-            </div>
-        </div>
-
         <!-- 메인 화면 -->
-        <div id="village-screen" class="screen hidden">
+        <div id="village-screen" class="screen">
             <h1>보랏빛 산지의 전투</h1>
 
             <!-- 플레이어 정보 -->
@@ -45,7 +20,6 @@
                 </div>
                 <div class="info-row">
                     <span>EXP: <span id="player-exp">0</span>/<span id="player-max-exp">100</span></span>
-                    <span>모드: <span id="current-mode">노말</span></span>
                 </div>
             </div>
 
@@ -94,11 +68,21 @@
             </div>
 
             <!-- 던전 입장 -->
-            <div class="dungeon-entry">
-                <button id="btn-dungeon" class="btn-enter">던전 입장 (1층~)</button>
-                <button id="btn-skip" class="btn-skip">스킵 (50% HP)</button>
+            <div class="section">
+                <h2>던전 입장</h2>
+                <div class="mode-select-grid">
+                    <button class="btn-mode-select selected" data-mode="easy">이지</button>
+                    <button class="btn-mode-select" data-mode="normal">노말</button>
+                    <button class="btn-mode-select" data-mode="hard">하드</button>
+                    <button class="btn-mode-select" data-mode="infinite">무한</button>
+                </div>
+                <p class="mode-desc-text" id="mode-desc-text">적 x0.5 / 보상 x1 / 입문용</p>
+                <div class="dungeon-entry">
+                    <button id="btn-dungeon" class="btn-enter">던전 입장 (1층~)</button>
+                    <button id="btn-skip" class="btn-skip">스킵 (50% HP)</button>
+                </div>
+                <p id="skip-info" class="skip-info"></p>
             </div>
-            <p id="skip-info" class="skip-info"></p>
         </div>
 
         <!-- 상점 화면 -->
@@ -177,64 +161,77 @@
             <div id="dungeon-header">
                 <span class="floor-info"><span id="current-floor">1</span>층</span>
                 <span class="pending-info">+<span id="pending-gold">0</span>G / +<span id="pending-exp">0</span>EXP</span>
+                <button id="btn-return" class="btn-flee">도주</button>
             </div>
 
-            <!-- 현재 유물 표시 -->
-            <div id="current-relics" class="current-relics hidden">
-                <span class="relic-label">유물:</span>
-                <span id="relic-icons"></span>
-            </div>
-
-            <div id="battle-area">
-                <div id="enemy-info">
-                    <h2 id="enemy-name">고블린</h2>
-                    <div class="battle-stat enemy-hp-stat">
-                        <span class="label">HP</span>
-                        <div class="bar-container">
-                            <div class="bar enemy-hp-bar" id="enemy-hp-bar"></div>
-                        </div>
-                        <span class="value"><span id="enemy-hp">50</span>/<span id="enemy-max-hp">50</span></span>
+            <div id="battle-layout">
+                <div id="player-stats-panel">
+                    <div class="stat-row">
+                        <span class="stat-label">ATK</span>
+                        <span class="stat-val" id="panel-atk">20</span>
                     </div>
-                    <div class="enemy-atk-display">
-                        공격력: <span id="enemy-atk">10</span>
+                    <div class="stat-row">
+                        <span class="stat-label">CRT</span>
+                        <span class="stat-val" id="panel-crit">5%</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">DOG</span>
+                        <span class="stat-val" id="panel-dodge">5%</span>
+                    </div>
+                    <div class="stat-row relics-row">
+                        <span id="panel-relics"></span>
+                    </div>
+                </div>
+                <div id="battle-main">
+                    <div id="enemy-info">
+                        <h2 id="enemy-name">고블린</h2>
+                        <div class="battle-stat enemy-hp-stat">
+                            <span class="label">HP</span>
+                            <div class="bar-container">
+                                <div class="bar enemy-hp-bar" id="enemy-hp-bar"></div>
+                            </div>
+                            <span class="value"><span id="enemy-hp">50</span>/<span id="enemy-max-hp">50</span></span>
+                        </div>
+                        <div class="enemy-atk-display">
+                            공격력: <span id="enemy-atk">10</span>
+                        </div>
+                        <div class="enemy-preempt-display">
+                            선제공격: <span id="enemy-preempt-counter">0</span>턴 후
+                        </div>
+                    </div>
+
+                    <div id="player-battle-info">
+                        <div class="battle-stat">
+                            <span class="label">HP</span>
+                            <div class="bar-container">
+                                <div class="bar hp-bar" id="hp-bar"></div>
+                            </div>
+                            <span class="value"><span id="battle-hp">100</span>/<span id="battle-max-hp">100</span></span>
+                        </div>
+                        <div class="battle-stat">
+                            <span class="label">MP</span>
+                            <div class="bar-container">
+                                <div class="bar mp-bar" id="mp-bar"></div>
+                            </div>
+                            <span class="value"><span id="battle-mp">5</span>/<span id="battle-max-mp">5</span></span>
+                        </div>
+                        <div class="potion-info">
+                            포션: <span id="battle-potions">0</span>개
+                            <button id="btn-use-potion" class="btn-potion">사용</button>
+                        </div>
+                        <div id="buff-display" class="buff-display"></div>
+                    </div>
+
+                    <div id="battle-actions">
+                        <button id="btn-attack">공격</button>
+                        <button id="btn-skill-1" class="btn-skill" title="">스킬1</button>
+                        <button id="btn-skill-2" class="btn-skill" title="">스킬2</button>
+                        <button id="btn-skill-3" class="btn-skill" title="">스킬3</button>
+                        <button id="btn-skill-4" class="btn-skill" title="">스킬4</button>
                     </div>
                 </div>
 
-                <div id="player-battle-info">
-                    <div class="battle-stat">
-                        <span class="label">HP</span>
-                        <div class="bar-container">
-                            <div class="bar hp-bar" id="hp-bar"></div>
-                        </div>
-                        <span class="value"><span id="battle-hp">100</span>/<span id="battle-max-hp">100</span></span>
-                    </div>
-                    <div class="battle-stat">
-                        <span class="label">MP</span>
-                        <div class="bar-container">
-                            <div class="bar mp-bar" id="mp-bar"></div>
-                        </div>
-                        <span class="value"><span id="battle-mp">5</span>/<span id="battle-max-mp">5</span></span>
-                    </div>
-                    <div class="potion-info">
-                        포션: <span id="battle-potions">0</span>개
-                        <button id="btn-use-potion" class="btn-potion">사용</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="battle-log"></div>
-
-            <div id="battle-actions">
-                <button id="btn-attack">공격</button>
-                <button id="btn-skill-1" class="btn-skill" title="">스킬1</button>
-                <button id="btn-skill-2" class="btn-skill" title="">스킬2</button>
-                <button id="btn-skill-3" class="btn-skill" title="">스킬3</button>
-                <button id="btn-skill-4" class="btn-skill" title="">스킬4</button>
-            </div>
-
-            <div id="floor-clear-actions" class="hidden">
-                <button id="btn-next-floor">다음 층</button>
-                <button id="btn-return" disabled>복귀 (100%)</button>
+                <div id="battle-log"></div>
             </div>
         </div>
 
