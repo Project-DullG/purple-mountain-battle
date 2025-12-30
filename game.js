@@ -1441,7 +1441,7 @@ function updateBattleUI() {
     document.getElementById('enemy-hp').textContent = Math.max(0, enemy.hp);
     document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
     document.getElementById('enemy-atk').textContent = enemy.atk;
-    document.getElementById('enemy-preempt-counter').textContent = enemyAttackCounter;
+    document.getElementById('enemy-preempt-counter').textContent = Math.max(0, enemyAttackCounter);
 
     // 선제공격 1턴 남았을 때 경고 표시
     const preemptDisplay = document.querySelector('.enemy-preempt-display');
