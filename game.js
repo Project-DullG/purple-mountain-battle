@@ -4,7 +4,7 @@ const gameState = {
         level: 1,
         exp: 0,
         gold: 0,
-        statPoints: 0,
+        statPoints: 5,
         hp: 100,
         maxHp: 100,
         mp: 5,
@@ -72,119 +72,121 @@ const gameState = {
 // 유물 데이터
 // 등급: common(일반), rare(희귀), epic(영웅), legendary(전설)
 const relicsData = [
-    // 일반 등급
-    { id: 'relic_sword', name: '고대의 검날', desc: '공격력 +10', effect: 'atk', value: 10, icon: '⚔️', rarity: 'common' },
-    { id: 'relic_ring', name: '마력의 반지', desc: '최대 MP +3', effect: 'mp', value: 3, icon: '💍', rarity: 'common' },
-    { id: 'relic_coin', name: '황금 동전', desc: '골드 획득 +15%', effect: 'gold', value: 1.15, icon: '🪙', rarity: 'common' },
-    { id: 'relic_feather', name: '깃털 장식', desc: '회피율 +5%', effect: 'dodge', value: 5, icon: '🪶', rarity: 'common' },
-    { id: 'relic_band', name: '전사의 머리띠', desc: '공격력 +5%', effect: 'atkMult', value: 0.05, icon: '🎀', rarity: 'common' },
-    // 희귀 등급
-    { id: 'relic_shield', name: '수호의 방패', desc: '받는 피해 -6%', effect: 'def', value: 0.94, icon: '🛡️', rarity: 'rare' },
-    { id: 'relic_cloak', name: '그림자 망토', desc: '회피율 +10%', effect: 'dodge', value: 10, icon: '🧥', rarity: 'rare' },
-    { id: 'relic_amulet', name: '행운의 부적', desc: '크리티컬 +10%', effect: 'crit', value: 10, icon: '🔮', rarity: 'rare' },
-    { id: 'relic_boots', name: '신속의 장화', desc: '선제공격 확률 +15%', effect: 'first', value: 15, icon: '👢', rarity: 'rare' },
-    { id: 'relic_gauntlet', name: '강철 건틀릿', desc: '공격력 +6%', effect: 'atkMult', value: 0.06, icon: '🧤', rarity: 'rare' },
-    { id: 'relic_pendant', name: '생명의 목걸이', desc: '최대 체력 +6%', effect: 'hpMult', value: 0.06, icon: '📿', rarity: 'rare' },
-    // 영웅 등급
-    { id: 'relic_crown', name: '왕의 왕관', desc: '경험치 획득 +25%', effect: 'exp', value: 1.25, icon: '👑', rarity: 'epic' },
-    { id: 'relic_orb', name: '마력의 오브', desc: '최대 MP +5', effect: 'mp', value: 5, icon: '🔵', rarity: 'epic' },
-    { id: 'relic_fang', name: '흡혈의 송곳니', desc: '공격 시 피해의 5% 회복', effect: 'lifeSteal', value: 0.05, icon: '🦷', rarity: 'epic' },
-    { id: 'relic_horn', name: '전쟁의 뿔피리', desc: '공격력 +20', effect: 'atk', value: 20, icon: '📯', rarity: 'epic' },
-    { id: 'relic_skull', name: '파멸의 해골', desc: '치명타 데미지 +10%', effect: 'critDmg', value: 10, icon: '💀', rarity: 'epic' },
-    { id: 'relic_belt', name: '거인의 허리띠', desc: '최대 체력 +9%', effect: 'hpMult', value: 0.09, icon: '🎗️', rarity: 'epic' },
-    { id: 'relic_gloves', name: '암살자의 장갑', desc: '공격력 +9%', effect: 'atkMult', value: 0.09, icon: '🖐️', rarity: 'epic' },
-    // 전설 등급
-    { id: 'relic_heart', name: '드래곤의 심장', desc: '받는 피해 -12%', effect: 'def', value: 0.88, icon: '❤️‍🔥', rarity: 'legendary' },
-    { id: 'relic_eye', name: '예언자의 눈', desc: '크리티컬 +15%', effect: 'crit', value: 15, icon: '👁️', rarity: 'legendary' },
-    { id: 'relic_star', name: '별의 파편', desc: '모든 스탯 +5%', effect: 'allStats', value: 0.05, icon: '⭐', rarity: 'legendary' },
-    { id: 'relic_blade', name: '파괴의 검', desc: '공격력 +12%', effect: 'atkMult', value: 0.12, icon: '🗡️', rarity: 'legendary' },
-    { id: 'relic_gem', name: '심판의 보석', desc: '치명타 데미지 +15%', effect: 'critDmg', value: 15, icon: '💎', rarity: 'legendary' },
-    { id: 'relic_titan', name: '타이탄의 심장', desc: '최대 체력 +12%', effect: 'hpMult', value: 0.12, icon: '🫀', rarity: 'legendary' },
-    // 스탯 증폭 유물
-    { id: 'relic_str_rare', name: '힘의 팔찌', desc: '힘 +10%', effect: 'strMult', value: 0.10, icon: '💪', rarity: 'rare' },
-    { id: 'relic_dex_rare', name: '민첩의 귀걸이', desc: '민첩 +10%', effect: 'dexMult', value: 0.10, icon: '🏃', rarity: 'rare' },
-    { id: 'relic_int_rare', name: '지혜의 안경', desc: '지능 +10%', effect: 'intMult', value: 0.10, icon: '🧠', rarity: 'rare' },
-    { id: 'relic_vit_rare', name: '활력의 벨트', desc: '활력 +10%', effect: 'vitMult', value: 0.10, icon: '💚', rarity: 'rare' },
-    { id: 'relic_luk_rare', name: '행운의 클로버', desc: '행운 +10%', effect: 'lukMult', value: 0.10, icon: '🍀', rarity: 'rare' },
-    { id: 'relic_str_epic', name: '전사의 문장', desc: '힘 +15%', effect: 'strMult', value: 0.15, icon: '🦁', rarity: 'epic' },
-    { id: 'relic_dex_epic', name: '암살자의 문장', desc: '민첩 +15%', effect: 'dexMult', value: 0.15, icon: '🦅', rarity: 'epic' },
-    { id: 'relic_int_epic', name: '현자의 문장', desc: '지능 +15%', effect: 'intMult', value: 0.15, icon: '🦉', rarity: 'epic' },
-    { id: 'relic_vit_epic', name: '수호자의 문장', desc: '활력 +15%', effect: 'vitMult', value: 0.15, icon: '🐢', rarity: 'epic' },
-    { id: 'relic_luk_epic', name: '도박사의 문장', desc: '행운 +15%', effect: 'lukMult', value: 0.15, icon: '🎰', rarity: 'epic' },
+    // ========== 일반 등급 (5% 수준, 디버프 25%) ==========
+    // 공격 (8개): 공격력, 치명타, 치명타피해, 첫공격, 보스피해, 추가공격, 흡혈, 처형
+    { id: 'relic_atk_c', name: '녹슨 검', desc: '공격력 +5%', effect: 'atkMult', value: 0.05, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_crit_c', name: '날카로운 눈', desc: '치명타 확률 +5%', effect: 'crit', value: 5, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_critdmg_c', name: '이빨 목걸이', desc: '치명타 피해 +5%', effect: 'critDmg', value: 5, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_firstHit_c', name: '기습의 단검', desc: '첫 공격 피해 +5%', effect: 'firstHit', value: 0.05, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_bossKiller_c', name: '사냥꾼의 눈', desc: '보스에게 피해 +5%', effect: 'bossKiller', value: 0.05, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_multiHit_c', name: '연속의 팔찌', desc: '5% 확률로 추가 공격', effect: 'multiHit', value: 0.05, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_lifesteal_c', name: '흡혈 이빨', desc: '25% 확률로 피해의 5% 흡혈', effect: 'lifeSteal', value: 0.25, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_execute_c', name: '사형집행인', desc: '적 HP 30% 이하 시 피해 +5%', effect: 'execute', value: 0.05, icon: '⚔️', rarity: 'common', tag: '공격' },
+    // 방어 (8개): 체력, 피해감소, 회피, 반사, 힘, 민첩, 활력, 처치회복
+    { id: 'relic_hp_c', name: '생명의 구슬', desc: '최대 체력 +5%', effect: 'hpMult', value: 0.05, icon: '🛡️', rarity: 'common', tag: '방어' },
+    { id: 'relic_def_c', name: '가죽 조끼', desc: '받는 피해 -2.5%', effect: 'def', value: 0.975, icon: '🛡️', rarity: 'common', tag: '방어' },
+    { id: 'relic_dodge_c', name: '깃털 장식', desc: '회피율 +5%', effect: 'dodge', value: 5, icon: '🛡️', rarity: 'common', tag: '방어' },
+    { id: 'relic_reflect_c', name: '가시 갑옷', desc: '받은 피해의 5% 반사', effect: 'reflect', value: 0.05, icon: '🛡️', rarity: 'common', tag: '방어' },
+    { id: 'relic_str_c', name: '힘의 반지', desc: '힘 +5%', effect: 'strMult', value: 0.05, icon: '🛡️', rarity: 'common', tag: '방어' },
+    { id: 'relic_dex_c', name: '민첩의 반지', desc: '민첩 +5%', effect: 'dexMult', value: 0.05, icon: '🛡️', rarity: 'common', tag: '방어' },
+    { id: 'relic_vit_c', name: '활력의 반지', desc: '활력 +5%', effect: 'vitMult', value: 0.05, icon: '🛡️', rarity: 'common', tag: '방어' },
+    { id: 'relic_killHeal_c', name: '수확의 부적', desc: '처치 시 HP 2% 회복', effect: 'killHeal', value: 0.02, icon: '🛡️', rarity: 'common', tag: '방어' },
+    // 특수 (8개): 보상, 지능, 행운, 처치MP, 출혈, 쇠약, 스턴, 빙결
+    { id: 'relic_reward_c', name: '보물 주머니', desc: '골드/경험치 +5%', effect: 'reward', value: 1.05, icon: '✨', rarity: 'common', tag: '특수' },
+    { id: 'relic_int_c', name: '지능의 반지', desc: '지능 +5%', effect: 'intMult', value: 0.05, icon: '✨', rarity: 'common', tag: '특수' },
+    { id: 'relic_luk_c', name: '행운의 반지', desc: '행운 +5%', effect: 'lukMult', value: 0.05, icon: '✨', rarity: 'common', tag: '특수' },
+    { id: 'relic_killmana_c', name: '마나 이빨', desc: '처치 시 MP 5% 회복', effect: 'killMana', value: 0.05, icon: '✨', rarity: 'common', tag: '특수' },
+    { id: 'relic_bleed_c', name: '톱니', desc: '공격 시 25% 출혈 부여', effect: 'bleed', value: 0.25, icon: '✨', rarity: 'common', tag: '특수' },
+    { id: 'relic_weaken_c', name: '쇠약의 부적', desc: '공격 시 25% 쇠약 부여', effect: 'weaken', value: 0.25, icon: '✨', rarity: 'common', tag: '특수' },
+    { id: 'relic_stun_c', name: '망치 조각', desc: '공격 시 25% 스턴 부여', effect: 'stun', value: 0.25, icon: '✨', rarity: 'common', tag: '특수' },
+    { id: 'relic_freeze_c', name: '얼음 조각', desc: '공격 시 25% 빙결 부여', effect: 'freeze', value: 0.25, icon: '✨', rarity: 'common', tag: '특수' },
 
-    // === 새로운 유물들 ===
-    // 일반 등급 - 새 효과
-    { id: 'relic_spike', name: '가시 갑옷', desc: '받은 피해의 5% 반사', effect: 'reflect', value: 0.05, icon: '🦔', rarity: 'common' },
-    { id: 'relic_book', name: '마법서', desc: 'MP 소모 -10%', effect: 'mpSave', value: 0.1, icon: '📖', rarity: 'common' },
+    // ========== 희귀 등급 (10% 수준, 디버프 50%) ==========
+    // 공격 (8개)
+    { id: 'relic_atk_r', name: '강철 검', desc: '공격력 +10%', effect: 'atkMult', value: 0.10, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_crit_r', name: '행운의 부적', desc: '치명타 확률 +10%', effect: 'crit', value: 10, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_critdmg_r', name: '파괴의 송곳니', desc: '치명타 피해 +10%', effect: 'critDmg', value: 10, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_firstHit_r', name: '암습의 단검', desc: '첫 공격 피해 +10%', effect: 'firstHit', value: 0.10, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_bossKiller_r', name: '사냥꾼의 표식', desc: '보스에게 피해 +10%', effect: 'bossKiller', value: 0.10, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_multiHit_r', name: '연쇄의 고리', desc: '10% 확률로 추가 공격', effect: 'multiHit', value: 0.10, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_lifesteal_r', name: '흡혈의 송곳니', desc: '50% 확률로 피해의 5% 흡혈', effect: 'lifeSteal', value: 0.50, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_execute_r', name: '처형인의 검', desc: '적 HP 30% 이하 시 피해 +10%', effect: 'execute', value: 0.10, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    // 방어 (8개)
+    { id: 'relic_hp_r', name: '생명의 목걸이', desc: '최대 체력 +10%', effect: 'hpMult', value: 0.10, icon: '🛡️', rarity: 'rare', tag: '방어' },
+    { id: 'relic_def_r', name: '수호의 방패', desc: '받는 피해 -6%', effect: 'def', value: 0.94, icon: '🛡️', rarity: 'rare', tag: '방어' },
+    { id: 'relic_dodge_r', name: '그림자 망토', desc: '회피율 +10%', effect: 'dodge', value: 10, icon: '🛡️', rarity: 'rare', tag: '방어' },
+    { id: 'relic_reflect_r', name: '가시 방패', desc: '받은 피해의 10% 반사', effect: 'reflect', value: 0.10, icon: '🛡️', rarity: 'rare', tag: '방어' },
+    { id: 'relic_str_r', name: '힘의 팔찌', desc: '힘 +10%', effect: 'strMult', value: 0.10, icon: '🛡️', rarity: 'rare', tag: '방어' },
+    { id: 'relic_dex_r', name: '민첩의 귀걸이', desc: '민첩 +10%', effect: 'dexMult', value: 0.10, icon: '🛡️', rarity: 'rare', tag: '방어' },
+    { id: 'relic_vit_r', name: '활력의 벨트', desc: '활력 +10%', effect: 'vitMult', value: 0.10, icon: '🛡️', rarity: 'rare', tag: '방어' },
+    { id: 'relic_killHeal_r', name: '영혼 수확자', desc: '처치 시 HP 5% 회복', effect: 'killHeal', value: 0.05, icon: '🛡️', rarity: 'rare', tag: '방어' },
+    // 특수 (8개)
+    { id: 'relic_reward_r', name: '보물 상자', desc: '골드/경험치 +10%', effect: 'reward', value: 1.10, icon: '✨', rarity: 'rare', tag: '특수' },
+    { id: 'relic_int_r', name: '지혜의 안경', desc: '지능 +10%', effect: 'intMult', value: 0.10, icon: '✨', rarity: 'rare', tag: '특수' },
+    { id: 'relic_luk_r', name: '행운의 클로버', desc: '행운 +10%', effect: 'lukMult', value: 0.10, icon: '✨', rarity: 'rare', tag: '특수' },
+    { id: 'relic_killmana_r', name: '마나 회복의 송곳니', desc: '처치 시 MP 10% 회복', effect: 'killMana', value: 0.10, icon: '✨', rarity: 'rare', tag: '특수' },
+    { id: 'relic_bleed_r', name: '야수의 발톱', desc: '공격 시 50% 출혈 부여', effect: 'bleed', value: 0.50, icon: '✨', rarity: 'rare', tag: '특수' },
+    { id: 'relic_weaken_r', name: '쇠약의 주문서', desc: '공격 시 50% 쇠약 부여', effect: 'weaken', value: 0.50, icon: '✨', rarity: 'rare', tag: '특수' },
+    { id: 'relic_stun_r', name: '강철 망치', desc: '공격 시 50% 스턴 부여', effect: 'stun', value: 0.50, icon: '✨', rarity: 'rare', tag: '특수' },
+    { id: 'relic_freeze_r', name: '서리 수정', desc: '공격 시 50% 빙결 부여', effect: 'freeze', value: 0.50, icon: '✨', rarity: 'rare', tag: '특수' },
 
-    // 희귀 등급 - 새 효과
-    { id: 'relic_dagger', name: '암살자의 단검', desc: '처치 시 HP 3% 회복', effect: 'killHeal', value: 0.03, icon: '🗡️', rarity: 'rare' },
-    { id: 'relic_hourglass', name: '시간의 모래', desc: '스킬 쿨타임 -1턴', effect: 'cooldownReduce', value: 1, icon: '⏳', rarity: 'rare' },
-    { id: 'relic_arrow', name: '맹독의 화살', desc: '공격 시 10% 확률로 독 (3턴간 5% 피해)', effect: 'poison', value: 0.1, icon: '🏹', rarity: 'rare' },
-    { id: 'relic_claw', name: '야수의 발톱', desc: '공격 시 10% 확률로 출혈 (3턴간 4% 피해)', effect: 'bleed', value: 0.1, icon: '🐾', rarity: 'rare' },
-    { id: 'relic_rage', name: '분노의 결정', desc: '첫 공격 피해 +25%', effect: 'firstHit', value: 0.25, icon: '😠', rarity: 'rare' },
-    { id: 'relic_hunter', name: '사냥꾼의 표식', desc: '보스에게 피해 +15%', effect: 'bossKiller', value: 0.15, icon: '🎯', rarity: 'rare' },
+    // ========== 영웅 등급 (25% 수준, 디버프 100%) ==========
+    // 공격 (8개)
+    { id: 'relic_atk_e', name: '전쟁의 검', desc: '공격력 +25%', effect: 'atkMult', value: 0.25, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_crit_e', name: '암살자의 장갑', desc: '치명타 확률 +25%', effect: 'crit', value: 25, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_critdmg_e', name: '파멸의 해골', desc: '치명타 피해 +25%', effect: 'critDmg', value: 25, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_firstHit_e', name: '기습의 장검', desc: '첫 공격 피해 +25%', effect: 'firstHit', value: 0.25, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_bossKiller_e', name: '드래곤 슬레이어', desc: '보스에게 피해 +25%', effect: 'bossKiller', value: 0.25, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_multiHit_e', name: '연쇄의 사슬', desc: '15% 확률로 추가 공격', effect: 'multiHit', value: 0.15, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_lifesteal_e', name: '흡혈왕의 송곳니', desc: '피해의 5% 흡혈', effect: 'lifeSteal', value: 1.0, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_execute_e', name: '광전사의 도끼', desc: '적 HP 30% 이하 시 피해 +25%', effect: 'execute', value: 0.25, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    // 방어 (8개)
+    { id: 'relic_hp_e', name: '거인의 심장', desc: '최대 체력 +25%', effect: 'hpMult', value: 0.25, icon: '🛡️', rarity: 'epic', tag: '방어' },
+    { id: 'relic_def_e', name: '강철 갑옷', desc: '받는 피해 -15%', effect: 'def', value: 0.85, icon: '🛡️', rarity: 'epic', tag: '방어' },
+    { id: 'relic_dodge_e', name: '바람의 망토', desc: '회피율 +25%', effect: 'dodge', value: 25, icon: '🛡️', rarity: 'epic', tag: '방어' },
+    { id: 'relic_reflect_e', name: '반사의 거울', desc: '받은 피해의 25% 반사', effect: 'reflect', value: 0.25, icon: '🛡️', rarity: 'epic', tag: '방어' },
+    { id: 'relic_str_e', name: '전사의 문장', desc: '힘 +25%', effect: 'strMult', value: 0.25, icon: '🛡️', rarity: 'epic', tag: '방어' },
+    { id: 'relic_dex_e', name: '암살자의 문장', desc: '민첩 +25%', effect: 'dexMult', value: 0.25, icon: '🛡️', rarity: 'epic', tag: '방어' },
+    { id: 'relic_vit_e', name: '수호자의 문장', desc: '활력 +25%', effect: 'vitMult', value: 0.25, icon: '🛡️', rarity: 'epic', tag: '방어' },
+    { id: 'relic_killHeal_e', name: '영혼 착취자', desc: '처치 시 HP 10% 회복', effect: 'killHeal', value: 0.10, icon: '🛡️', rarity: 'epic', tag: '방어' },
+    // 특수 (8개)
+    { id: 'relic_reward_e', name: '용의 보물', desc: '골드/경험치 +25%', effect: 'reward', value: 1.25, icon: '✨', rarity: 'epic', tag: '특수' },
+    { id: 'relic_int_e', name: '현자의 문장', desc: '지능 +25%', effect: 'intMult', value: 0.25, icon: '✨', rarity: 'epic', tag: '특수' },
+    { id: 'relic_luk_e', name: '도박사의 문장', desc: '행운 +25%', effect: 'lukMult', value: 0.25, icon: '✨', rarity: 'epic', tag: '특수' },
+    { id: 'relic_killmana_e', name: '마나 착취자', desc: '처치 시 MP 25% 회복', effect: 'killMana', value: 0.25, icon: '✨', rarity: 'epic', tag: '특수' },
+    { id: 'relic_bleed_e', name: '피의 칼날', desc: '공격 시 출혈 부여', effect: 'bleed', value: 1.0, icon: '✨', rarity: 'epic', tag: '특수' },
+    { id: 'relic_weaken_e', name: '쇠약의 인장', desc: '공격 시 쇠약 부여', effect: 'weaken', value: 1.0, icon: '✨', rarity: 'epic', tag: '특수' },
+    { id: 'relic_stun_e', name: '번개 망치', desc: '공격 시 스턴 부여', effect: 'stun', value: 1.0, icon: '✨', rarity: 'epic', tag: '특수' },
+    { id: 'relic_freeze_e', name: '빙결 수정', desc: '공격 시 빙결 부여', effect: 'freeze', value: 1.0, icon: '✨', rarity: 'epic', tag: '특수' },
 
-    // 영웅 등급 - 새 효과
-    { id: 'relic_mirror', name: '반사의 거울', desc: '받은 피해의 10% 반사', effect: 'reflect', value: 0.1, icon: '🪞', rarity: 'epic' },
-    { id: 'relic_scroll', name: '고대의 두루마리', desc: 'MP 소모 -20%', effect: 'mpSave', value: 0.2, icon: '📜', rarity: 'epic' },
-    { id: 'relic_soul', name: '영혼 수확자', desc: '처치 시 HP 5% 회복', effect: 'killHeal', value: 0.05, icon: '👻', rarity: 'epic' },
-    { id: 'relic_spear', name: '염화의 창', desc: '공격 시 15% 확률로 화상 (3턴간 7% 피해)', effect: 'burn', value: 0.15, icon: '🔱', rarity: 'epic' },
-    { id: 'relic_fang', name: '흡혈박쥐 송곳니', desc: '공격 시 15% 확률로 출혈 (3턴간 4% 피해)', effect: 'bleed', value: 0.15, icon: '🦇', rarity: 'epic' },
-    { id: 'relic_hex', name: '저주받은 인형', desc: '공격 시 12% 확률로 저주 (3턴간 3% + 공격력↓)', effect: 'curse', value: 0.12, icon: '🪆', rarity: 'epic' },
-    { id: 'relic_fury', name: '광전사의 도끼', desc: '적 HP 30% 이하 시 피해 +35%', effect: 'execute', value: 0.35, icon: '🪓', rarity: 'epic' },
-    { id: 'relic_slayer', name: '드래곤 슬레이어', desc: '보스에게 피해 +25%', effect: 'bossKiller', value: 0.25, icon: '🐉', rarity: 'epic' },
-    { id: 'relic_chain', name: '연쇄의 사슬', desc: '10% 확률로 추가 공격', effect: 'multiHit', value: 0.1, icon: '⛓️', rarity: 'epic' },
-    { id: 'relic_skill', name: '마법 증폭기', desc: '스킬 피해 +15%', effect: 'skillDmg', value: 0.15, icon: '✨', rarity: 'epic' },
-
-    // 전설 등급 - 새 효과
-    { id: 'relic_phoenix', name: '불사조의 깃털', desc: '처치 시 HP 10% 회복', effect: 'killHeal', value: 0.1, icon: '🔥', rarity: 'legendary' },
-    { id: 'relic_void', name: '공허의 수정', desc: '스킬 쿨타임 -2턴', effect: 'cooldownReduce', value: 2, icon: '🌀', rarity: 'legendary' },
-    { id: 'relic_pierce', name: '역병의 창', desc: '공격 시 20% 확률로 독+화상 (3턴간 10% 피해)', effect: 'plague', value: 0.2, icon: '⚡', rarity: 'legendary' },
-    { id: 'relic_berserk', name: '광기의 가면', desc: '첫 공격 피해 +50%', effect: 'firstHit', value: 0.5, icon: '🎭', rarity: 'legendary' },
-    { id: 'relic_godslayer', name: '신 사냥꾼', desc: '보스에게 피해 +35%', effect: 'bossKiller', value: 0.35, icon: '☠️', rarity: 'legendary' },
-    { id: 'relic_storm', name: '폭풍의 눈', desc: '15% 확률로 추가 공격', effect: 'multiHit', value: 0.15, icon: '🌪️', rarity: 'legendary' },
-    { id: 'relic_arcane', name: '비전의 오브', desc: '스킬 피해 +20%', effect: 'skillDmg', value: 0.2, icon: '🔮', rarity: 'legendary' },
-    { id: 'relic_thorns', name: '가시왕관', desc: '받은 피해의 15% 반사', effect: 'reflect', value: 0.15, icon: '👑', rarity: 'legendary' },
-
-    // === 복합 효과 유물 ===
-    // 일반 등급 - 복합 (단일 효과 대비 약 60% 성능)
-    { id: 'relic_trainee', name: '수련자의 장신구', desc: '공격력 +6, 치명타 +3%', icon: '🏅', rarity: 'common',
-      effects: [{ effect: 'atk', value: 6 }, { effect: 'crit', value: 3 }] },
-    { id: 'relic_traveler', name: '여행자의 장비', desc: '골드 +8%, 경험치 +8%', icon: '🎒', rarity: 'common',
-      effects: [{ effect: 'gold', value: 1.08 }, { effect: 'exp', value: 1.08 }] },
-
-    // 희귀 등급 - 복합 (단일 효과 대비 약 60% 성능)
-    { id: 'relic_warrior_mark', name: '전투의 증표', desc: '공격력 +4%, 받는 피해 -4%', icon: '⚔️', rarity: 'rare',
-      effects: [{ effect: 'atkMult', value: 0.04 }, { effect: 'def', value: 0.96 }] },
-    { id: 'relic_survivor', name: '생존자의 부적', desc: '회피 +4%, 최대 HP +4%', icon: '🧿', rarity: 'rare',
-      effects: [{ effect: 'dodge', value: 4 }, { effect: 'hpMult', value: 0.04 }] },
-    { id: 'relic_explorer', name: '탐험가의 지도', desc: '골드 +10%, 경험치 +10%', icon: '🗺️', rarity: 'rare',
-      effects: [{ effect: 'gold', value: 1.10 }, { effect: 'exp', value: 1.10 }] },
-    { id: 'relic_duelist', name: '결투사의 장갑', desc: '치명타 +5%, 치명타 피해 +6%', icon: '🥊', rarity: 'rare',
-      effects: [{ effect: 'crit', value: 5 }, { effect: 'critDmg', value: 6 }] },
-
-    // 영웅 등급 - 복합 (단일 효과 대비 약 55% 성능, 3개 효과)
-    { id: 'relic_balance', name: '균형의 결정', desc: '공격력 +5%, 받는 피해 -5%, 치명타 +4%', icon: '⚖️', rarity: 'epic',
-      effects: [{ effect: 'atkMult', value: 0.05 }, { effect: 'def', value: 0.95 }, { effect: 'crit', value: 4 }] },
-    { id: 'relic_tactician', name: '전략가의 문장', desc: '스킬 피해 +10%, MP 소모 -12%', icon: '📋', rarity: 'epic',
-      effects: [{ effect: 'skillDmg', value: 0.10 }, { effect: 'mpSave', value: 0.12 }] },
-    { id: 'relic_hunter_arm', name: '사냥꾼의 완장', desc: '보스 피해 +15%, 독 확률 +10%', icon: '🎖️', rarity: 'epic',
-      effects: [{ effect: 'bossKiller', value: 0.15 }, { effect: 'poison', value: 0.10 }] },
-    { id: 'relic_undying', name: '불굴의 심장', desc: '최대 HP +6%, 처치 시 HP 3% 회복', icon: '💗', rarity: 'epic',
-      effects: [{ effect: 'hpMult', value: 0.06 }, { effect: 'killHeal', value: 0.03 }] },
-    { id: 'relic_assassin', name: '암살자의 비수', desc: '치명타 +6%, 치명타 피해 +8%, 회피 +4%', icon: '🔪', rarity: 'epic',
-      effects: [{ effect: 'crit', value: 6 }, { effect: 'critDmg', value: 8 }, { effect: 'dodge', value: 4 }] },
-
-    // 전설 등급 - 복합 (단일 효과 대비 약 50% 성능, 3개 효과)
-    { id: 'relic_hero_legacy', name: '영웅의 유산', desc: '공격력 +7%, 치명타 +6%, 치명타 피해 +8%', icon: '🏆', rarity: 'legendary',
-      effects: [{ effect: 'atkMult', value: 0.07 }, { effect: 'crit', value: 6 }, { effect: 'critDmg', value: 8 }] },
-    { id: 'relic_guardian', name: '수호신의 축복', desc: '받는 피해 -7%, 최대 HP +7%, 피해 반사 6%', icon: '🛡️', rarity: 'legendary',
-      effects: [{ effect: 'def', value: 0.93 }, { effect: 'hpMult', value: 0.07 }, { effect: 'reflect', value: 0.06 }] },
-    { id: 'relic_conqueror', name: '정복자의 인장', desc: '보스 피해 +20%, 화상 확률 +10%, 스킬 피해 +8%', icon: '👑', rarity: 'legendary',
-      effects: [{ effect: 'bossKiller', value: 0.20 }, { effect: 'burn', value: 0.10 }, { effect: 'skillDmg', value: 0.08 }] },
-    { id: 'relic_eternal', name: '영원의 성배', desc: '최대 HP +8%, 처치 시 HP 4% 회복, 흡혈 2%', icon: '🏺', rarity: 'legendary',
-      effects: [{ effect: 'hpMult', value: 0.08 }, { effect: 'killHeal', value: 0.04 }, { effect: 'lifeSteal', value: 0.02 }] }
+    // ========== 전설 등급 (80% 수준, 디버프 복합) ==========
+    // 공격 (8개)
+    { id: 'relic_atk_l', name: '파괴의 검', desc: '공격력 +80%', effect: 'atkMult', value: 0.80, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_crit_l', name: '예언자의 눈', desc: '치명타 확률 +50%', effect: 'crit', value: 50, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_critdmg_l', name: '심판의 보석', desc: '치명타 피해 +80%', effect: 'critDmg', value: 80, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_firstHit_l', name: '광기의 가면', desc: '첫 공격 피해 +80%', effect: 'firstHit', value: 0.80, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_bossKiller_l', name: '신 사냥꾼', desc: '보스에게 피해 +80%', effect: 'bossKiller', value: 0.80, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_multiHit_l', name: '폭풍의 눈', desc: '30% 확률로 추가 공격', effect: 'multiHit', value: 0.30, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_lifesteal_l', name: '흡혈 군주', desc: '피해의 10% 흡혈', effect: 'lifeSteal', value: 2.0, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_execute_l', name: '처형자의 도끼', desc: '적 HP 30% 이하 시 피해 +80%', effect: 'execute', value: 0.80, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    // 방어 (8개)
+    { id: 'relic_hp_l', name: '타이탄의 심장', desc: '최대 체력 +80%', effect: 'hpMult', value: 0.80, icon: '🛡️', rarity: 'legendary', tag: '방어' },
+    { id: 'relic_def_l', name: '드래곤의 심장', desc: '받는 피해 -30%', effect: 'def', value: 0.70, icon: '🛡️', rarity: 'legendary', tag: '방어' },
+    { id: 'relic_dodge_l', name: '환영의 망토', desc: '회피율 +50%', effect: 'dodge', value: 50, icon: '🛡️', rarity: 'legendary', tag: '방어' },
+    { id: 'relic_reflect_l', name: '가시왕관', desc: '받은 피해의 50% 반사', effect: 'reflect', value: 0.50, icon: '🛡️', rarity: 'legendary', tag: '방어' },
+    { id: 'relic_str_l', name: '거인의 힘', desc: '힘 +50%', effect: 'strMult', value: 0.50, icon: '🛡️', rarity: 'legendary', tag: '방어' },
+    { id: 'relic_dex_l', name: '바람의 축복', desc: '민첩 +50%', effect: 'dexMult', value: 0.50, icon: '🛡️', rarity: 'legendary', tag: '방어' },
+    { id: 'relic_vit_l', name: '대지의 축복', desc: '활력 +50%', effect: 'vitMult', value: 0.50, icon: '🛡️', rarity: 'legendary', tag: '방어' },
+    { id: 'relic_killHeal_l', name: '불사조의 깃털', desc: '처치 시 HP 25% 회복', effect: 'killHeal', value: 0.25, icon: '🛡️', rarity: 'legendary', tag: '방어' },
+    // 특수 (8개)
+    { id: 'relic_reward_l', name: '신의 축복', desc: '골드/경험치 +80%', effect: 'reward', value: 1.80, icon: '✨', rarity: 'legendary', tag: '특수' },
+    { id: 'relic_int_l', name: '지혜의 축복', desc: '지능 +50%', effect: 'intMult', value: 0.50, icon: '✨', rarity: 'legendary', tag: '특수' },
+    { id: 'relic_luk_l', name: '행운의 축복', desc: '행운 +50%', effect: 'lukMult', value: 0.50, icon: '✨', rarity: 'legendary', tag: '특수' },
+    { id: 'relic_killmana_l', name: '마나 지배자', desc: '처치 시 MP 50% 회복', effect: 'killMana', value: 0.50, icon: '✨', rarity: 'legendary', tag: '특수' },
+    { id: 'relic_bleed_l', name: '피의 군주', desc: '공격 시 출혈 부여 (2중첩)', effect: 'bleed', value: 2.0, icon: '✨', rarity: 'legendary', tag: '특수' },
+    { id: 'relic_weaken_l', name: '쇠약의 군주', desc: '공격 시 쇠약 부여 (2중첩)', effect: 'weaken', value: 2.0, icon: '✨', rarity: 'legendary', tag: '특수' },
+    { id: 'relic_stun_l', name: '천둥 망치', desc: '공격 시 스턴 부여', effect: 'stun', value: 1.0, icon: '✨', rarity: 'legendary', tag: '특수' },
+    { id: 'relic_freeze_l', name: '영원의 빙결', desc: '공격 시 빙결 부여 (2중첩)', effect: 'freeze', value: 2.0, icon: '✨', rarity: 'legendary', tag: '특수' }
 ];
 
 // 등급별 출현 확률 (조정됨)
@@ -196,34 +198,23 @@ const rarityWeights = {
 };
 
 // 3가지 태그 종류
-const RELIC_TAGS = ['공격', '방어', '마법'];
+const RELIC_TAGS = ['공격', '방어', '특수'];
 
-// 효과별 태그 매핑 (대부분 1개, 일부는 2개 태그)
+// 효과별 태그 매핑 (공격/방어/특수)
 const effectToTags = {
-    // 공격 전용
+    // 공격
     'atk': ['공격'], 'atkMult': ['공격'], 'bossKiller': ['공격'],
-    'strMult': ['공격'],
-    'poison': ['공격'], 'burn': ['공격'], 'bleed': ['공격'], 'curse': ['공격', '마법'], 'plague': ['공격'],
-    // 방어 전용
+    'crit': ['공격'], 'critDmg': ['공격'],
+    'execute': ['공격'], 'firstHit': ['공격'], 'multiHit': ['공격'],
+    'lifeSteal': ['공격'],
+    // 방어
     'def': ['방어'], 'hpMult': ['방어'], 'vitMult': ['방어'],
-    // 마법 전용
-    'mp': ['마법'], 'mpSave': ['마법'], 'cooldownReduce': ['마법'],
-    'intMult': ['마법'], 'gold': ['마법'], 'exp': ['마법'],
-    // 하이브리드 (2개 태그)
-    'crit': ['공격', '마법'],           // 치명타 - 공격+마법
-    'critDmg': ['공격', '마법'],        // 치명타 데미지 - 공격+마법
-    'multiHit': ['공격', '마법'],       // 다중 공격 - 공격+마법
-    'skillDmg': ['공격', '마법'],       // 스킬 데미지 - 공격+마법
-    'dodge': ['방어', '마법'],          // 회피 - 방어+마법
-    'first': ['공격', '마법'],          // 선제공격 - 공격+마법
-    'lifeSteal': ['공격', '방어'],      // 흡혈 - 공격+방어
-    'killHeal': ['공격', '방어'],       // 처치 회복 - 공격+방어
-    'reflect': ['방어', '공격'],        // 반사 - 방어+공격
-    'execute': ['공격'],                // 처형 - 공격
-    'firstHit': ['공격'],               // 첫타 - 공격
-    'dexMult': ['공격', '방어'],        // 민첩 - 공격+방어
-    'lukMult': ['마법', '공격'],        // 행운 - 마법+공격
-    'allStats': ['공격', '방어', '마법'] // 모든 스탯 - 3개 전부
+    'dodge': ['방어'], 'reflect': ['방어'], 'killHeal': ['방어'],
+    'strMult': ['방어'], 'dexMult': ['방어'],
+    // 특수
+    'intMult': ['특수'], 'lukMult': ['특수'],
+    'reward': ['특수'], 'killMana': ['특수'],
+    'bleed': ['특수'], 'weaken': ['특수'], 'stun': ['특수'], 'freeze': ['특수']
 };
 
 // 유물의 태그 가져오기 (배열로 반환, 최대 2개)
@@ -281,7 +272,7 @@ function findCombinableGroups() {
     return result;
 }
 
-// 태그 합성 실행 - 같은 태그+등급 3개 → 다음 등급 무작위 유물
+// 태그 합성 실행 - 같은 태그+등급 2개 → 다음 등급 무작위 유물
 function executeTagCombine(indices) {
     const relics = indices.map(i => gameState.tempRelics[i]);
     const rarity = relics[0].rarity;
@@ -289,9 +280,13 @@ function executeTagCombine(indices) {
 
     if (!nextRarity) return null;
 
-    // 다음 등급의 무작위 유물 선택
-    const nextRarityRelics = relicsData.filter(r => r.rarity === nextRarity);
-    const randomRelic = { ...nextRarityRelics[Math.floor(Math.random() * nextRarityRelics.length)] };
+    // 공통 태그 찾기
+    const tags1 = getRelicTags(relics[0]);
+    const tags2 = getRelicTags(relics[1]);
+    const commonTags = tags1.filter(t => tags2.includes(t));
+
+    // 해당 태그를 가진 다음 등급 유물 중 무작위 선택
+    const randomRelic = getRandomRelicWithTag(commonTags[0], nextRarity);
 
     // 기존 2개 유물 제거 (인덱스 큰 것부터)
     const sortedIndices = [...indices].sort((a, b) => b - a);
@@ -303,6 +298,24 @@ function executeTagCombine(indices) {
     gameState.tempRelics.push(randomRelic);
 
     return randomRelic;
+}
+
+// 특정 태그를 가진 특정 등급 유물 중 무작위 선택
+function getRandomRelicWithTag(tag, rarity) {
+    // 해당 등급의 유물 중 해당 태그를 가진 것 필터
+    const candidates = relicsData.filter(r => {
+        if (r.rarity !== rarity) return false;
+        const tags = getRelicTags(r);
+        return tags.includes(tag);
+    });
+
+    // 후보가 없으면 해당 등급 전체에서 무작위
+    if (candidates.length === 0) {
+        const allOfRarity = relicsData.filter(r => r.rarity === rarity);
+        return { ...allOfRarity[Math.floor(Math.random() * allOfRarity.length)] };
+    }
+
+    return { ...candidates[Math.floor(Math.random() * candidates.length)] };
 }
 
 // 태그 합성 UI 업데이트
@@ -479,8 +492,8 @@ const skillsData = {
             desc: '3턴간 공격력 +25% (쿨타임 4턴)', char: '묘인'
         },
         {
-            id: 'cat_slash', name: '폭렬참', mpCost: 3, damage: 35, type: 'active', cooldown: 2,
-            desc: '35 피해 (적 반격 있음, 쿨타임 2턴)', char: '묘인'
+            id: 'cat_slash', name: '폭렬참', mpCost: 3, damageMult: 1.5, type: 'active', cooldown: 2,
+            desc: '공격력의 1.5배 피해 (적 반격 있음, 쿨타임 2턴)', char: '묘인'
         },
         {
             id: 'cat_bleed', name: '피의 갈증', mpCost: 0, type: 'passive',
@@ -496,8 +509,8 @@ const skillsData = {
         },
         {
             id: 'elf_mana', name: '마나 순환', mpCost: 0, type: 'active', cooldown: 2,
-            effect: 'mpRecover', value: 3,
-            desc: 'MP 3 즉시 회복 (쿨타임 2턴)', char: '엘프'
+            effect: 'mpRecoverHalf', value: 3,
+            desc: 'MP 3 + 최대 MP의 절반 회복 (쿨타임 2턴)', char: '엘프'
         },
         {
             id: 'elf_nature', name: '자연의 축복', mpCost: 0, type: 'passive',
@@ -533,14 +546,14 @@ const skillsData = {
             desc: '25 피해 (적 반격 없음)', char: '인간'
         },
         {
-            id: 'human_evasion', name: '회피 기동', mpCost: 2, type: 'buff', cooldown: 3,
-            buffEffect: 'dodgeBoost', buffValue: 25, buffTurns: 2, buffIcon: '💨',
-            desc: '2턴간 회피율 +25% (쿨타임 3턴)', char: '인간'
+            id: 'human_focus', name: '집중 사격', mpCost: 2, type: 'buff', cooldown: 3,
+            buffEffect: 'critBoost', buffValue: 20, buffTurns: 3, buffIcon: '🎯',
+            desc: '3턴간 치명타 확률 +20% (쿨타임 3턴)', char: '인간'
         },
         {
             id: 'human_tactics', name: '전술적 우위', mpCost: 0, type: 'passive',
-            effect: 'firstStrike', value: 1,
-            desc: '[패시브] 적의 선제공격이 1턴 늦게 발동', char: '인간'
+            effect: 'critDmgBoost', value: 15,
+            desc: '[패시브] 치명타 데미지 +15%', char: '인간'
         }
     ]
 };
@@ -548,24 +561,39 @@ const skillsData = {
 // 모드별 설정
 // enemyMult: 적 능력치 배율, rewardMult: 보상 배율
 const modeSettings = {
-    easy: { enemyMult: 0.5, rewardMult: 1, maxFloor: 100, name: '이지' },
-    normal: { enemyMult: 5, rewardMult: 3, maxFloor: 100, name: '노말' },
-    hard: { enemyMult: 30, rewardMult: 5, maxFloor: 100, name: '하드' },
-    infinite: { enemyMult: 10, rewardMult: 4, maxFloor: Infinity, name: '무한' }
+    easy: { enemyMult: 0.5, rewardMult: 1, maxFloor: 100, name: '전장 초입부' },
+    normal: { enemyMult: 5, rewardMult: 5, maxFloor: 100, name: '전장 중심부' },
+    hard: { enemyMult: 30, rewardMult: 10, maxFloor: 100, name: '전장의 끝' },
+    infinite: { enemyMult: 10, rewardMult: 10, maxFloor: Infinity, name: '무한의 전장' }
 };
 
-// 적 타입
+// 적 타입 (weight: 등장 확률 가중치)
 const enemyTypes = [
-    { id: 'power', name: '파워', prefix: '강력한 ', hpMult: 0.8, atkMult: 1.4, dodge: 0, crit: 5 },
-    { id: 'speed', name: '스피드', prefix: '날렵한 ', hpMult: 0.9, atkMult: 1.0, dodge: 15, crit: 10 },
-    { id: 'lucky', name: '행운', prefix: '행운의 ', hpMult: 0.9, atkMult: 1.0, dodge: 20, crit: 20 }
+    { id: 'power', name: '파워', prefix: '강력한 ', hpMult: 0.8, atkMult: 1.4, dodge: 0, crit: 5, weight: 30 },
+    { id: 'speed', name: '스피드', prefix: '날렵한 ', hpMult: 0.9, atkMult: 1.0, dodge: 15, crit: 10, weight: 30 },
+    { id: 'lucky', name: '행운', prefix: '행운의 ', hpMult: 0.9, atkMult: 1.0, dodge: 20, crit: 20, weight: 20 },
+    { id: 'tank', name: '탱크', prefix: '단단한 ', hpMult: 1.5, atkMult: 0.7, dodge: 0, crit: 0, weight: 8 },
+    { id: 'berserk', name: '광폭', prefix: '광폭한 ', hpMult: 0.7, atkMult: 1.6, dodge: 0, crit: 15, weight: 5 },
+    { id: 'cunning', name: '교활', prefix: '교활한 ', hpMult: 1.0, atkMult: 1.1, dodge: 10, crit: 15, weight: 5 },
+    { id: 'giant', name: '거대', prefix: '거대한 ', hpMult: 2.0, atkMult: 0.9, dodge: 0, crit: 5, weight: 2 }
 ];
+
+// 가중치 기반 적 타입 선택
+function selectEnemyType() {
+    const totalWeight = enemyTypes.reduce((sum, t) => sum + t.weight, 0);
+    let random = Math.random() * totalWeight;
+    for (const type of enemyTypes) {
+        random -= type.weight;
+        if (random <= 0) return type;
+    }
+    return enemyTypes[0];
+}
 
 // 보스 버프 목록
 const bossBuffs = [
     { id: 'rage', name: '격노', desc: '공격력 +30%', atkMult: 1.3, hpMult: 1.0 },
     { id: 'fortify', name: '강화', desc: '체력 +50%', atkMult: 1.0, hpMult: 1.5 },
-    { id: 'swift', name: '신속', desc: '회피 +15%, 치명타 +10%', atkMult: 1.0, hpMult: 1.0, dodge: 15, crit: 10 },
+    { id: 'swift', name: '신속', desc: '회피 +15%, 치명타 확률 +10%', atkMult: 1.0, hpMult: 1.0, dodge: 15, crit: 10 },
     { id: 'berserk', name: '광폭화', desc: '공격력 +50%, 체력 -20%', atkMult: 1.5, hpMult: 0.8 },
     { id: 'resilient', name: '불굴', desc: '체력 +30%, 공격력 +15%', atkMult: 1.15, hpMult: 1.3 }
 ];
@@ -577,8 +605,8 @@ function generateEnemy(floor) {
     const isRelicFloor = floor % 5 === 0; // 5층마다 유물 보상
     const modeMult = modeSettings[gameState.gameMode].enemyMult;
 
-    // 랜덤 타입 선택
-    const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+    // 가중치 기반 타입 선택
+    const type = selectEnemyType();
 
     // 보스/중보스에게 랜덤 버프 부여
     const buff = (isBoss || isMiniBoss) ? bossBuffs[Math.floor(Math.random() * bossBuffs.length)] : null;
@@ -609,30 +637,68 @@ function generateEnemy(floor) {
         isBoss,
         isMiniBoss,
         stunned: false,
-        // 디버프 상태 (남은 턴 수)
+        // 디버프 상태 (중첩 수)
         debuffs: {
-            poison: 0,      // 독: 턴당 최대HP 5% 피해
-            burn: 0,        // 화상: 턴당 최대HP 7% 피해
-            bleed: 0,       // 출혈: 턴당 최대HP 4% 피해
-            curse: 0        // 저주: 턴당 최대HP 3% + 공격력 20% 감소
+            bleed: 0,       // 출혈: 턴당 플레이어 공격력의 50% 데미지 (중첩 가능)
+            weaken: 0,      // 쇠약: 공격력 -10%, 받는 피해 +10% (중첩 가능)
+            stun: 0,        // 스턴: 반격 불가 1턴, 선제공격 +1
+            freeze: 0       // 빙결: 선제공격 +2
         }
     };
 }
 
 function getEnemyName(floor, isBoss, isMiniBoss) {
-    const normalEnemies = ['고블린', '슬라임', '스켈레톤', '오크', '늑대'];
-    const miniBosses = ['고블린 대장', '거대 슬라임', '해골 기사', '오크 전사', '늑대 대장'];
-    const bosses = ['고블린 왕', '슬라임 킹', '리치', '오크 로드', '늑대 군주'];
     const tier = Math.floor((floor - 1) / 10) % 5;
-    if (isBoss) return bosses[tier];
-    if (isMiniBoss) return miniBosses[tier];
-    return normalEnemies[tier];
+
+    // 난이도별 마물 이름
+    const enemyNames = {
+        easy: {
+            normal: ['임프', '고블린', '슬라임', '박쥐', '해골'],
+            miniBoss: ['임프 대장', '고블린 대장', '거대 슬라임', '박쥐 군장', '해골 전사'],
+            boss: ['임프 군주', '고블린 왕', '슬라임 킹', '박쥐 군주', '해골 기사']
+        },
+        normal: {
+            normal: ['하급 악령', '오크', '늑대인간', '트롤', '가고일'],
+            miniBoss: ['악령 대장', '오크 대장', '늑대인간 대장', '트롤 대장', '가고일 대장'],
+            boss: ['악령 군주', '오크 로드', '늑대인간 군주', '트롤 왕', '가고일 군주']
+        },
+        hard: {
+            normal: ['마물 전사', '마계 기사', '데몬', '암흑 마법사', '죽음의 기사'],
+            miniBoss: ['마물 대장', '마계 기사장', '데몬 대장', '암흑 대마법사', '죽음의 기사장'],
+            boss: ['마물 장군', '마계 사령관', '데몬 군주', '암흑 대현자', '죽음의 군주']
+        },
+        infinite: {
+            normal: ['마왕 친위병', '상급 악마', '지옥의 전사', '심연의 기사', '파멸의 사도'],
+            miniBoss: ['친위 대장', '상급 악마장', '지옥의 장군', '심연의 기사장', '파멸의 사도장'],
+            boss: ['마왕 근위대장', '대악마', '지옥의 군주', '심연의 군주', '파멸의 군주']
+        }
+    };
+
+    const mode = gameState.gameMode || 'easy';
+    const enemies = enemyNames[mode];
+
+    if (isBoss) return enemies.boss[tier];
+    if (isMiniBoss) return enemies.miniBoss[tier];
+    return enemies.normal[tier];
 }
 
 // 유물에서 특정 효과의 값을 가져오는 헬퍼 함수 (복합 효과 지원)
 // 근원 강화 보너스 (0.5% per level, max 100%)
 function getOriginEnhancementBonus() {
     return Math.min(gameState.originEnhancement * 0.5, 100) / 100;
+}
+
+// 근원 강화 비용 (단계별 증가)
+function getOriginEnhanceCost() {
+    const level = gameState.originEnhancement;
+    if (level < 25) return 1;
+    if (level < 50) return 2;
+    if (level < 75) return 3;
+    if (level < 100) return 5;
+    if (level < 125) return 7;
+    if (level < 150) return 10;
+    if (level < 175) return 15;
+    return 20; // 175-200
 }
 
 function getRelicEffectValue(relic, effectType) {
@@ -853,6 +919,13 @@ function getCritDamage() {
         if (val !== null) critDmg += val;
     });
 
+    // 패시브 스킬 치명타 데미지 보너스
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'critDmgBoost') {
+            critDmg += skill.value;
+        }
+    });
+
     // 100% 초과 치명타 확률은 치명타 데미지로 전환
     const rawCrit = getRawCritChance();
     if (rawCrit > 100) {
@@ -912,37 +985,48 @@ function getCounterDefenseMultiplier() {
     return mult;
 }
 
-// 흡혈 효과 체크
-function getLifeStealPercent() {
-    let percent = 0;
+// 총 피해 감소율 (표시용, 최대 50%)
+function getTotalDamageReduction() {
+    let totalReduction = 0;
 
+    // 방어 배율 (패시브/버프/유물)
+    totalReduction += (1 - getDefenseMultiplier()) * 100;
+
+    // 활력 스탯 데미지 감소
+    totalReduction += getVitDamageReduction() * 100;
+
+    // 퍼센트 강화 (상점)
+    totalReduction += gameState.percentBonus.def;
+
+    return Math.min(totalReduction, 50);
+}
+
+// 흡혈 효과 체크 (확률 + 흡혈량 반환)
+function getLifeStealInfo() {
+    let chance = 0;
+    let healPercent = 0.05; // 기본 5%
+
+    // 스킬 흡혈 효과 (묘인 패시브 등)
     gameState.equippedSkills.forEach(skill => {
         if (skill?.type === 'passive' && skill.effect === 'lifeSteal') {
-            percent += skill.value;
+            chance += 1.0; // 스킬은 100% 확률
+            healPercent = Math.max(healPercent, skill.value);
         }
     });
 
-    // 유물 흡혈 효과
+    // 유물 흡혈 효과 (value가 확률)
     gameState.tempRelics.forEach(relic => {
         const val = getRelicEffectValue(relic, 'lifeSteal');
-        if (val !== null) percent += val;
-    });
-
-    return percent;
-}
-
-// 선제공격 보너스 체크
-function getFirstStrikeBonus() {
-    let bonus = 0;
-
-    gameState.equippedSkills.forEach(skill => {
-        if (skill?.type === 'passive' && skill.effect === 'firstStrike') {
-            bonus += skill.value;
+        if (val !== null) {
+            chance += val;
+            // 2.0 이상이면 10% 흡혈 (전설급)
+            if (val >= 2.0) healPercent = 0.10;
         }
     });
 
-    return bonus;
+    return { chance: Math.min(chance, 1.0), healPercent };
 }
+
 
 // === 새 유물 효과 헬퍼 함수들 ===
 
@@ -976,6 +1060,16 @@ function getKillHealPercent() {
     return percent;
 }
 
+// 처치 시 MP 회복률
+function getKillManaPercent() {
+    let percent = 0;
+    gameState.tempRelics.forEach(relic => {
+        const val = getRelicEffectValue(relic, 'killMana');
+        if (val !== null) percent += val;
+    });
+    return percent;
+}
+
 // 쿨타임 감소량
 function getCooldownReduce() {
     let reduce = 0;
@@ -986,19 +1080,14 @@ function getCooldownReduce() {
     return reduce;
 }
 
-// 디버프 확률 계산
+// 디버프 확률 계산 (value가 확률, 1.0 이상이면 중첩 수)
 function getDebuffChance(debuffType) {
     let chance = 0;
     gameState.tempRelics.forEach(relic => {
         const val = getRelicEffectValue(relic, debuffType);
         if (val !== null) chance += val;
-        // plague는 독+화상 동시 적용
-        if (debuffType === 'poison' || debuffType === 'burn') {
-            const plagueVal = getRelicEffectValue(relic, 'plague');
-            if (plagueVal !== null) chance += plagueVal;
-        }
     });
-    return Math.min(chance, 0.8); // 최대 80%
+    return chance;
 }
 
 // 공격 후 디버프 적용 시도
@@ -1006,50 +1095,98 @@ function tryApplyDebuffs() {
     const enemy = gameState.currentEnemy;
     if (!enemy || enemy.hp <= 0) return;
 
-    const debuffTypes = ['poison', 'burn', 'bleed', 'curse'];
-    const debuffNames = { poison: '독', burn: '화상', bleed: '출혈', curse: '저주' };
-    const debuffDuration = 3; // 기본 3턴
+    const debuffTypes = ['bleed', 'weaken', 'stun', 'freeze'];
+    const debuffNames = { bleed: '출혈', weaken: '쇠약', stun: '스턴', freeze: '빙결' };
 
     debuffTypes.forEach(type => {
         const chance = getDebuffChance(type);
-        if (chance > 0 && Math.random() < chance) {
-            if (enemy.debuffs[type] === 0) {
-                addBattleLog(`💀 ${enemy.name}에게 ${debuffNames[type]} 적용!`);
+        if (chance <= 0) return;
+
+        // 확률 적용 (1.0 이상이면 확정 적용, 나머지는 확률)
+        const baseChance = Math.min(chance, 1.0);
+        const stacks = Math.floor(chance); // 1.0 이상이면 중첩 수
+
+        if (Math.random() < baseChance) {
+            const applyStacks = stacks > 0 ? stacks : 1;
+            const prevStacks = enemy.debuffs[type];
+            enemy.debuffs[type] += applyStacks;
+
+            if (prevStacks === 0) {
+                addBattleLog(`${enemy.name}에게 ${debuffNames[type]} 적용!`);
+            } else if (applyStacks > 1 || prevStacks > 0) {
+                addBattleLog(`${debuffNames[type]} ${enemy.debuffs[type]}중첩!`);
             }
-            enemy.debuffs[type] = debuffDuration; // 갱신
         }
     });
 }
 
-// 턴 시작 시 디버프 피해 처리
+// 턴 시작 시 디버프 피해 처리 (출혈만 피해)
 function processDebuffDamage() {
     const enemy = gameState.currentEnemy;
     if (!enemy || enemy.hp <= 0) return;
 
-    const debuffDamage = {
-        poison: 0.05,   // 5%
-        burn: 0.07,     // 7%
-        bleed: 0.04,    // 4%
-        curse: 0.03     // 3%
-    };
-    const debuffIcons = { poison: '🟢', burn: '🔥', bleed: '🩸', curse: '💜' };
-
-    let totalDamage = 0;
-    let debuffMessages = [];
-
-    Object.keys(enemy.debuffs).forEach(type => {
-        if (enemy.debuffs[type] > 0) {
-            const damage = Math.floor(enemy.maxHp * debuffDamage[type]);
-            totalDamage += damage;
-            debuffMessages.push(`${debuffIcons[type]}${damage}`);
-            enemy.debuffs[type]--;
-        }
-    });
-
-    if (totalDamage > 0) {
-        enemy.hp -= totalDamage;
-        addBattleLog(`디버프 피해: ${debuffMessages.join(' + ')} = ${totalDamage}`);
+    // 출혈: 플레이어 공격력의 50% * 중첩 수
+    if (enemy.debuffs.bleed > 0) {
+        const playerAtk = calculatePlayerAtk();
+        const bleedDamage = Math.floor(playerAtk * 0.5 * enemy.debuffs.bleed);
+        enemy.hp -= bleedDamage;
+        addBattleLog(`출혈 피해: ${bleedDamage} (${enemy.debuffs.bleed}중첩)`);
+        // 출혈은 턴마다 1중첩씩 감소
+        enemy.debuffs.bleed--;
     }
+
+    // 스턴은 반격 후 감소 (checkStunBlockCounter에서 처리)
+    // 빙결은 지속 (전투 끝날 때까지)
+}
+
+// 디버프로 인한 적 공격력 감소 (쇠약: 10% per stack)
+function getEnemyDebuffAtkReduction() {
+    const enemy = gameState.currentEnemy;
+    if (!enemy) return 1.0;
+
+    let reduction = 0;
+    // 쇠약: 중첩당 10% 감소
+    const weakenStacks = enemy.debuffs.weaken || 0;
+    reduction += weakenStacks * 10;
+
+    return Math.max(0.1, 1 - reduction / 100); // 최소 10% 공격력
+}
+
+// 디버프로 인한 적 받는 피해 증가 (쇠약: 10% per stack)
+function getEnemyDebuffDamageTaken() {
+    const enemy = gameState.currentEnemy;
+    if (!enemy) return 1.0;
+
+    let increase = 0;
+    // 쇠약: 중첩당 10% 증가
+    const weakenStacks = enemy.debuffs.weaken || 0;
+    increase += weakenStacks * 10;
+
+    return 1 + increase / 100;
+}
+
+// 스턴으로 인한 반격 불가 체크
+function checkStunBlockCounter() {
+    const enemy = gameState.currentEnemy;
+    if (!enemy) return false;
+
+    if (enemy.debuffs.stun > 0) {
+        enemy.debuffs.stun--;
+        addBattleLog(`스턴으로 적의 반격이 무효화됨!`);
+        return true; // 반격 불가
+    }
+    return false;
+}
+
+// 디버프로 인한 적 선제공격 증가 (스턴 +1, 빙결 +2)
+function getEnemyPriorityPenalty() {
+    const enemy = gameState.currentEnemy;
+    if (!enemy) return 0;
+
+    let penalty = 0;
+    if (enemy.debuffs.stun > 0) penalty += 1;
+    penalty += (enemy.debuffs.freeze || 0) * 2;
+    return penalty;
 }
 
 // 처형 보너스 (적 HP 30% 이하 시 추가 피해)
@@ -1105,7 +1242,7 @@ function getSkillDmgBonus() {
 function calculateDamageTaken(damage, guarding = false, isCounter = false) {
     let finalDamage = damage;
 
-    // 총 피해 감소율 계산 (최대 80%)
+    // 총 피해 감소율 계산 (최대 50%)
     let totalReduction = 0;
 
     // 방어 배율 (패시브/버프)
@@ -1117,8 +1254,8 @@ function calculateDamageTaken(damage, guarding = false, isCounter = false) {
     // 퍼센트 강화 (상점)
     totalReduction += gameState.percentBonus.def;
 
-    // 최대 80%로 제한
-    totalReduction = Math.min(totalReduction, 80);
+    // 최대 50%로 제한
+    totalReduction = Math.min(totalReduction, 50);
     finalDamage *= (1 - totalReduction / 100);
 
     // 반격일 경우 추가 감소 (별도 계산)
@@ -1211,7 +1348,8 @@ function tickMpRegen() {
 }
 
 function getExpForLevel(level) {
-    return 100 * level;
+    // 초반 레벨업 경험치 감소: 50 * level
+    return 50 * level;
 }
 
 function checkLevelUp() {
@@ -1243,6 +1381,16 @@ function updateVillageUI() {
     document.getElementById('player-max-exp').textContent = getExpForLevel(gameState.player.level);
 
     document.getElementById('stat-points').textContent = gameState.player.statPoints;
+
+    // 포인트가 있을 때 뱃지 강조 효과
+    const pointBadge = document.querySelector('.point-badge');
+    if (pointBadge) {
+        if (gameState.player.statPoints > 0) {
+            pointBadge.classList.add('has-points');
+        } else {
+            pointBadge.classList.remove('has-points');
+        }
+    }
     document.getElementById('stat-str').textContent = gameState.player.stats.str;
     document.getElementById('stat-dex').textContent = gameState.player.stats.dex;
     document.getElementById('stat-int').textContent = gameState.player.stats.int;
@@ -1255,10 +1403,10 @@ function updateVillageUI() {
     document.getElementById('spec-crit').textContent = getCritChance() + '%';
     document.getElementById('spec-critdmg').textContent = getCritDamage() + '%';
     document.getElementById('spec-dodge').textContent = getDodgeChance() + '%';
-    // 피해감소: 활력 기반 + 상점 보너스 (최대 80%)
+    // 피해감소: 활력 기반 + 상점 보너스 (최대 50%)
     const totalDefReduction = Math.min(
         getVitDamageReduction() * 100 + gameState.percentBonus.def,
-        80
+        50
     );
     document.getElementById('spec-def').textContent = Math.floor(totalDefReduction) + '%';
 
@@ -1277,15 +1425,17 @@ function updateVillageUI() {
 }
 
 function getPercentUpgradeCost(currentPercent) {
-    // 비용: 100 + (현재% * 10), 0.5%씩 증가하므로 currentPercent는 0.5 단위
-    return Math.floor(100 + currentPercent * 10);
+    // 비용: 기본 50 + 10*단계 + 10%씩 증가 (0.5%씩 증가하므로 단계 = currentPercent * 2)
+    const purchases = currentPercent * 2;
+    const base = 50;
+    return Math.floor(base * (1 + purchases * 0.1) + 10 * purchases);
 }
 
 function getTalismanCost(type, purchases) {
-    // 부적별 기본 비용과 증가율
-    const baseCosts = { exp: 100, gold: 100, stone: 200, origin: 500 };
-    const multiplier = 1 + purchases * 0.1; // 구매할수록 10%씩 증가
-    return Math.floor(baseCosts[type] * multiplier);
+    // 부적별 기본 비용: 초반 단가 감소 + 10*단계 + 10% 증가
+    const baseCosts = { exp: 50, gold: 50, stone: 100, origin: 300 };
+    const base = baseCosts[type];
+    return Math.floor(base * (1 + purchases * 0.1) + 10 * purchases);
 }
 
 function updateShopUI() {
@@ -1293,10 +1443,10 @@ function updateShopUI() {
     document.getElementById('shop-stones').textContent = gameState.enhancementStones;
     document.getElementById('shop-origins').textContent = gameState.originStones;
 
-    // 방어구
+    // 방어구 (초반 단가 감소: 100 -> 50)
     document.getElementById('armor-level').textContent = gameState.armorLevel;
-    document.getElementById('armor-cost').textContent = gameState.armorLevel * 100;
-    const armorCost = gameState.armorLevel * 100;
+    const armorCost = gameState.armorLevel * 50;
+    document.getElementById('armor-cost').textContent = armorCost;
     document.getElementById('btn-upgrade-armor').disabled = gameState.player.gold < armorCost;
 
     // 부적 (경험치, 골드)
@@ -1327,16 +1477,20 @@ function updateShopUI() {
     document.getElementById('cost-origin').textContent = originCost;
     document.querySelector('.btn-talisman[data-talisman="origin"]').disabled = gameState.player.gold < originCost;
 
-    // 능력 부적 (퍼센트 강화) - 0.5%씩 증가, 모든 스탯 100%까지 구매 가능
+    // 능력 부적 (퍼센트 강화) - 기본 0.5%씩, def는 0.15%씩 증가
     const stats = ['atk', 'hp', 'crit', 'critDmg', 'dodge', 'def'];
     stats.forEach(stat => {
         const current = gameState.percentBonus[stat];
         const cost = getPercentUpgradeCost(current);
-        const isMax = current >= 100;
+        // def는 최대 15% (100회 구매), 나머지는 100%
+        const maxValue = stat === 'def' ? 15 : 100;
+        const isMax = current >= maxValue;
 
         document.getElementById(`percent-${stat}`).textContent = current.toFixed(1);
         document.getElementById(`cost-${stat}`).textContent = isMax ? 'MAX' : cost;
-        document.getElementById(`fill-${stat}`).style.width = `${current}%`;
+        // 진행바: def는 15% 기준, 나머지는 100% 기준
+        const fillPercent = stat === 'def' ? (current / 15) * 100 : current;
+        document.getElementById(`fill-${stat}`).style.width = `${fillPercent}%`;
 
         const btn = document.querySelector(`.btn-percent-upgrade[data-stat="${stat}"]`);
         btn.disabled = isMax || gameState.player.gold < cost;
@@ -1408,18 +1562,21 @@ function updateInnUI() {
     // 근원 강화 표시
     const enhancementLevel = gameState.originEnhancement;
     const enhancementBonus = Math.min(enhancementLevel * 0.5, 100);
+    const enhanceCost = getOriginEnhanceCost();
     document.getElementById('origin-enhancement-level').textContent = enhancementLevel;
-    document.getElementById('origin-enhancement-bonus').textContent = enhancementBonus.toFixed(1) + '%';
+    document.getElementById('origin-enhancement-bonus').textContent = Math.floor(enhancementBonus) + '%';
 
-    // 근원 강화 버튼 상태 (최대 200레벨)
+    // 근원 강화 버튼 상태 및 비용 표시 (최대 200레벨)
     const enhanceBtn = document.getElementById('btn-origin-enhance');
     if (enhanceBtn) {
-        enhanceBtn.disabled = gameState.originStones < 1 || enhancementLevel >= 200;
+        enhanceBtn.disabled = gameState.originStones < enhanceCost || enhancementLevel >= 200;
+        enhanceBtn.textContent = `강화 (${enhanceCost}🔮)`;
     }
 
     // 스탯 포인트 구매 비용 (구매할수록 증가)
     const statPointCost = 1 + Math.floor(gameState.statPointsPurchased / 5);
     document.getElementById('stat-point-cost').textContent = statPointCost;
+    document.getElementById('stat-points-purchased').textContent = gameState.statPointsPurchased;
     document.getElementById('btn-buy-stat-point').disabled = gameState.originStones < statPointCost;
 }
 
@@ -1471,7 +1628,19 @@ function updateBattleUI() {
     document.getElementById('panel-crit').textContent = getCritChance() + '%';
     document.getElementById('panel-crit-dmg').textContent = getCritDamage() + '%';
     document.getElementById('panel-dodge').textContent = getDodgeChance() + '%';
-    document.getElementById('panel-def').textContent = Math.floor(getVitDamageReduction() * 100) + '%';
+    document.getElementById('panel-def').textContent = Math.floor(getTotalDamageReduction()) + '%';
+    document.getElementById('panel-reflect').textContent = Math.floor(getReflectPercent() * 100) + '%';
+
+    // 근원 강화 보너스 표시
+    const originBonus = Math.floor(getOriginEnhancementBonus() * 100);
+    const originBonusEl = document.getElementById('panel-origin-bonus');
+    if (originBonusEl) {
+        originBonusEl.textContent = originBonus > 0 ? `+${originBonus}%` : '';
+    }
+
+    // 획득 보상 표시
+    document.getElementById('panel-gold').textContent = gameState.dungeon.pendingGold || 0;
+    document.getElementById('panel-exp').textContent = gameState.dungeon.pendingExp || 0;
 
     // 적 정보 업데이트 (적이 있을 때만)
     const enemy = gameState.currentEnemy;
@@ -1483,16 +1652,7 @@ function updateBattleUI() {
     document.getElementById('enemy-hp').textContent = Math.max(0, Math.floor(enemy.hp));
     document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
     document.getElementById('enemy-atk').textContent = enemy.atk;
-    document.getElementById('enemy-preempt-counter').textContent = Math.max(0, enemyAttackCounter);
-
-    // 선제공격 1턴 남았을 때 경고 표시
-    const preemptDisplay = document.querySelector('.enemy-preempt-display');
-    if (enemyAttackCounter <= 1) {
-        preemptDisplay.classList.add('warning');
-    } else {
-        preemptDisplay.classList.remove('warning');
-    }
-
+    
     const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
     document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
 
@@ -1525,9 +1685,7 @@ let hasActed = false; // 행동 여부 (도주 가능 여부)
 let enemyAttackCounter = 0; // 적 선제공격까지 남은 턴
 
 function getRandomAttackCounter() {
-    const base = Math.floor(Math.random() * 4) + 3; // 3-6
-    const bonus = getFirstStrikeBonus(); // 인간 패시브
-    return base + bonus;
+    return Math.floor(Math.random() * 4) + 3; // 3-6턴
 }
 
 function startBattle() {
@@ -1549,7 +1707,7 @@ function startBattle() {
 
     // 보스/중보스 버프 표시
     if (enemy.buff) {
-        addBattleLog(`⚡ 버프: ${enemy.buff.name} - ${enemy.buff.desc}`);
+        addBattleLog(`버프: ${enemy.buff.name} - ${enemy.buff.desc}`);
     }
 
     addBattleLog(`적 선제공격까지 ${enemyAttackCounter}턴`);
@@ -1601,7 +1759,8 @@ function enemyPreemptiveAttack() {
         return;
     }
 
-    const enemyAtk = gameState.currentEnemy.atk;
+    // 디버프로 인한 공격력 감소 적용
+    const enemyAtk = Math.floor(gameState.currentEnemy.atk * getEnemyDebuffAtkReduction());
     const enemyCrit = gameState.currentEnemy.crit || 0;
     const isCrit = Math.random() * 100 < enemyCrit;
     const isDodge = Math.random() * 100 < getDodgeChance();
@@ -1690,6 +1849,9 @@ function executePlayerAttack(isSkill = false, skillDamage = 0) {
     if (isCrit) damage = Math.floor(damage * getCritDamage() / 100);
     if (isEnemyDodge) damage = Math.floor(damage * 0.5);
 
+    // 디버프로 인한 받는 피해 증가 적용
+    damage = Math.floor(damage * getEnemyDebuffDamageTaken());
+
     gameState.currentEnemy.hp -= damage;
     const logParts = [`${isSkill ? '' : '공격! '}${damage} 피해!`];
     if (isCrit) logParts.push('(치명타!)');
@@ -1715,19 +1877,25 @@ function processPlayerTurn() {
     processDebuffDamage();
 }
 
-// 흡혈 효과
+// 흡혈 효과 (확률 기반)
 function applyLifeSteal(damage) {
-    const lifeSteal = getLifeStealPercent();
-    if (lifeSteal > 0) {
-        const heal = Math.floor(damage * lifeSteal);
+    const { chance, healPercent } = getLifeStealInfo();
+    if (chance > 0 && Math.random() < chance) {
+        const heal = Math.floor(damage * healPercent);
         if (heal > 0) {
             gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + heal);
-            addBattleLog(`💚 HP +${heal} (흡혈)`);
+            addBattleLog(`HP +${heal} (흡혈)`);
         }
     }
 }
 
 function enemyCounterAttack() {
+    // 스턴으로 인한 반격 불가 체크
+    if (checkStunBlockCounter()) {
+        endPlayerTurn();
+        return;
+    }
+
     if (gameState.currentEnemy.stunned) {
         addBattleLog(`${gameState.currentEnemy.name}은(는) 스턴 상태!`);
         gameState.currentEnemy.stunned = false;
@@ -1735,7 +1903,8 @@ function enemyCounterAttack() {
         return;
     }
 
-    const enemyAtk = gameState.currentEnemy.atk;
+    // 디버프로 인한 공격력 감소 적용
+    const enemyAtk = Math.floor(gameState.currentEnemy.atk * getEnemyDebuffAtkReduction());
     const enemyCrit = gameState.currentEnemy.crit || 0;
     const isCrit = Math.random() * 100 < enemyCrit;
     const isDodge = Math.random() * 100 < getDodgeChance();
@@ -1836,14 +2005,26 @@ function useSkill(slotIndex) {
     if (skill.effect === 'mpRecover') {
         const recoverAmount = Math.floor(skill.value * (1 + weaponBonus / 100));
         gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + recoverAmount);
-        addBattleLog(`💙 MP +${recoverAmount} 회복!`);
+        addBattleLog(`MP +${recoverAmount} 회복!`);
+        endPlayerTurn();
+        updateBattleUI();
+        return;
+    }
+
+    // === MP 고정 + 절반 회복 스킬 ===
+    if (skill.effect === 'mpRecoverHalf') {
+        const baseRecover = skill.value || 0;
+        const halfRecover = Math.floor(gameState.player.maxMp / 2);
+        const recoverAmount = baseRecover + halfRecover;
+        gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + recoverAmount);
+        addBattleLog(`MP +${recoverAmount} 회복! (${baseRecover} + 절반 ${halfRecover})`);
         endPlayerTurn();
         updateBattleUI();
         return;
     }
 
     // === 데미지 스킬 ===
-    if (skill.damage) {
+    if (skill.damage || skill.damageMult) {
         const hits = skill.hits || 1;
         const damageMultiplier = getDamageMultiplier();
         const skillDmgBonus = 1 + getSkillDmgBonus(); // 스킬 데미지 보너스
@@ -1851,9 +2032,14 @@ function useSkill(slotIndex) {
 
         for (let i = 0; i < hits; i++) {
             const isCrit = Math.random() * 100 < getCritChance();
-            const isEnemyDodge = gameState.currentEnemy.dodge && Math.random() * 100 < gameState.currentEnemy.dodge;
+            const enemyDodge = Math.max(0, (gameState.currentEnemy.dodge || 0) - getEnemyDebuffDodgeReduction());
+            const isEnemyDodge = enemyDodge > 0 && Math.random() * 100 < enemyDodge;
 
-            let baseDamage = Math.floor(skill.damage * (1 + weaponBonus / 100) * damageMultiplier * skillDmgBonus);
+            // damageMult가 있으면 플레이어 공격력 기반, 없으면 고정 데미지
+            const skillBaseDamage = skill.damageMult
+                ? getPlayerAtk() * skill.damageMult
+                : skill.damage;
+            let baseDamage = Math.floor(skillBaseDamage * (1 + weaponBonus / 100) * damageMultiplier * skillDmgBonus);
 
             // 보스킬러 보너스
             if (gameState.currentEnemy.isBoss || gameState.currentEnemy.isMiniBoss) {
@@ -1865,6 +2051,9 @@ function useSkill(slotIndex) {
 
             if (isCrit) baseDamage = Math.floor(baseDamage * getCritDamage() / 100);
             if (isEnemyDodge) baseDamage = Math.floor(baseDamage * 0.5);
+
+            // 디버프로 인한 받는 피해 증가 적용
+            baseDamage = Math.floor(baseDamage * getEnemyDebuffDamageTaken());
 
             gameState.currentEnemy.hp -= baseDamage;
             totalDamage += baseDamage;
@@ -1915,8 +2104,13 @@ function enemyDefeated() {
     gameState.tempRelics.forEach(relic => {
         const goldVal = getRelicEffectValue(relic, 'gold');
         const expVal = getRelicEffectValue(relic, 'exp');
+        const rewardVal = getRelicEffectValue(relic, 'reward');
         if (goldVal !== null) goldReward = Math.floor(goldReward * goldVal);
         if (expVal !== null) expReward = Math.floor(expReward * expVal);
+        if (rewardVal !== null) {
+            goldReward = Math.floor(goldReward * rewardVal);
+            expReward = Math.floor(expReward * rewardVal);
+        }
     });
 
     // 부적 효과 (+3% per purchase)
@@ -1936,7 +2130,15 @@ function enemyDefeated() {
     if (killHealPercent > 0) {
         const healAmount = Math.floor(gameState.player.maxHp * killHealPercent);
         gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
-        addBattleLog(`💚 HP +${healAmount} (처치 회복)`);
+        addBattleLog(`HP +${healAmount} (처치 회복)`);
+    }
+
+    // 처치 시 MP 회복 (killMana)
+    const killManaPercent = getKillManaPercent();
+    if (killManaPercent > 0) {
+        const manaAmount = Math.floor(gameState.player.maxMp * killManaPercent);
+        gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + manaAmount);
+        addBattleLog(`MP +${manaAmount} (처치 회복)`);
     }
 
     // 강화석 드랍 (하드 모드에서 더 많이)
@@ -1991,17 +2193,38 @@ function handleRelicFloorClear() {
         return;
     }
 
-    // 유물 선택지 생성 (3개)
-    // 중간보스(5층): 일반 등급만, 보스(10층): 희귀 등급만
-    generateRelicChoices(isBossFloor ? 'rare' : 'common');
+    // 보상 페이즈 초기화
+    // 중간보스: tier1 -> done (1단계 유물 + 30% 회복)
+    // 보스: tier1 -> tier2 -> skill -> done (1단계 + 2단계 유물 + 스킬 + 30% 회복)
+    gameState.rewardPhase = 'tier1';
+    gameState.isBossReward = isBossFloor;
 
-    // 보스층(10층 단위)에는 스킬 선택도 제공
+    // 1단계(common) 유물 선택지 생성
+    generateRelicChoices('common');
+
+    // 보스층에는 2단계 유물과 스킬도 미리 생성
     if (isBossFloor) {
+        generateRelicChoices2('rare');
         generateSkillChoices();
     }
 
     // 보스 클리어 화면 표시
     showBossClearScreen(isBossFloor);
+}
+
+// 2단계 유물 선택지 생성 (보스용)
+function generateRelicChoices2(fixedRarity) {
+    gameState.relicChoices2 = [];
+    const selectedIds = new Set();
+    const allowedRarities = fixedRarity ? [fixedRarity] : null;
+
+    while (gameState.relicChoices2.length < 3) {
+        const relic = selectRelicByRarity(allowedRarities);
+        if (!selectedIds.has(relic.id)) {
+            selectedIds.add(relic.id);
+            gameState.relicChoices2.push({ ...relic });
+        }
+    }
 }
 
 
@@ -2079,22 +2302,23 @@ function generateStartingSkills() {
     ];
 }
 
-function showBossClearScreen(showSkillChoice = true) {
+function showBossClearScreen(isBossFloor = false) {
     // 확인 버튼 섹션만 표시, 나머지는 숨김
     document.getElementById('boss-confirm-section').classList.remove('hidden');
     document.getElementById('relic-choice-section').classList.add('hidden');
     document.getElementById('skill-rest-section').classList.add('hidden');
     document.getElementById('relic-replace-section').classList.add('hidden');
 
-    // 스킬 선택 표시 여부 저장 (확인 버튼 클릭 시 사용)
-    gameState.showSkillChoiceOnReward = showSkillChoice;
-
     // 현재 층 정보 표시
-    const floorType = showSkillChoice ? '보스' : '중간';
+    const floorType = isBossFloor ? '보스' : '중간보스';
     document.getElementById('boss-confirm-section').querySelector('h2').textContent =
         `${gameState.dungeon.currentFloor}층 ${floorType} 클리어!`;
-    document.getElementById('boss-confirm-section').querySelector('.boss-confirm-msg').textContent =
-        '특별한 보상을 선택하세요!';
+
+    // 보상 안내 메시지
+    const rewardMsg = isBossFloor
+        ? '1단계 유물 + 2단계 유물 + 스킬 변경 + HP 30% 회복!'
+        : '1단계 유물 + HP 30% 회복!';
+    document.getElementById('boss-confirm-section').querySelector('.boss-confirm-msg').textContent = rewardMsg;
 
     showScreen('boss-clear-screen');
 }
@@ -2103,48 +2327,20 @@ function showBossRewardChoices() {
     // 확인 버튼 숨기고 선택지 표시
     document.getElementById('boss-confirm-section').classList.add('hidden');
     document.getElementById('relic-choice-section').classList.remove('hidden');
+    document.getElementById('skill-rest-section').classList.add('hidden'); // 스킬은 나중에
 
-    // 스킬 선택은 보스층(10층 단위)에서만 표시
-    const skillSection = document.getElementById('skill-rest-section');
-    if (gameState.showSkillChoiceOnReward) {
-        skillSection.classList.remove('hidden');
+    // 교체 섹션 숨김
+    document.getElementById('relic-replace-section').classList.add('hidden');
 
-        // 스킬 선택지 표시
-        const skillGrid = document.getElementById('skill-choice-grid');
-        skillGrid.innerHTML = '';
-
-        gameState.skillChoices.forEach(skill => {
-            const btn = document.createElement('button');
-            btn.className = 'skill-choice-btn';
-            btn.innerHTML = `
-                <div class="skill-choice-name">${skill.name} ${skill.type === 'passive' ? '[패시브]' : `(MP ${skill.mpCost})`}</div>
-                <div class="skill-choice-char">${skill.char}</div>
-                <div class="skill-choice-desc">${skill.desc}</div>
-            `;
-            btn.addEventListener('click', () => selectSkillAndContinue(skill));
-            skillGrid.appendChild(btn);
-        });
-    } else {
-        skillSection.classList.add('hidden');
-    }
+    // 1단계 유물 선택 안내
+    document.getElementById('relic-choice-desc').textContent = '1단계 유물을 선택하세요 (일반)';
 
     // 유물 선택지 표시 (3개)
     const relicGrid = document.getElementById('relic-choice-grid');
     relicGrid.innerHTML = '';
 
-    // 교체 섹션 숨김
-    document.getElementById('relic-replace-section').classList.add('hidden');
-
-    // 유물 설명 (보스층에서는 유물/스킬 중 택1 안내)
-    if (gameState.showSkillChoiceOnReward) {
-        document.getElementById('relic-choice-desc').textContent = '유물을 선택하면 스킬 변경 불가';
-    } else {
-        document.getElementById('relic-choice-desc').textContent = '3개 중 하나를 선택하세요';
-    }
-
     if (gameState.relicChoices.length > 0) {
         gameState.relicChoices.forEach(relic => {
-            // 같은 유물 보유 개수 확인
             const ownedCount = gameState.tempRelics.filter(r => r.id === relic.id && r.rarity === relic.rarity).length;
             const tags = getRelicTags(relic);
             const tagsHtml = tags.map(t => `<span class="tag tag-${t}">태그 | ${t}</span>`).join('');
@@ -2170,7 +2366,241 @@ function showBossRewardChoices() {
 function selectRelic(relic) {
     // 유물 바로 추가 (합성은 수동으로)
     gameState.tempRelics.push({ ...relic });
+
+    // 보상 페이즈에 따라 합성 단계로 이동
+    if (gameState.rewardPhase === 'tier1') {
+        gameState.rewardPhase = 'combine1';
+        showRewardCombinePhase();
+    } else if (gameState.rewardPhase === 'tier2') {
+        gameState.rewardPhase = 'combine2';
+        showRewardCombinePhase();
+    }
+}
+
+// 보상 중 합성 선택 상태
+let rewardCombineSelected = [];
+
+// 보상 중 유물 합성 페이즈 표시
+function showRewardCombinePhase() {
+    document.getElementById('relic-choice-section').classList.add('hidden');
+    document.getElementById('reward-combine-section').classList.remove('hidden');
+
+    rewardCombineSelected = [];
+    updateRewardCombineUI();
+}
+
+// 보상 합성 UI 업데이트
+function updateRewardCombineUI() {
+    const grid = document.getElementById('reward-combine-relics');
+    grid.innerHTML = '';
+
+    if (gameState.tempRelics.length < 2) {
+        grid.innerHTML = '<p style="color: #888;">합성 가능한 유물이 부족합니다</p>';
+        document.getElementById('btn-reward-combine').disabled = true;
+        return;
+    }
+
+    gameState.tempRelics.forEach((relic, idx) => {
+        const tags = getRelicTags(relic);
+        const item = document.createElement('div');
+        item.className = `reward-combine-item rarity-${relic.rarity}`;
+        if (rewardCombineSelected.includes(idx)) {
+            item.classList.add('selected');
+        }
+        item.innerHTML = `
+            <div class="relic-icon">${relic.icon}</div>
+            <div class="relic-name">${relic.name}</div>
+            <div class="relic-tag">${tags.join(', ')}</div>
+        `;
+        item.addEventListener('click', () => toggleRewardCombineSelect(idx));
+        grid.appendChild(item);
+    });
+
+    updateRewardCombineButton();
+}
+
+// 합성 유물 선택/해제
+function toggleRewardCombineSelect(idx) {
+    const pos = rewardCombineSelected.indexOf(idx);
+    if (pos !== -1) {
+        rewardCombineSelected.splice(pos, 1);
+    } else if (rewardCombineSelected.length < 2) {
+        rewardCombineSelected.push(idx);
+    }
+    updateRewardCombineUI();
+}
+
+// 합성 버튼 상태 업데이트
+function updateRewardCombineButton() {
+    const btn = document.getElementById('btn-reward-combine');
+    const selected = document.getElementById('reward-combine-selected');
+
+    if (rewardCombineSelected.length === 2) {
+        const r1 = gameState.tempRelics[rewardCombineSelected[0]];
+        const r2 = gameState.tempRelics[rewardCombineSelected[1]];
+        const tags1 = getRelicTags(r1);
+        const tags2 = getRelicTags(r2);
+        const commonTags = tags1.filter(t => tags2.includes(t));
+
+        selected.innerHTML = `
+            <span>${r1.icon} ${r1.name}</span>
+            <span>+</span>
+            <span>${r2.icon} ${r2.name}</span>
+        `;
+
+        if (r1.rarity === 'legendary' || r2.rarity === 'legendary') {
+            btn.disabled = true;
+            btn.textContent = '전설 등급 합성 불가';
+        } else if (r1.rarity !== r2.rarity) {
+            btn.disabled = true;
+            btn.textContent = '같은 등급만 합성 가능';
+        } else if (commonTags.length === 0) {
+            btn.disabled = true;
+            btn.textContent = '공통 태그 없음';
+        } else {
+            btn.disabled = false;
+            const nextRarity = getNextRarity(r1.rarity);
+            btn.textContent = `합성 [${commonTags[0]}] → ${rarityNames[nextRarity]}`;
+        }
+    } else {
+        selected.innerHTML = `<span style="color: #888;">유물 2개를 선택하세요</span>`;
+        btn.disabled = true;
+        btn.textContent = `합성하기 (${rewardCombineSelected.length}/2)`;
+    }
+}
+
+// 보상 합성 실행
+function executeRewardCombine() {
+    if (rewardCombineSelected.length !== 2) return;
+
+    const idx1 = rewardCombineSelected[0];
+    const idx2 = rewardCombineSelected[1];
+    const r1 = gameState.tempRelics[idx1];
+    const r2 = gameState.tempRelics[idx2];
+
+    const tags1 = getRelicTags(r1);
+    const tags2 = getRelicTags(r2);
+    const commonTags = tags1.filter(t => tags2.includes(t));
+
+    if (commonTags.length === 0 || r1.rarity !== r2.rarity) return;
+
+    const nextRarity = getNextRarity(r1.rarity);
+    const newRelic = getRandomRelicWithTag(commonTags[0], nextRarity);
+
+    // 기존 유물 제거 (인덱스 큰 것부터)
+    const toRemove = [idx1, idx2].sort((a, b) => b - a);
+    toRemove.forEach(i => gameState.tempRelics.splice(i, 1));
+
+    // 새 유물 추가
+    gameState.tempRelics.push({ ...newRelic });
+
+    // UI 업데이트
+    rewardCombineSelected = [];
+    updateRewardCombineUI();
+
+    // 합성 결과 표시
+    const selected = document.getElementById('reward-combine-selected');
+    selected.innerHTML = `<span style="color: #50fa7b;">✨ ${newRelic.icon} ${newRelic.name} 획득!</span>`;
+}
+
+// 다음 보상 단계로 이동
+function proceedToNextRewardPhase() {
+    document.getElementById('reward-combine-section').classList.add('hidden');
+
+    if (gameState.rewardPhase === 'combine1') {
+        if (gameState.isBossReward) {
+            // 보스: 2단계 유물 선택으로
+            gameState.rewardPhase = 'tier2';
+            document.getElementById('relic-choice-section').classList.remove('hidden');
+            showTier2RelicChoices();
+        } else {
+            // 중간보스: 30% 회복 후 종료
+            applyRewardHeal();
+            proceedAfterRelicChoice();
+        }
+    } else if (gameState.rewardPhase === 'combine2') {
+        // 보스: 스킬 선택으로
+        gameState.rewardPhase = 'skill';
+        showSkillChoicesOnly();
+    }
+}
+
+// 2단계 유물 선택지 표시
+function showTier2RelicChoices() {
+    const relicGrid = document.getElementById('relic-choice-grid');
+    relicGrid.innerHTML = '';
+
+    document.getElementById('relic-choice-desc').textContent = '2단계 유물을 선택하세요 (희귀)';
+
+    gameState.relicChoices2.forEach(relic => {
+        const ownedCount = gameState.tempRelics.filter(r => r.id === relic.id && r.rarity === relic.rarity).length;
+        const tags = getRelicTags(relic);
+        const tagsHtml = tags.map(t => `<span class="tag tag-${t}">태그 | ${t}</span>`).join('');
+        const btn = document.createElement('button');
+        btn.className = `relic-choice-btn rarity-${relic.rarity}`;
+        btn.innerHTML = `
+            <div class="relic-rarity rarity-${relic.rarity}">${rarityNames[relic.rarity]}</div>
+            <div class="relic-icon">${relic.icon}</div>
+            <div class="relic-name">${relic.name}</div>
+            <div class="relic-desc">${relic.desc}</div>
+            <div class="relic-tags">${tagsHtml}</div>
+            ${ownedCount > 0 ? `<div class="relic-owned">보유: ${ownedCount}개</div>` : ''}
+        `;
+        btn.addEventListener('click', () => selectTier2Relic(relic));
+        relicGrid.appendChild(btn);
+    });
+}
+
+// 2단계 유물 선택
+function selectTier2Relic(relic) {
+    gameState.tempRelics.push({ ...relic });
+    gameState.rewardPhase = 'skill';
+    showSkillChoicesOnly();
+}
+
+// 스킬 선택지만 표시 (유물 선택 완료 후)
+function showSkillChoicesOnly() {
+    document.getElementById('relic-choice-section').classList.add('hidden');
+    document.getElementById('skill-rest-section').classList.remove('hidden');
+
+    const skillGrid = document.getElementById('skill-choice-grid');
+    skillGrid.innerHTML = '';
+
+    gameState.skillChoices.forEach(skill => {
+        const btn = document.createElement('button');
+        btn.className = 'skill-choice-btn';
+        btn.innerHTML = `
+            <div class="skill-choice-name">${skill.name} ${skill.type === 'passive' ? '[패시브]' : `(MP ${skill.mpCost})`}</div>
+            <div class="skill-choice-char">${skill.char}</div>
+            <div class="skill-choice-desc">${skill.desc}</div>
+        `;
+        btn.addEventListener('click', () => selectSkillFinal(skill));
+        skillGrid.appendChild(btn);
+    });
+}
+
+// 스킬 선택 (최종 - 보스 보상 마무리)
+function selectSkillFinal(skill) {
+    // 스킬 교체
+    const characterOrder = ['cat', 'elf', 'dwarf', 'human'];
+    const slotIndex = characterOrder.indexOf(skill.character);
+    if (slotIndex !== -1) {
+        gameState.equippedSkills[slotIndex] = skill;
+    } else {
+        const emptySlot = gameState.equippedSkills.findIndex(s => s === null);
+        gameState.equippedSkills[emptySlot !== -1 ? emptySlot : 0] = skill;
+    }
+    updateSkillButtons();
+
+    // 30% 회복 후 종료
+    applyRewardHeal();
     proceedAfterRelicChoice();
+}
+
+// 보상 30% 체력 회복
+function applyRewardHeal() {
+    const healAmount = Math.floor(gameState.player.maxHp * 0.3);
+    gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
 }
 
 // 합성 결과 표시
@@ -2274,10 +2704,9 @@ function generateRelicDesc(relic) {
         'exp': (v) => `경험치 +${Math.floor((v - 1) * 100)}%`,
         'dodge': (v) => `회피 +${Math.floor(v)}%`,
         'def': (v) => `피해 -${Math.floor((1 - v) * 100)}%`,
-        'crit': (v) => `치명타 +${Math.floor(v)}%`,
-        'first': (v) => `선제공격 +${Math.floor(v)}%`,
-        'lifeSteal': (v) => `흡혈 ${Math.floor(v * 100)}%`,
-        'critDmg': (v) => `치명타 피해 +${Math.floor(v)}%`,
+        'crit': (v) => `치명타 확률 +${Math.floor(v)}%`,
+        'killMana': (v) => `처치 시 MP ${Math.floor(v * 100)}% 회복`,
+        'critDmg': (v) => `치명타 데미지 +${Math.floor(v)}%`,
         'atkMult': (v) => `공격력 +${Math.floor(v * 100)}%`,
         'hpMult': (v) => `체력 +${Math.floor(v * 100)}%`,
         'allStats': (v) => `모든 스탯 +${Math.floor(v * 100)}%`,
@@ -2291,11 +2720,11 @@ function generateRelicDesc(relic) {
         'mpSave': (v) => `MP 소모 -${Math.floor(v * 100)}%`,
         'killHeal': (v) => `처치 시 HP ${Math.floor(v * 100)}% 회복`,
         'cooldownReduce': (v) => `스킬 쿨타임 -${Math.floor(v)}턴`,
-        'poison': (v) => `독 ${Math.floor(v * 100)}% 확률`,
-        'burn': (v) => `화상 ${Math.floor(v * 100)}% 확률`,
-        'bleed': (v) => `출혈 ${Math.floor(v * 100)}% 확률`,
-        'curse': (v) => `저주 ${Math.floor(v * 100)}% 확률`,
-        'plague': (v) => `역병 ${Math.floor(v * 100)}% 확률`,
+        'bleed': (v) => v >= 1.0 ? `출혈 ${Math.floor(v)}중첩` : `출혈 ${Math.floor(v * 100)}%`,
+        'weaken': (v) => v >= 1.0 ? `쇠약 ${Math.floor(v)}중첩` : `쇠약 ${Math.floor(v * 100)}%`,
+        'stun': (v) => `스턴 ${Math.floor(v * 100)}%`,
+        'freeze': (v) => v >= 1.0 ? `빙결 ${Math.floor(v)}중첩` : `빙결 ${Math.floor(v * 100)}%`,
+        'reward': (v) => `골드/경험치 +${Math.floor((v - 1) * 100)}%`,
         'execute': (v) => `처형 피해 +${Math.floor(v * 100)}%`,
         'firstHit': (v) => `첫타 피해 +${Math.floor(v * 100)}%`,
         'bossKiller': (v) => `보스에게 피해 +${Math.floor(v * 100)}%`,
@@ -2463,18 +2892,11 @@ function selectSkillAndContinue(skill) {
     proceedToNextFloor();
 }
 
-// 스킬 유지 + HP 30% 회복 후 다음 층으로
+// 스킬 스킵 + HP 30% 회복 후 다음 층으로
 function skipSkillAndContinue() {
-    // HP 30% 회복
-    const healAmount = Math.floor(gameState.player.maxHp * 0.3);
-    gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
-
-    // MP 회복
-    gameState.player.maxMp = getMaxMp();
-    gameState.player.mp = gameState.player.maxMp;
-
-    // 다음 층으로 (스킵 모드 처리 포함)
-    proceedToNextFloor();
+    // 30% 회복 후 종료
+    applyRewardHeal();
+    proceedAfterRelicChoice();
 }
 
 function handleGameClear() {
@@ -2492,6 +2914,18 @@ function handleGameClear() {
     document.getElementById('clear-origin-stones').textContent = gameState.dungeon.pendingOriginStones;
 
     showScreen('clear-screen');
+}
+
+function showReturnScreen() {
+    gameState.dungeon.inBattle = false;
+
+    document.getElementById('return-floor').textContent = gameState.dungeon.currentFloor;
+    document.getElementById('return-gold').textContent = gameState.dungeon.pendingGold;
+    document.getElementById('return-exp').textContent = gameState.dungeon.pendingExp;
+    document.getElementById('return-stones').textContent = gameState.dungeon.pendingStones;
+    document.getElementById('return-origin-stones').textContent = gameState.dungeon.pendingOriginStones;
+
+    showScreen('return-screen');
 }
 
 function playerDefeated() {
@@ -2631,16 +3065,16 @@ function updateInfoPanel() {
     html += '<div class="info-section-title">📊 현재 스탯</div>';
     const totalDefReduction = Math.min(
         getVitDamageReduction() * 100 + gameState.percentBonus.def,
-        80
+        50
     );
     html += `
         <div class="info-stats-grid">
             <div class="info-stat-item"><span class="info-stat-label">공격력</span><span class="info-stat-value">${getPlayerAtk()}</span></div>
             <div class="info-stat-item"><span class="info-stat-label">최대HP</span><span class="info-stat-value">${gameState.player.maxHp}</span></div>
-            <div class="info-stat-item"><span class="info-stat-label">치명타</span><span class="info-stat-value">${getCritChance()}%</span></div>
-            <div class="info-stat-item"><span class="info-stat-label">크리뎀</span><span class="info-stat-value">${getCritDamage()}%</span></div>
+            <div class="info-stat-item"><span class="info-stat-label">치명타 확률</span><span class="info-stat-value">${getCritChance()}%</span></div>
+            <div class="info-stat-item"><span class="info-stat-label">치명타 데미지</span><span class="info-stat-value">${getCritDamage()}%</span></div>
             <div class="info-stat-item"><span class="info-stat-label">회피율</span><span class="info-stat-value">${getDodgeChance()}%</span></div>
-            <div class="info-stat-item"><span class="info-stat-label">피해감소</span><span class="info-stat-value">${Math.floor(totalDefReduction)}%</span></div>
+            <div class="info-stat-item"><span class="info-stat-label">피해 감소</span><span class="info-stat-value">${Math.floor(totalDefReduction)}%</span></div>
         </div>
     `;
 
@@ -2745,7 +3179,7 @@ function updateBuffDisplay() {
     // 버프 효과 설명
     const effectDescriptions = {
         atkBoost: (v) => `공격력 +${Math.round(v * 100)}%`,
-        critBoost: (v) => `치명타 +${v}%`,
+        critBoost: (v) => `치명타 확률 +${v}%`,
         defBoost: (v) => `받는 피해 -${Math.round(v * 100)}%`,
         counterDef: (v) => `반격 피해 -${Math.round(v * 100)}%`,
         dodgeBoost: (v) => `회피율 +${v}%`
@@ -2777,10 +3211,10 @@ function updateBuffDisplay() {
 
 // 모드 설명 텍스트
 const modeDescriptions = {
-    easy: '적 능력치 x0.5 / 보상 x1 / 입문자용',
-    normal: '적 능력치 x5 / 보상 x3 / 성장 필요',
-    hard: '적 능력치 x30 / 보상 x5 / 고성장 필수',
-    infinite: '적 능력치 x10 / 보상 x4 / 끝없는 도전'
+    easy: '보상 x1',
+    normal: '보상 x5',
+    hard: '보상 x10',
+    infinite: '보상 x10 (무한 스테이지)'
 };
 
 // 이벤트
@@ -2897,9 +3331,9 @@ function initEventListeners() {
         });
     });
 
-    // 상점 - 방어구 강화 (골드 사용)
+    // 상점 - 방어구 강화 (골드 사용, 초반 단가 감소)
     document.getElementById('btn-upgrade-armor').addEventListener('click', () => {
-        const cost = gameState.armorLevel * 100;
+        const cost = gameState.armorLevel * 50;
         if (gameState.player.gold >= cost) {
             gameState.player.gold -= cost;
             gameState.armorLevel++;
@@ -2929,16 +3363,19 @@ function initEventListeners() {
         });
     });
 
-    // 상점 - 퍼센트 능력 강화 (골드 사용, 0.5%씩)
+    // 상점 - 퍼센트 능력 강화 (골드 사용, 기본 0.5%씩, def는 0.15%씩)
     document.querySelectorAll('.btn-percent-upgrade').forEach(btn => {
         btn.addEventListener('click', () => {
             const stat = btn.dataset.stat;
             const current = gameState.percentBonus[stat];
             const cost = getPercentUpgradeCost(current);
+            // def는 최대 15% (100회 구매), 나머지는 100%
+            const maxValue = stat === 'def' ? 15 : 100;
+            const increment = stat === 'def' ? 0.15 : 0.5;
 
-            if (current < 100 && gameState.player.gold >= cost) {
+            if (current < maxValue && gameState.player.gold >= cost) {
                 gameState.player.gold -= cost;
-                gameState.percentBonus[stat] += 0.5;
+                gameState.percentBonus[stat] += increment;
 
                 // HP 강화 시 즉시 적용
                 if (stat === 'hp') {
@@ -2951,8 +3388,9 @@ function initEventListeners() {
 
     // 숙소 - 근원 강화 (근원석 사용, 유물 효과 +0.5%)
     document.getElementById('btn-origin-enhance')?.addEventListener('click', () => {
-        if (gameState.originStones >= 1 && gameState.originEnhancement < 200) {
-            gameState.originStones--;
+        const cost = getOriginEnhanceCost();
+        if (gameState.originStones >= cost && gameState.originEnhancement < 200) {
+            gameState.originStones -= cost;
             gameState.originEnhancement++;
             updateInnUI();
         }
@@ -2996,7 +3434,8 @@ function initEventListeners() {
     // 상세 정보 버튼
     document.getElementById('btn-info-toggle').addEventListener('click', toggleInfoPanel);
 
-    document.getElementById('btn-return').addEventListener('click', () => returnToVillage(false));
+    document.getElementById('btn-return').addEventListener('click', () => showReturnScreen());
+    document.getElementById('btn-return-confirm').addEventListener('click', () => returnToVillage(false));
     document.getElementById('btn-gameover-return').addEventListener('click', () => returnToVillage(true));
     document.getElementById('btn-clear-return').addEventListener('click', () => returnToVillage(false));
 
@@ -3007,6 +3446,10 @@ function initEventListeners() {
 
     // 유물 합성 확인
     document.getElementById('btn-skip-combine').addEventListener('click', confirmCombineResult);
+
+    // 보상 중 유물 합성
+    document.getElementById('btn-reward-combine').addEventListener('click', executeRewardCombine);
+    document.getElementById('btn-reward-next').addEventListener('click', proceedToNextRewardPhase);
 
     // 태그 합성
     document.getElementById('btn-tag-combine-open').addEventListener('click', openTagCombineMode);

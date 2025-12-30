@@ -111,17 +111,31 @@ h2 {
 .point-badge {
     font-size: 1rem;
     font-weight: bold;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #555, #666);
     padding: 6px 14px;
     border-radius: 15px;
     margin-left: 10px;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
-    animation: point-pulse 2s ease-in-out infinite;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
 }
 
-@keyframes point-pulse {
-    0%, 100% { box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4); }
-    50% { box-shadow: 0 2px 15px rgba(102, 126, 234, 0.7); }
+/* 포인트가 있을 때 강조 효과 */
+.point-badge.has-points {
+    background: linear-gradient(135deg, #f39c12, #e74c3c);
+    box-shadow: 0 0 20px rgba(243, 156, 18, 0.6), 0 0 40px rgba(231, 76, 60, 0.4);
+    animation: point-glow 1.2s ease-in-out infinite;
+    transform: scale(1.05);
+}
+
+@keyframes point-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(243, 156, 18, 0.6), 0 0 40px rgba(231, 76, 60, 0.4);
+        transform: scale(1.05);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(243, 156, 18, 0.9), 0 0 60px rgba(231, 76, 60, 0.6);
+        transform: scale(1.1);
+    }
 }
 
 /* 스탯 그리드 */
@@ -618,11 +632,11 @@ h2 {
 }
 
 #player-stats-panel {
-    width: 85px;
+    width: 130px;
     background: rgba(102, 126, 234, 0.2);
     border: 1px solid #667eea;
     border-radius: 8px;
-    padding: 10px 8px;
+    padding: 12px 10px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -652,14 +666,32 @@ h2 {
 }
 
 .stat-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: #8be9fd;
 }
 
 .stat-val {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: bold;
     color: #fff;
+}
+
+.origin-bonus-tag {
+    font-size: 0.6rem;
+    color: #bd93f9;
+    background: rgba(189, 147, 249, 0.2);
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin-left: 4px;
+}
+
+.rewards-section .stats-title {
+    color: #f1fa8c;
+    border-bottom-color: rgba(241, 250, 140, 0.3);
+}
+
+.rewards-section .stat-val {
+    color: #f1fa8c;
 }
 
 .relics-row {
@@ -1065,6 +1097,56 @@ h2 {
     font-size: 0.85rem;
     color: #ffd93d;
     cursor: default;
+}
+
+/* 마을 복귀 화면 */
+#return-screen {
+    text-align: center;
+    padding: 30px 15px;
+}
+
+#return-screen h1 {
+    color: #50fa7b;
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.return-msg {
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+.return-msg span {
+    color: #74b9ff;
+    font-weight: bold;
+}
+
+.return-rewards {
+    background: rgba(80, 250, 123, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(80, 250, 123, 0.3);
+}
+
+.return-rewards p {
+    margin: 5px 0;
+    font-size: 1.1rem;
+}
+
+#btn-return-confirm {
+    padding: 12px 40px;
+    background: linear-gradient(135deg, #50fa7b 0%, #38ef7d 100%);
+    border: none;
+    border-radius: 8px;
+    color: #1a1a2e;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+#btn-return-confirm:hover {
+    opacity: 0.9;
 }
 
 /* 게임오버 화면 */
@@ -1803,6 +1885,113 @@ h2 {
     background: #5a6fd6;
 }
 
+/* 보상 중 유물 합성 */
+.reward-combine-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.reward-combine-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reward-combine-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.reward-combine-item.selected {
+    border-color: #50fa7b;
+    background: rgba(80, 250, 123, 0.2);
+}
+
+.reward-combine-item .relic-icon {
+    font-size: 1.5rem;
+}
+
+.reward-combine-item .relic-name {
+    font-size: 0.7rem;
+    text-align: center;
+    margin-top: 4px;
+}
+
+.reward-combine-item .relic-tag {
+    font-size: 0.6rem;
+    color: #8be9fd;
+    margin-top: 2px;
+}
+
+.reward-combine-selected {
+    min-height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 10px;
+    background: rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.combine-phase-desc {
+    font-size: 0.9rem;
+    color: #bd93f9;
+    margin-bottom: 10px;
+}
+
+.reward-combine-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.btn-reward-combine, .btn-reward-next {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.btn-reward-combine {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-reward-combine:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+.btn-reward-next {
+    background: #667eea;
+    color: white;
+}
+
+.btn-reward-combine:not(:disabled):hover {
+    background: #45a049;
+}
+
+.btn-reward-next:hover {
+    background: #5a6fd6;
+}
+
 /* 반응형 */
 @media (max-width: 500px) {
     #battle-layout {
@@ -2222,6 +2411,18 @@ h2 {
 
 .purchase-row span {
     color: #a29bfe;
+    font-weight: bold;
+}
+
+.purchase-record {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    text-align: right;
+}
+
+.purchase-record span {
+    color: #74b9ff;
     font-weight: bold;
 }
 

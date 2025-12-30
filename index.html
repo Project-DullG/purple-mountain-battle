@@ -36,11 +36,11 @@
                         <span class="spec-value" id="spec-hp">0</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">치명타</span>
+                        <span class="spec-label">치명타 확률</span>
                         <span class="spec-value" id="spec-crit">0%</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">크리뎀</span>
+                        <span class="spec-label">치명타 데미지</span>
                         <span class="spec-value" id="spec-critdmg">0%</span>
                     </div>
                     <div class="spec-item">
@@ -48,7 +48,7 @@
                         <span class="spec-value" id="spec-dodge">0%</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">피해감소</span>
+                        <span class="spec-label">피해 감소</span>
                         <span class="spec-value" id="spec-def">0%</span>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                                 <button class="btn-stat-up btn-stat-10" data-stat="str" data-amount="10">+10</button>
                             </div>
                         </div>
-                        <span class="stat-desc">공격력 +1, 체력 +2, 크리뎀 +0.5%</span>
+                        <span class="stat-desc">공격력 +1, 체력 +2, 치명타 데미지 +0.5%</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
@@ -78,7 +78,7 @@
                                 <button class="btn-stat-up btn-stat-10" data-stat="dex" data-amount="10">+10</button>
                             </div>
                         </div>
-                        <span class="stat-desc">치명타 +1%, 공격력 +1, 체력 +0.5</span>
+                        <span class="stat-desc">치명타 확률 +1%, 공격력 +1, 체력 +0.5</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
@@ -89,7 +89,7 @@
                                 <button class="btn-stat-up btn-stat-10" data-stat="int" data-amount="10">+10</button>
                             </div>
                         </div>
-                        <span class="stat-desc">크리뎀 +2%, MP +0.5, 체력 +1</span>
+                        <span class="stat-desc">치명타 데미지 +2%, MP +0.5, 체력 +1</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
@@ -100,7 +100,7 @@
                                 <button class="btn-stat-up btn-stat-10" data-stat="vit" data-amount="10">+10</button>
                             </div>
                         </div>
-                        <span class="stat-desc">체력 +4, 피해감소 +0.2%</span>
+                        <span class="stat-desc">체력 +4, 피해 감소 +0.2%</span>
                     </div>
                     <div class="stat-item">
                         <div class="stat-header">
@@ -261,7 +261,7 @@
                         <div class="upgrade-name">피해 감소</div>
                         <div class="upgrade-percent">+<span id="percent-def">0</span>%</div>
                         <div class="upgrade-bar"><div class="upgrade-fill" id="fill-def"></div></div>
-                        <div class="upgrade-cap">총합 최대 80%</div>
+                        <div class="upgrade-cap">상점 최대 15% (총합 50%)</div>
                         <button class="btn-percent-upgrade" data-stat="def"><span id="cost-def">100</span>G</button>
                     </div>
                 </div>
@@ -358,6 +358,7 @@
                     <span>비용: <span id="stat-point-cost">1</span> 근원석</span>
                     <button id="btn-buy-stat-point" class="btn-buy-stat">+1 포인트 구매</button>
                 </div>
+                <p class="purchase-record">지금까지 구매한 포인트: <span id="stat-points-purchased">0</span>개</p>
             </div>
 
             <button id="btn-inn-back" class="btn-back">돌아가기</button>
@@ -420,7 +421,7 @@
                         </div>
                     </div>
                     <div class="stats-section">
-                        <div class="stats-title">전투 능력</div>
+                        <div class="stats-title">전투 능력 <span id="panel-origin-bonus" class="origin-bonus-tag"></span></div>
                         <div class="stat-row">
                             <span class="stat-label">공격력</span>
                             <span class="stat-val" id="panel-atk">5</span>
@@ -440,6 +441,21 @@
                         <div class="stat-row">
                             <span class="stat-label">피해 감소</span>
                             <span class="stat-val" id="panel-def">0%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">피해 반사</span>
+                            <span class="stat-val" id="panel-reflect">0%</span>
+                        </div>
+                    </div>
+                    <div class="stats-section rewards-section">
+                        <div class="stats-title">획득 보상</div>
+                        <div class="stat-row">
+                            <span class="stat-label">💰 골드</span>
+                            <span class="stat-val" id="panel-gold">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">⭐ 경험치</span>
+                            <span class="stat-val" id="panel-exp">0</span>
                         </div>
                     </div>
                 </div>
@@ -531,13 +547,38 @@
                 </div>
             </div>
 
+            <!-- 보상 중 유물 합성 -->
+            <div id="reward-combine-section" class="section hidden">
+                <h2>유물 합성</h2>
+                <p class="combine-phase-desc">보유 유물 중 2개를 선택하여 합성하세요 (같은 태그 + 같은 등급)</p>
+                <div id="reward-combine-relics" class="reward-combine-grid"></div>
+                <div id="reward-combine-selected" class="reward-combine-selected"></div>
+                <div class="reward-combine-buttons">
+                    <button id="btn-reward-combine" class="btn-reward-combine" disabled>합성하기</button>
+                    <button id="btn-reward-next" class="btn-reward-next">다음으로</button>
+                </div>
+            </div>
+
             <!-- 옵션 2: 스킬 교체 + 휴식 (보스층만, 유물 대신) -->
             <div id="skill-rest-section" class="section hidden">
                 <h2>또는 스킬 교체</h2>
-                <p class="skill-swap-desc">스킬을 선택하면 유물 포기 + HP 30% 회복</p>
+                <p class="skill-swap-desc">스킬을 교체하거나 유지하세요</p>
                 <div id="skill-choice-grid" class="skill-choice-grid"></div>
-                <button id="btn-skip-skill" class="btn-skip-skill">유물/스킬 모두 포기 (HP 30% 회복)</button>
+                <button id="btn-skip-skill" class="btn-skip-skill">스킬 유지 (HP 30% 회복)</button>
             </div>
+        </div>
+
+        <!-- 마을 복귀 화면 -->
+        <div id="return-screen" class="screen hidden">
+            <h1>마을 복귀</h1>
+            <p class="return-msg"><span id="return-floor">0</span>층까지 도달했습니다</p>
+            <div class="return-rewards">
+                <p>+<span id="return-gold">0</span> 골드</p>
+                <p>+<span id="return-exp">0</span> 경험치</p>
+                <p>+<span id="return-stones">0</span> 강화석 💎</p>
+                <p>+<span id="return-origin-stones">0</span> 근원석 🔮</p>
+            </div>
+            <button id="btn-return-confirm">마을로</button>
         </div>
 
         <!-- 게임 오버 화면 -->
