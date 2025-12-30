@@ -1465,6 +1465,7 @@ function updateBattleUI() {
 
     const typeIcon = enemy.type ? enemy.type.icon : '';
     document.getElementById('enemy-name').textContent = typeIcon + enemy.name + (enemy.stunned ? ' [스턴]' : '');
+    console.log('UI 업데이트 - 적 HP:', enemy.hp);
     document.getElementById('enemy-hp').textContent = Math.max(0, enemy.hp);
     document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
     document.getElementById('enemy-atk').textContent = enemy.atk;
@@ -1624,6 +1625,7 @@ function playerAttack() {
     } else {
         enemyCounterAttack();
     }
+    console.log('playerAttack 종료 - 최종 적 HP:', gameState.currentEnemy?.hp);
     updateBattleUI();
 }
 
@@ -1668,6 +1670,7 @@ function executePlayerAttack(isSkill = false, skillDamage = 0) {
     if (isEnemyDodge) damage = Math.floor(damage * 0.5);
 
     gameState.currentEnemy.hp -= damage;
+    console.log('적 HP 감소:', damage, '-> 남은 HP:', gameState.currentEnemy.hp);
     const logParts = [`${isSkill ? '' : '공격! '}${damage} 피해!`];
     if (isCrit) logParts.push('(치명타!)');
     if (isEnemyDodge) logParts.push('(적 부분 회피!)');
