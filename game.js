@@ -595,15 +595,6 @@ function startBattle() {
     // 도주 버튼 활성화
     document.getElementById('btn-return').disabled = false;
 
-    // 스킬 정보 패널 닫기
-    const skillPanel = document.getElementById('skill-info-panel');
-    const skillInfoBtn = document.getElementById('btn-skill-info');
-    if (skillPanel) {
-        skillPanel.classList.add('hidden');
-        skillInfoBtn.classList.remove('active');
-        skillInfoBtn.textContent = '스킬 정보';
-    }
-
     const floorType = gameState.currentEnemy.isBoss ? '보스' : gameState.currentEnemy.isMiniBoss ? '중간보스' : '';
     addBattleLog(`${gameState.dungeon.currentFloor}층 - ${gameState.currentEnemy.name} ${floorType ? `[${floorType}]` : ''}`);
     addBattleLog(`선제공격까지 ${enemyAttackCounter}턴`);
@@ -1241,36 +1232,40 @@ function updateSkillButtons() {
     // 버프 표시 업데이트
     updateBuffDisplay();
 
-    // 스킬 정보 패널이 열려있으면 업데이트
-    const panel = document.getElementById('skill-info-panel');
+    // 상세 정보 패널이 열려있으면 업데이트
+    const panel = document.getElementById('info-panel');
     if (panel && !panel.classList.contains('hidden')) {
-        updateSkillInfoPanel();
+        updateInfoPanel();
     }
 }
 
-// 스킬 정보 패널 토글
-function toggleSkillInfoPanel() {
-    const panel = document.getElementById('skill-info-panel');
-    const btn = document.getElementById('btn-skill-info');
+// 상세 정보 패널 토글
+function toggleInfoPanel() {
+    const panel = document.getElementById('info-panel');
+    const btn = document.getElementById('btn-info-toggle');
 
     if (panel.classList.contains('hidden')) {
-        updateSkillInfoPanel();
+        updateInfoPanel();
         panel.classList.remove('hidden');
         btn.classList.add('active');
-        btn.textContent = '스킬 정보 닫기';
+        btn.textContent = '정보 닫기';
     } else {
         panel.classList.add('hidden');
         btn.classList.remove('active');
-        btn.textContent = '스킬 정보';
+        btn.textContent = '상세 정보';
     }
 }
 
-function updateSkillInfoPanel() {
-    const panel = document.getElementById('skill-info-panel');
+function updateInfoPanel() {
+    const panel = document.getElementById('info-panel');
     const charNames = { cat: '묘인', elf: '엘프', dwarf: '드워프', human: '인간' };
 
     let html = '';
 
+    // 스킬 정보 섹션
+    html += '<div class="info-section-title">🗡️ 스킬</div>';
+
+    let skillHtml = '';
     for (let i = 0; i < 4; i++) {
         const skill = gameState.equippedSkills[i];
         if (!skill) continue;
@@ -1294,7 +1289,7 @@ function updateSkillInfoPanel() {
         const cdText = skill.cooldown > 0 ? `쿨타임 ${skill.cooldown}턴` : '';
         const metaText = [mpText, cdText].filter(t => t).join(' | ');
 
-        html += `
+        skillHtml += `
             <div class="skill-info-item">
                 <div class="skill-info-header">
                     <span class="skill-info-name">${charName} - ${skill.name}</span>
@@ -1306,8 +1301,28 @@ function updateSkillInfoPanel() {
             </div>
         `;
     }
+    html += skillHtml || '<p class="no-info-msg">장착된 스킬이 없습니다</p>';
 
-    panel.innerHTML = html || '<p style="color:#888;text-align:center;">장착된 스킬이 없습니다</p>';
+    // 유물 정보 섹션
+    html += '<div class="info-section-title">✨ 유물</div>';
+
+    if (gameState.tempRelics.length > 0) {
+        gameState.tempRelics.forEach(relic => {
+            html += `
+                <div class="relic-info-item">
+                    <span class="relic-info-icon">${relic.icon}</span>
+                    <div class="relic-info-content">
+                        <div class="relic-info-name">${relic.name}</div>
+                        <div class="relic-info-desc">${relic.desc}</div>
+                    </div>
+                </div>
+            `;
+        });
+    } else {
+        html += '<p class="no-info-msg">보유한 유물이 없습니다</p>';
+    }
+
+    panel.innerHTML = html;
 }
 
 function updateBuffDisplay() {
@@ -1468,8 +1483,8 @@ function initEventListeners() {
         document.getElementById(`btn-skill-${i}`).addEventListener('click', () => useSkill(i - 1));
     }
 
-    // 스킬 정보 버튼
-    document.getElementById('btn-skill-info').addEventListener('click', toggleSkillInfoPanel);
+    // 상세 정보 버튼
+    document.getElementById('btn-info-toggle').addEventListener('click', toggleInfoPanel);
 
     document.getElementById('btn-use-potion').addEventListener('click', usePotion);
 

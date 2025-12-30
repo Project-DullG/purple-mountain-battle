@@ -709,8 +709,8 @@ h2 {
     color: #ffd93d;
 }
 
-/* 스킬 정보 버튼 */
-.btn-skill-info {
+/* 상세 정보 버튼 */
+.btn-info-toggle {
     grid-column: span 2;
     background: rgba(255, 255, 255, 0.1) !important;
     border: 1px solid #667eea !important;
@@ -719,17 +719,17 @@ h2 {
     padding: 8px !important;
 }
 
-.btn-skill-info:hover {
+.btn-info-toggle:hover {
     background: rgba(102, 126, 234, 0.3) !important;
 }
 
-.btn-skill-info.active {
+.btn-info-toggle.active {
     background: rgba(102, 126, 234, 0.4) !important;
     border-color: #b388ff !important;
 }
 
-/* 스킬 정보 패널 */
-.skill-info-panel {
+/* 상세 정보 패널 */
+.info-panel {
     background: rgba(0, 0, 0, 0.9);
     border: 2px solid #667eea;
     border-radius: 8px;
@@ -737,8 +737,21 @@ h2 {
     margin-top: 10px;
 }
 
-.skill-info-panel.hidden {
+.info-panel.hidden {
     display: none;
+}
+
+.info-section-title {
+    color: #b388ff;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(179, 136, 255, 0.3);
+}
+
+.info-section-title:not(:first-child) {
+    margin-top: 12px;
 }
 
 .skill-info-item {
@@ -799,6 +812,47 @@ h2 {
     color: #ff6b6b;
     font-size: 0.8rem;
     margin-top: 5px;
+}
+
+/* 유물 정보 */
+.relic-info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+}
+
+.relic-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.relic-info-icon {
+    font-size: 1.3rem;
+}
+
+.relic-info-content {
+    flex: 1;
+}
+
+.relic-info-name {
+    color: gold;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.relic-info-desc {
+    color: #ccc;
+    font-size: 0.8rem;
+}
+
+.no-info-msg {
+    color: #666;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 10px;
 }
 
 #battle-actions button:hover:not(:disabled) {
