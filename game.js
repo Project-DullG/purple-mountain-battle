@@ -9,13 +9,13 @@ const gameState = {
         maxHp: 100,
         mp: 5,
         maxMp: 5,
-        baseAtk: 10,
+        baseAtk: 5,
         stats: {
-            str: 5,
-            dex: 5,
-            int: 5,
-            vit: 5,
-            luk: 5
+            str: 4,
+            dex: 4,
+            int: 4,
+            vit: 4,
+            luk: 4
         }
     },
     dungeon: {
@@ -3002,10 +3002,10 @@ function initEventListeners() {
 
 // 스탯 초기화 (모든 스탯을 5로 되돌리고 포인트 환불)
 function resetStats() {
-    const baseStats = 5;
+    const baseStats = 4;
     const currentTotal = gameState.player.stats.str + gameState.player.stats.dex +
                         gameState.player.stats.int + gameState.player.stats.vit + gameState.player.stats.luk;
-    const baseTotal = baseStats * 5; // 25 (5개 스탯)
+    const baseTotal = baseStats * 5; // 20 (5개 스탯)
 
     // 투자한 포인트 환불
     const refund = currentTotal - baseTotal;
