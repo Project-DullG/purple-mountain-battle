@@ -41,12 +41,7 @@ const gameState = {
     enhancementStones: 0,
     originStones: 0,
     statPointsPurchased: 0,  // 구매한 스탯 포인트 수 (비용 증가용)
-    ashBlessings: {  // 잿빛 소녀의 축복 (근원석 사용)
-        fury: 0,      // 분노의 축복 - 공격력
-        aegis: 0,     // 수호의 축복 - 체력
-        insight: 0,   // 통찰의 축복 - 치명타
-        patience: 0   // 인내의 축복 - 방어
-    },
+    originEnhancement: 0,  // 근원 강화 레벨 (유물 효과 +0.5% per level, max 200 = 100%)
     armorLevel: 1,
     // 부적 구매 횟수 (비용 증가용)
     talismanPurchases: {
@@ -635,17 +630,30 @@ function getEnemyName(floor, isBoss, isMiniBoss) {
 }
 
 // 유물에서 특정 효과의 값을 가져오는 헬퍼 함수 (복합 효과 지원)
+// 근원 강화 보너스 (0.5% per level, max 100%)
+function getOriginEnhancementBonus() {
+    return Math.min(gameState.originEnhancement * 0.5, 100) / 100;
+}
+
 function getRelicEffectValue(relic, effectType) {
+    let value = null;
+
     // 단일 효과 체크
     if (relic.effect === effectType) {
-        return relic.value;
+        value = relic.value;
     }
     // 복합 효과 체크
     if (relic.effects) {
         const found = relic.effects.find(e => e.effect === effectType);
-        if (found) return found.value;
+        if (found) value = found.value;
     }
-    return null;
+
+    // 근원 강화 보너스 적용 (수치형 효과에만)
+    if (value !== null && typeof value === 'number') {
+        value *= (1 + getOriginEnhancementBonus());
+    }
+
+    return value;
 }
 
 // 모든 스탯 보너스 계산
@@ -690,9 +698,6 @@ function getEffectiveStat(statType) {
 // 행운: 치명타 확률 +0.5%, 회피 +0.5%, 경험치 +1%, 골드 +1%
 function getPlayerAtk() {
     let atk = gameState.player.baseAtk + (getEffectiveStat('str') * 1) + (getEffectiveStat('dex') * 1);
-
-    // 잿빛 소녀의 축복 - 분노 (근원석)
-    atk += gameState.ashBlessings.fury * 2;
 
     gameState.equippedSkills.forEach(skill => {
         if (skill?.type === 'passive' && skill.effect === 'atkUp') {
@@ -741,10 +746,7 @@ function getMaxHp() {
     const intHp = getEffectiveStat('int') * 0.5;
     const vitHp = getEffectiveStat('vit') * 2;
 
-    // 잿빛 소녀의 축복 - 수호 (근원석)
-    const charHp = gameState.ashBlessings.aegis * 10;
-
-    let totalHp = baseHp + strHp + dexHp + intHp + vitHp + charHp;
+    let totalHp = baseHp + strHp + dexHp + intHp + vitHp;
 
     // 유물 체력 증폭
     let hpMult = 1;
@@ -815,9 +817,6 @@ function getCritChance() {
 function getRawCritChance() {
     // 기본 10% + 행운(0.5%) + 민첩(1%)으로 치명타 확률 증가
     let chance = 10 + (getEffectiveStat('luk') * 0.5) + (getEffectiveStat('dex') * 1);
-
-    // 잿빛 소녀의 축복 - 통찰 (근원석)
-    chance += gameState.ashBlessings.insight * 1;
 
     gameState.equippedSkills.forEach(skill => {
         if (skill?.type === 'passive' && skill.effect === 'critUp') {
@@ -1115,9 +1114,6 @@ function calculateDamageTaken(damage, guarding = false, isCounter = false) {
     // 활력 스탯 데미지 감소
     totalReduction += getVitDamageReduction() * 100;
 
-    // 잿빛 소녀의 축복 - 인내 (0.5% per level)
-    totalReduction += Math.min(gameState.ashBlessings.patience * 0.5, 30);
-
     // 퍼센트 강화 (상점)
     totalReduction += gameState.percentBonus.def;
 
@@ -1259,11 +1255,9 @@ function updateVillageUI() {
     document.getElementById('spec-crit').textContent = getCritChance() + '%';
     document.getElementById('spec-critdmg').textContent = getCritDamage() + '%';
     document.getElementById('spec-dodge').textContent = getDodgeChance() + '%';
-    // 피해감소: 활력 기반 + 상점 보너스 + 인내의 축복 (최대 80%)
+    // 피해감소: 활력 기반 + 상점 보너스 (최대 80%)
     const totalDefReduction = Math.min(
-        getVitDamageReduction() * 100 +
-        gameState.percentBonus.def +
-        Math.min(gameState.ashBlessings.patience * 0.5, 30),
+        getVitDamageReduction() * 100 + gameState.percentBonus.def,
         80
     );
     document.getElementById('spec-def').textContent = Math.floor(totalDefReduction) + '%';
@@ -1411,16 +1405,17 @@ function updateBlacksmithUI() {
 function updateInnUI() {
     document.getElementById('inn-origin-stones').textContent = gameState.originStones;
 
-    // 잿빛 소녀의 축복 표시
-    document.getElementById('blessing-fury').textContent = gameState.ashBlessings.fury;
-    document.getElementById('blessing-aegis').textContent = gameState.ashBlessings.aegis;
-    document.getElementById('blessing-insight').textContent = gameState.ashBlessings.insight;
-    document.getElementById('blessing-patience').textContent = gameState.ashBlessings.patience;
+    // 근원 강화 표시
+    const enhancementLevel = gameState.originEnhancement;
+    const enhancementBonus = Math.min(enhancementLevel * 0.5, 100);
+    document.getElementById('origin-enhancement-level').textContent = enhancementLevel;
+    document.getElementById('origin-enhancement-bonus').textContent = enhancementBonus.toFixed(1) + '%';
 
-    // 축복 버튼 상태
-    document.querySelectorAll('.btn-blessing').forEach(btn => {
-        btn.disabled = gameState.originStones < 1;
-    });
+    // 근원 강화 버튼 상태 (최대 200레벨)
+    const enhanceBtn = document.getElementById('btn-origin-enhance');
+    if (enhanceBtn) {
+        enhanceBtn.disabled = gameState.originStones < 1 || enhancementLevel >= 200;
+    }
 
     // 스탯 포인트 구매 비용 (구매할수록 증가)
     const statPointCost = 1 + Math.floor(gameState.statPointsPurchased / 5);
@@ -2635,9 +2630,7 @@ function updateInfoPanel() {
     // 현재 스탯 섹션
     html += '<div class="info-section-title">📊 현재 스탯</div>';
     const totalDefReduction = Math.min(
-        getVitDamageReduction() * 100 +
-        gameState.percentBonus.def +
-        Math.min(gameState.ashBlessings.patience * 0.5, 30),
+        getVitDamageReduction() * 100 + gameState.percentBonus.def,
         80
     );
     html += `
@@ -2956,20 +2949,13 @@ function initEventListeners() {
         });
     });
 
-    // 숙소 - 잿빛 소녀의 축복 (근원석 사용)
-    document.querySelectorAll('.btn-blessing').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const blessing = btn.dataset.blessing;
-            if (gameState.originStones >= 1) {
-                gameState.originStones--;
-                gameState.ashBlessings[blessing]++;
-                // 수호의 축복(aegis) - HP 증가 시 즉시 적용
-                if (blessing === 'aegis') {
-                    gameState.player.maxHp = getMaxHp();
-                }
-                updateInnUI();
-            }
-        });
+    // 숙소 - 근원 강화 (근원석 사용, 유물 효과 +0.5%)
+    document.getElementById('btn-origin-enhance')?.addEventListener('click', () => {
+        if (gameState.originStones >= 1 && gameState.originEnhancement < 200) {
+            gameState.originStones--;
+            gameState.originEnhancement++;
+            updateInnUI();
+        }
     });
 
     // 숙소 - 능력치 포인트 구매 (근원석 사용)

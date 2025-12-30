@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>보랏빛 산지의 전투</title>
-    <link rel="stylesheet" href="style.css?v=20251231b">
+    <link rel="stylesheet" href="style.css?v=20251231g">
 </head>
 <body>
     <div id="game-container">
@@ -326,7 +326,7 @@
             <button id="btn-blacksmith-back" class="btn-back">돌아가기</button>
         </div>
 
-        <!-- 숙소 화면 (잿빛 소녀의 축복) -->
+        <!-- 숙소 화면 (근원 강화) -->
         <div id="inn-screen" class="screen hidden">
             <h1>🔮 숙소 - 잿빛 소녀</h1>
             <div class="resource-display inn-resource">
@@ -335,37 +335,20 @@
 
             <div class="inn-intro">
                 <p class="inn-dialogue">"어서와~ 오늘도 수고했어!"</p>
-                <p class="inn-dialogue-sub">"근원석이 있으면 내가 힘을 나눠줄게. 우리 같이 힘내자!"</p>
+                <p class="inn-dialogue-sub">"근원석으로 유물의 힘을 강화할 수 있어!"</p>
             </div>
 
-            <div class="section ash-blessing-section">
-                <h2>잿빛 소녀의 축복</h2>
-                <div class="char-upgrade-grid">
-                    <div class="char-upgrade-card blessing-card">
-                        <div class="upgrade-name">🔥 분노의 축복</div>
-                        <div class="upgrade-level">Lv.<span id="blessing-fury">0</span></div>
-                        <div class="upgrade-effect">기본 공격력 +2</div>
-                        <button class="btn-blessing" data-blessing="fury">축복 (1개)</button>
+            <div class="section origin-enhance-section">
+                <h2>🔮 근원 강화</h2>
+                <p class="enhance-desc">근원석을 사용해 모든 유물 효과를 증폭시킵니다</p>
+                <div class="origin-enhance-display">
+                    <div class="enhance-info">
+                        <span class="enhance-level">Lv.<span id="origin-enhancement-level">0</span> / 200</span>
+                        <span class="enhance-bonus">유물 효과 +<span id="origin-enhancement-bonus">0.0%</span></span>
                     </div>
-                    <div class="char-upgrade-card blessing-card">
-                        <div class="upgrade-name">💜 수호의 축복</div>
-                        <div class="upgrade-level">Lv.<span id="blessing-aegis">0</span></div>
-                        <div class="upgrade-effect">최대 HP +10</div>
-                        <button class="btn-blessing" data-blessing="aegis">축복 (1개)</button>
-                    </div>
-                    <div class="char-upgrade-card blessing-card">
-                        <div class="upgrade-name">👁️ 통찰의 축복</div>
-                        <div class="upgrade-level">Lv.<span id="blessing-insight">0</span></div>
-                        <div class="upgrade-effect">치명타 확률 +1%</div>
-                        <button class="btn-blessing" data-blessing="insight">축복 (1개)</button>
-                    </div>
-                    <div class="char-upgrade-card blessing-card">
-                        <div class="upgrade-name">🪨 인내의 축복</div>
-                        <div class="upgrade-level">Lv.<span id="blessing-patience">0</span></div>
-                        <div class="upgrade-effect">받는 피해 -0.5%</div>
-                        <button class="btn-blessing" data-blessing="patience">축복 (1개)</button>
-                    </div>
+                    <button id="btn-origin-enhance" class="btn-enhance">강화 (1 근원석)</button>
                 </div>
+                <p class="enhance-note">레벨당 +0.5%, 최대 +100%</p>
             </div>
 
             <div class="section">
@@ -585,6 +568,6 @@
         </div>
     </div>
 
-    <script src="game.js?v=20251231f"></script>
+    <script src="game.js?v=20251231g"></script>
 </body>
 </html>

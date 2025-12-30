@@ -2110,62 +2110,77 @@ h2 {
 }
 
 /* 잿빛 소녀의 축복 섹션 */
-.ash-blessing-section {
+.origin-enhance-section {
     background: linear-gradient(135deg, rgba(108, 92, 231, 0.15) 0%, rgba(30, 30, 50, 0.9) 100%);
     border: 1px solid #6c5ce7;
+    padding: 20px;
 }
 
-.ash-blessing-section h2 {
+.origin-enhance-section h2 {
     color: #a29bfe;
     text-shadow: 0 0 8px rgba(162, 155, 254, 0.5);
 }
 
-.blessing-card {
+.enhance-desc {
+    color: #b0b0b0;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+.origin-enhance-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background: linear-gradient(135deg, #2d1b4e 0%, #1a1a2e 100%);
     border: 1px solid #8b7bc7;
-    position: relative;
-    overflow: hidden;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
 }
 
-.blessing-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(162, 155, 254, 0.1) 0%, transparent 70%);
-    animation: blessing-glow 3s ease-in-out infinite;
+.enhance-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-@keyframes blessing-glow {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(-5%, -5%); }
+.enhance-level {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #a29bfe;
 }
 
-.btn-blessing {
-    width: 100%;
-    padding: 8px;
+.enhance-bonus {
+    font-size: 1rem;
+    color: #00ff88;
+}
+
+.btn-enhance {
+    padding: 12px 24px;
     background: linear-gradient(135deg, #8b7bc7, #6c5ce7);
     border: none;
     border-radius: 5px;
     color: white;
     font-weight: bold;
     cursor: pointer;
-    font-size: 0.85rem;
-    position: relative;
-    z-index: 1;
+    transition: all 0.2s;
 }
 
-.btn-blessing:hover:not(:disabled) {
-    background: linear-gradient(135deg, #9b8bd7, #7c6cf7);
-    box-shadow: 0 0 10px rgba(139, 123, 199, 0.5);
+.btn-enhance:hover:not(:disabled) {
+    background: linear-gradient(135deg, #9d8fd9, #7d6dd7);
+    transform: translateY(-2px);
 }
 
-.btn-blessing:disabled {
-    background: #444;
-    color: #666;
+.btn-enhance:disabled {
+    opacity: 0.5;
     cursor: not-allowed;
+}
+
+.enhance-note {
+    color: #888;
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 5px;
 }
 
 /* 능력치 포인트 구매 섹션 */
