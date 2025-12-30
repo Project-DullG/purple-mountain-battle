@@ -413,25 +413,51 @@
 
             <div id="battle-layout">
                 <div id="player-stats-panel">
-                    <div class="stat-row">
-                        <span class="stat-label">ATK</span>
-                        <span class="stat-val" id="panel-atk">20</span>
+                    <div class="stats-section">
+                        <div class="stats-title">기본 스탯</div>
+                        <div class="stat-row">
+                            <span class="stat-label">힘</span>
+                            <span class="stat-val" id="panel-str">5</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">민첩</span>
+                            <span class="stat-val" id="panel-dex">5</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">지능</span>
+                            <span class="stat-val" id="panel-int">5</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">활력</span>
+                            <span class="stat-val" id="panel-vit">5</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">행운</span>
+                            <span class="stat-val" id="panel-luk">5</span>
+                        </div>
                     </div>
-                    <div class="stat-row">
-                        <span class="stat-label">CRT</span>
-                        <span class="stat-val" id="panel-crit">10%</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label">C.DMG</span>
-                        <span class="stat-val" id="panel-crit-dmg">130%</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label">DOG</span>
-                        <span class="stat-val" id="panel-dodge">10%</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label">DEF</span>
-                        <span class="stat-val" id="panel-def">0%</span>
+                    <div class="stats-section">
+                        <div class="stats-title">전투 능력</div>
+                        <div class="stat-row">
+                            <span class="stat-label">공격력</span>
+                            <span class="stat-val" id="panel-atk">20</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">치명타</span>
+                            <span class="stat-val" id="panel-crit">10%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">크리뎀</span>
+                            <span class="stat-val" id="panel-crit-dmg">130%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">회피</span>
+                            <span class="stat-val" id="panel-dodge">10%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">피감</span>
+                            <span class="stat-val" id="panel-def">0%</span>
+                        </div>
                     </div>
                 </div>
                 <div id="battle-main">
@@ -501,6 +527,7 @@
                 <h2>유물 선택</h2>
                 <p class="choice-desc" id="relic-choice-desc">3개 중 하나를 선택하세요 (같은 유물 합성 가능)</p>
                 <div id="relic-choice-grid" class="relic-choice-grid"></div>
+                <p class="tag-info-desc">각 유물은 태그를 보유합니다. 같은 태그의 유물 3개를 모으면 합성 가능!</p>
             </div>
 
             <!-- 유물 교체 선택 (이전 시스템, 현재 미사용) -->

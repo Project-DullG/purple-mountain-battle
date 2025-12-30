@@ -84,38 +84,38 @@ const relicsData = [
     { id: 'relic_feather', name: '깃털 장식', desc: '회피율 +5%', effect: 'dodge', value: 5, icon: '🪶', rarity: 'common' },
     { id: 'relic_band', name: '전사의 머리띠', desc: '공격력 +5%', effect: 'atkMult', value: 0.05, icon: '🎀', rarity: 'common' },
     // 희귀 등급
-    { id: 'relic_shield', name: '수호의 방패', desc: '받는 피해 -10%', effect: 'def', value: 0.9, icon: '🛡️', rarity: 'rare' },
+    { id: 'relic_shield', name: '수호의 방패', desc: '받는 피해 -6%', effect: 'def', value: 0.94, icon: '🛡️', rarity: 'rare' },
     { id: 'relic_cloak', name: '그림자 망토', desc: '회피율 +10%', effect: 'dodge', value: 10, icon: '🧥', rarity: 'rare' },
     { id: 'relic_amulet', name: '행운의 부적', desc: '크리티컬 +10%', effect: 'crit', value: 10, icon: '🔮', rarity: 'rare' },
     { id: 'relic_boots', name: '신속의 장화', desc: '선제공격 확률 +15%', effect: 'first', value: 15, icon: '👢', rarity: 'rare' },
-    { id: 'relic_gauntlet', name: '강철 건틀릿', desc: '공격력 +10%', effect: 'atkMult', value: 0.10, icon: '🧤', rarity: 'rare' },
-    { id: 'relic_pendant', name: '생명의 목걸이', desc: '최대 체력 +10%', effect: 'hpMult', value: 0.10, icon: '📿', rarity: 'rare' },
+    { id: 'relic_gauntlet', name: '강철 건틀릿', desc: '공격력 +6%', effect: 'atkMult', value: 0.06, icon: '🧤', rarity: 'rare' },
+    { id: 'relic_pendant', name: '생명의 목걸이', desc: '최대 체력 +6%', effect: 'hpMult', value: 0.06, icon: '📿', rarity: 'rare' },
     // 영웅 등급
     { id: 'relic_crown', name: '왕의 왕관', desc: '경험치 획득 +25%', effect: 'exp', value: 1.25, icon: '👑', rarity: 'epic' },
     { id: 'relic_orb', name: '마력의 오브', desc: '최대 MP +5', effect: 'mp', value: 5, icon: '🔵', rarity: 'epic' },
     { id: 'relic_fang', name: '흡혈의 송곳니', desc: '공격 시 피해의 5% 회복', effect: 'lifeSteal', value: 0.05, icon: '🦷', rarity: 'epic' },
     { id: 'relic_horn', name: '전쟁의 뿔피리', desc: '공격력 +20', effect: 'atk', value: 20, icon: '📯', rarity: 'epic' },
-    { id: 'relic_skull', name: '파멸의 해골', desc: '치명타 데미지 +15%', effect: 'critDmg', value: 15, icon: '💀', rarity: 'epic' },
-    { id: 'relic_belt', name: '거인의 허리띠', desc: '최대 체력 +15%', effect: 'hpMult', value: 0.15, icon: '🎗️', rarity: 'epic' },
-    { id: 'relic_gloves', name: '암살자의 장갑', desc: '공격력 +15%', effect: 'atkMult', value: 0.15, icon: '🖐️', rarity: 'epic' },
+    { id: 'relic_skull', name: '파멸의 해골', desc: '치명타 데미지 +10%', effect: 'critDmg', value: 10, icon: '💀', rarity: 'epic' },
+    { id: 'relic_belt', name: '거인의 허리띠', desc: '최대 체력 +9%', effect: 'hpMult', value: 0.09, icon: '🎗️', rarity: 'epic' },
+    { id: 'relic_gloves', name: '암살자의 장갑', desc: '공격력 +9%', effect: 'atkMult', value: 0.09, icon: '🖐️', rarity: 'epic' },
     // 전설 등급
-    { id: 'relic_heart', name: '드래곤의 심장', desc: '받는 피해 -20%', effect: 'def', value: 0.8, icon: '❤️‍🔥', rarity: 'legendary' },
-    { id: 'relic_eye', name: '예언자의 눈', desc: '크리티컬 +20%', effect: 'crit', value: 20, icon: '👁️', rarity: 'legendary' },
+    { id: 'relic_heart', name: '드래곤의 심장', desc: '받는 피해 -12%', effect: 'def', value: 0.88, icon: '❤️‍🔥', rarity: 'legendary' },
+    { id: 'relic_eye', name: '예언자의 눈', desc: '크리티컬 +15%', effect: 'crit', value: 15, icon: '👁️', rarity: 'legendary' },
     { id: 'relic_star', name: '별의 파편', desc: '모든 스탯 +5%', effect: 'allStats', value: 0.05, icon: '⭐', rarity: 'legendary' },
-    { id: 'relic_blade', name: '파괴의 검', desc: '공격력 +20%', effect: 'atkMult', value: 0.20, icon: '🗡️', rarity: 'legendary' },
-    { id: 'relic_gem', name: '심판의 보석', desc: '치명타 데미지 +20%', effect: 'critDmg', value: 20, icon: '💎', rarity: 'legendary' },
-    { id: 'relic_titan', name: '타이탄의 심장', desc: '최대 체력 +20%', effect: 'hpMult', value: 0.20, icon: '🫀', rarity: 'legendary' },
+    { id: 'relic_blade', name: '파괴의 검', desc: '공격력 +12%', effect: 'atkMult', value: 0.12, icon: '🗡️', rarity: 'legendary' },
+    { id: 'relic_gem', name: '심판의 보석', desc: '치명타 데미지 +15%', effect: 'critDmg', value: 15, icon: '💎', rarity: 'legendary' },
+    { id: 'relic_titan', name: '타이탄의 심장', desc: '최대 체력 +12%', effect: 'hpMult', value: 0.12, icon: '🫀', rarity: 'legendary' },
     // 스탯 증폭 유물
-    { id: 'relic_str_rare', name: '힘의 팔찌', desc: '힘 +15%', effect: 'strMult', value: 0.15, icon: '💪', rarity: 'rare' },
-    { id: 'relic_dex_rare', name: '민첩의 귀걸이', desc: '민첩 +15%', effect: 'dexMult', value: 0.15, icon: '🏃', rarity: 'rare' },
-    { id: 'relic_int_rare', name: '지혜의 안경', desc: '지능 +15%', effect: 'intMult', value: 0.15, icon: '🧠', rarity: 'rare' },
-    { id: 'relic_vit_rare', name: '활력의 벨트', desc: '활력 +15%', effect: 'vitMult', value: 0.15, icon: '💚', rarity: 'rare' },
-    { id: 'relic_luk_rare', name: '행운의 클로버', desc: '행운 +15%', effect: 'lukMult', value: 0.15, icon: '🍀', rarity: 'rare' },
-    { id: 'relic_str_epic', name: '전사의 문장', desc: '힘 +25%', effect: 'strMult', value: 0.25, icon: '🦁', rarity: 'epic' },
-    { id: 'relic_dex_epic', name: '암살자의 문장', desc: '민첩 +25%', effect: 'dexMult', value: 0.25, icon: '🦅', rarity: 'epic' },
-    { id: 'relic_int_epic', name: '현자의 문장', desc: '지능 +25%', effect: 'intMult', value: 0.25, icon: '🦉', rarity: 'epic' },
-    { id: 'relic_vit_epic', name: '수호자의 문장', desc: '활력 +25%', effect: 'vitMult', value: 0.25, icon: '🐢', rarity: 'epic' },
-    { id: 'relic_luk_epic', name: '도박사의 문장', desc: '행운 +25%', effect: 'lukMult', value: 0.25, icon: '🎰', rarity: 'epic' },
+    { id: 'relic_str_rare', name: '힘의 팔찌', desc: '힘 +10%', effect: 'strMult', value: 0.10, icon: '💪', rarity: 'rare' },
+    { id: 'relic_dex_rare', name: '민첩의 귀걸이', desc: '민첩 +10%', effect: 'dexMult', value: 0.10, icon: '🏃', rarity: 'rare' },
+    { id: 'relic_int_rare', name: '지혜의 안경', desc: '지능 +10%', effect: 'intMult', value: 0.10, icon: '🧠', rarity: 'rare' },
+    { id: 'relic_vit_rare', name: '활력의 벨트', desc: '활력 +10%', effect: 'vitMult', value: 0.10, icon: '💚', rarity: 'rare' },
+    { id: 'relic_luk_rare', name: '행운의 클로버', desc: '행운 +10%', effect: 'lukMult', value: 0.10, icon: '🍀', rarity: 'rare' },
+    { id: 'relic_str_epic', name: '전사의 문장', desc: '힘 +15%', effect: 'strMult', value: 0.15, icon: '🦁', rarity: 'epic' },
+    { id: 'relic_dex_epic', name: '암살자의 문장', desc: '민첩 +15%', effect: 'dexMult', value: 0.15, icon: '🦅', rarity: 'epic' },
+    { id: 'relic_int_epic', name: '현자의 문장', desc: '지능 +15%', effect: 'intMult', value: 0.15, icon: '🦉', rarity: 'epic' },
+    { id: 'relic_vit_epic', name: '수호자의 문장', desc: '활력 +15%', effect: 'vitMult', value: 0.15, icon: '🐢', rarity: 'epic' },
+    { id: 'relic_luk_epic', name: '도박사의 문장', desc: '행운 +15%', effect: 'lukMult', value: 0.15, icon: '🎰', rarity: 'epic' },
 
     // === 새로운 유물들 ===
     // 일반 등급 - 새 효과
@@ -127,8 +127,8 @@ const relicsData = [
     { id: 'relic_hourglass', name: '시간의 모래', desc: '스킬 쿨타임 -1턴', effect: 'cooldownReduce', value: 1, icon: '⏳', rarity: 'rare' },
     { id: 'relic_arrow', name: '맹독의 화살', desc: '공격 시 10% 확률로 독 (3턴간 5% 피해)', effect: 'poison', value: 0.1, icon: '🏹', rarity: 'rare' },
     { id: 'relic_claw', name: '야수의 발톱', desc: '공격 시 10% 확률로 출혈 (3턴간 4% 피해)', effect: 'bleed', value: 0.1, icon: '🐾', rarity: 'rare' },
-    { id: 'relic_rage', name: '분노의 결정', desc: '첫 공격 피해 +20%', effect: 'firstHit', value: 0.2, icon: '😠', rarity: 'rare' },
-    { id: 'relic_hunter', name: '사냥꾼의 표식', desc: '보스에게 피해 +10%', effect: 'bossKiller', value: 0.1, icon: '🎯', rarity: 'rare' },
+    { id: 'relic_rage', name: '분노의 결정', desc: '첫 공격 피해 +25%', effect: 'firstHit', value: 0.25, icon: '😠', rarity: 'rare' },
+    { id: 'relic_hunter', name: '사냥꾼의 표식', desc: '보스에게 피해 +15%', effect: 'bossKiller', value: 0.15, icon: '🎯', rarity: 'rare' },
 
     // 영웅 등급 - 새 효과
     { id: 'relic_mirror', name: '반사의 거울', desc: '받은 피해의 10% 반사', effect: 'reflect', value: 0.1, icon: '🪞', rarity: 'epic' },
@@ -137,8 +137,8 @@ const relicsData = [
     { id: 'relic_spear', name: '염화의 창', desc: '공격 시 15% 확률로 화상 (3턴간 7% 피해)', effect: 'burn', value: 0.15, icon: '🔱', rarity: 'epic' },
     { id: 'relic_fang', name: '흡혈박쥐 송곳니', desc: '공격 시 15% 확률로 출혈 (3턴간 4% 피해)', effect: 'bleed', value: 0.15, icon: '🦇', rarity: 'epic' },
     { id: 'relic_hex', name: '저주받은 인형', desc: '공격 시 12% 확률로 저주 (3턴간 3% + 공격력↓)', effect: 'curse', value: 0.12, icon: '🪆', rarity: 'epic' },
-    { id: 'relic_fury', name: '광전사의 도끼', desc: '적 HP 30% 이하 시 피해 +30%', effect: 'execute', value: 0.3, icon: '🪓', rarity: 'epic' },
-    { id: 'relic_slayer', name: '드래곤 슬레이어', desc: '보스에게 피해 +20%', effect: 'bossKiller', value: 0.2, icon: '🐉', rarity: 'epic' },
+    { id: 'relic_fury', name: '광전사의 도끼', desc: '적 HP 30% 이하 시 피해 +35%', effect: 'execute', value: 0.35, icon: '🪓', rarity: 'epic' },
+    { id: 'relic_slayer', name: '드래곤 슬레이어', desc: '보스에게 피해 +25%', effect: 'bossKiller', value: 0.25, icon: '🐉', rarity: 'epic' },
     { id: 'relic_chain', name: '연쇄의 사슬', desc: '10% 확률로 추가 공격', effect: 'multiHit', value: 0.1, icon: '⛓️', rarity: 'epic' },
     { id: 'relic_skill', name: '마법 증폭기', desc: '스킬 피해 +15%', effect: 'skillDmg', value: 0.15, icon: '✨', rarity: 'epic' },
 
@@ -146,8 +146,8 @@ const relicsData = [
     { id: 'relic_phoenix', name: '불사조의 깃털', desc: '처치 시 HP 10% 회복', effect: 'killHeal', value: 0.1, icon: '🔥', rarity: 'legendary' },
     { id: 'relic_void', name: '공허의 수정', desc: '스킬 쿨타임 -2턴', effect: 'cooldownReduce', value: 2, icon: '🌀', rarity: 'legendary' },
     { id: 'relic_pierce', name: '역병의 창', desc: '공격 시 20% 확률로 독+화상 (3턴간 10% 피해)', effect: 'plague', value: 0.2, icon: '⚡', rarity: 'legendary' },
-    { id: 'relic_berserk', name: '광기의 가면', desc: '첫 공격 피해 +40%', effect: 'firstHit', value: 0.4, icon: '🎭', rarity: 'legendary' },
-    { id: 'relic_godslayer', name: '신 사냥꾼', desc: '보스에게 피해 +25%', effect: 'bossKiller', value: 0.25, icon: '☠️', rarity: 'legendary' },
+    { id: 'relic_berserk', name: '광기의 가면', desc: '첫 공격 피해 +50%', effect: 'firstHit', value: 0.5, icon: '🎭', rarity: 'legendary' },
+    { id: 'relic_godslayer', name: '신 사냥꾼', desc: '보스에게 피해 +35%', effect: 'bossKiller', value: 0.35, icon: '☠️', rarity: 'legendary' },
     { id: 'relic_storm', name: '폭풍의 눈', desc: '15% 확률로 추가 공격', effect: 'multiHit', value: 0.15, icon: '🌪️', rarity: 'legendary' },
     { id: 'relic_arcane', name: '비전의 오브', desc: '스킬 피해 +20%', effect: 'skillDmg', value: 0.2, icon: '🔮', rarity: 'legendary' },
     { id: 'relic_thorns', name: '가시왕관', desc: '받은 피해의 15% 반사', effect: 'reflect', value: 0.15, icon: '👑', rarity: 'legendary' },
@@ -160,36 +160,36 @@ const relicsData = [
       effects: [{ effect: 'gold', value: 1.08 }, { effect: 'exp', value: 1.08 }] },
 
     // 희귀 등급 - 복합 (단일 효과 대비 약 60% 성능)
-    { id: 'relic_warrior_mark', name: '전투의 증표', desc: '공격력 +6%, 받는 피해 -6%', icon: '⚔️', rarity: 'rare',
-      effects: [{ effect: 'atkMult', value: 0.06 }, { effect: 'def', value: 0.94 }] },
-    { id: 'relic_survivor', name: '생존자의 부적', desc: '회피 +6%, 최대 HP +6%', icon: '🧿', rarity: 'rare',
-      effects: [{ effect: 'dodge', value: 6 }, { effect: 'hpMult', value: 0.06 }] },
+    { id: 'relic_warrior_mark', name: '전투의 증표', desc: '공격력 +4%, 받는 피해 -4%', icon: '⚔️', rarity: 'rare',
+      effects: [{ effect: 'atkMult', value: 0.04 }, { effect: 'def', value: 0.96 }] },
+    { id: 'relic_survivor', name: '생존자의 부적', desc: '회피 +4%, 최대 HP +4%', icon: '🧿', rarity: 'rare',
+      effects: [{ effect: 'dodge', value: 4 }, { effect: 'hpMult', value: 0.04 }] },
     { id: 'relic_explorer', name: '탐험가의 지도', desc: '골드 +10%, 경험치 +10%', icon: '🗺️', rarity: 'rare',
       effects: [{ effect: 'gold', value: 1.10 }, { effect: 'exp', value: 1.10 }] },
-    { id: 'relic_duelist', name: '결투사의 장갑', desc: '치명타 +6%, 치명타 피해 +8%', icon: '🥊', rarity: 'rare',
-      effects: [{ effect: 'crit', value: 6 }, { effect: 'critDmg', value: 8 }] },
+    { id: 'relic_duelist', name: '결투사의 장갑', desc: '치명타 +5%, 치명타 피해 +6%', icon: '🥊', rarity: 'rare',
+      effects: [{ effect: 'crit', value: 5 }, { effect: 'critDmg', value: 6 }] },
 
     // 영웅 등급 - 복합 (단일 효과 대비 약 55% 성능, 3개 효과)
-    { id: 'relic_balance', name: '균형의 결정', desc: '공격력 +8%, 받는 피해 -8%, 치명타 +5%', icon: '⚖️', rarity: 'epic',
-      effects: [{ effect: 'atkMult', value: 0.08 }, { effect: 'def', value: 0.92 }, { effect: 'crit', value: 5 }] },
+    { id: 'relic_balance', name: '균형의 결정', desc: '공격력 +5%, 받는 피해 -5%, 치명타 +4%', icon: '⚖️', rarity: 'epic',
+      effects: [{ effect: 'atkMult', value: 0.05 }, { effect: 'def', value: 0.95 }, { effect: 'crit', value: 4 }] },
     { id: 'relic_tactician', name: '전략가의 문장', desc: '스킬 피해 +10%, MP 소모 -12%', icon: '📋', rarity: 'epic',
       effects: [{ effect: 'skillDmg', value: 0.10 }, { effect: 'mpSave', value: 0.12 }] },
-    { id: 'relic_hunter_arm', name: '사냥꾼의 완장', desc: '보스 피해 +12%, 독 확률 +12%', icon: '🎖️', rarity: 'epic',
-      effects: [{ effect: 'bossKiller', value: 0.12 }, { effect: 'poison', value: 0.12 }] },
-    { id: 'relic_undying', name: '불굴의 심장', desc: '최대 HP +10%, 처치 시 HP 3% 회복', icon: '💗', rarity: 'epic',
-      effects: [{ effect: 'hpMult', value: 0.10 }, { effect: 'killHeal', value: 0.03 }] },
-    { id: 'relic_assassin', name: '암살자의 비수', desc: '치명타 +8%, 치명타 피해 +12%, 회피 +5%', icon: '🔪', rarity: 'epic',
-      effects: [{ effect: 'crit', value: 8 }, { effect: 'critDmg', value: 12 }, { effect: 'dodge', value: 5 }] },
+    { id: 'relic_hunter_arm', name: '사냥꾼의 완장', desc: '보스 피해 +15%, 독 확률 +10%', icon: '🎖️', rarity: 'epic',
+      effects: [{ effect: 'bossKiller', value: 0.15 }, { effect: 'poison', value: 0.10 }] },
+    { id: 'relic_undying', name: '불굴의 심장', desc: '최대 HP +6%, 처치 시 HP 3% 회복', icon: '💗', rarity: 'epic',
+      effects: [{ effect: 'hpMult', value: 0.06 }, { effect: 'killHeal', value: 0.03 }] },
+    { id: 'relic_assassin', name: '암살자의 비수', desc: '치명타 +6%, 치명타 피해 +8%, 회피 +4%', icon: '🔪', rarity: 'epic',
+      effects: [{ effect: 'crit', value: 6 }, { effect: 'critDmg', value: 8 }, { effect: 'dodge', value: 4 }] },
 
     // 전설 등급 - 복합 (단일 효과 대비 약 50% 성능, 3개 효과)
-    { id: 'relic_hero_legacy', name: '영웅의 유산', desc: '공격력 +12%, 치명타 +8%, 치명타 피해 +12%', icon: '🏆', rarity: 'legendary',
-      effects: [{ effect: 'atkMult', value: 0.12 }, { effect: 'crit', value: 8 }, { effect: 'critDmg', value: 12 }] },
-    { id: 'relic_guardian', name: '수호신의 축복', desc: '받는 피해 -12%, 최대 HP +12%, 피해 반사 8%', icon: '🛡️', rarity: 'legendary',
-      effects: [{ effect: 'def', value: 0.88 }, { effect: 'hpMult', value: 0.12 }, { effect: 'reflect', value: 0.08 }] },
-    { id: 'relic_conqueror', name: '정복자의 인장', desc: '보스 피해 +18%, 화상 확률 +12%, 스킬 피해 +10%', icon: '👑', rarity: 'legendary',
-      effects: [{ effect: 'bossKiller', value: 0.18 }, { effect: 'burn', value: 0.12 }, { effect: 'skillDmg', value: 0.10 }] },
-    { id: 'relic_eternal', name: '영원의 성배', desc: '최대 HP +15%, 처치 시 HP 5% 회복, 흡혈 3%', icon: '🏺', rarity: 'legendary',
-      effects: [{ effect: 'hpMult', value: 0.15 }, { effect: 'killHeal', value: 0.05 }, { effect: 'lifeSteal', value: 0.03 }] }
+    { id: 'relic_hero_legacy', name: '영웅의 유산', desc: '공격력 +7%, 치명타 +6%, 치명타 피해 +8%', icon: '🏆', rarity: 'legendary',
+      effects: [{ effect: 'atkMult', value: 0.07 }, { effect: 'crit', value: 6 }, { effect: 'critDmg', value: 8 }] },
+    { id: 'relic_guardian', name: '수호신의 축복', desc: '받는 피해 -7%, 최대 HP +7%, 피해 반사 6%', icon: '🛡️', rarity: 'legendary',
+      effects: [{ effect: 'def', value: 0.93 }, { effect: 'hpMult', value: 0.07 }, { effect: 'reflect', value: 0.06 }] },
+    { id: 'relic_conqueror', name: '정복자의 인장', desc: '보스 피해 +20%, 화상 확률 +10%, 스킬 피해 +8%', icon: '👑', rarity: 'legendary',
+      effects: [{ effect: 'bossKiller', value: 0.20 }, { effect: 'burn', value: 0.10 }, { effect: 'skillDmg', value: 0.08 }] },
+    { id: 'relic_eternal', name: '영원의 성배', desc: '최대 HP +8%, 처치 시 HP 4% 회복, 흡혈 2%', icon: '🏺', rarity: 'legendary',
+      effects: [{ effect: 'hpMult', value: 0.08 }, { effect: 'killHeal', value: 0.04 }, { effect: 'lifeSteal', value: 0.02 }] }
 ];
 
 // 등급별 출현 확률 (조정됨)
@@ -1454,7 +1454,13 @@ function updateBattleUI() {
     const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
     document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
 
-    // 왼쪽 스탯 패널
+    // 왼쪽 스탯 패널 - 기본 스탯
+    document.getElementById('panel-str').textContent = Math.floor(getFinalStat('str'));
+    document.getElementById('panel-dex').textContent = Math.floor(getFinalStat('dex'));
+    document.getElementById('panel-int').textContent = Math.floor(getFinalStat('int'));
+    document.getElementById('panel-vit').textContent = Math.floor(getFinalStat('vit'));
+    document.getElementById('panel-luk').textContent = Math.floor(getFinalStat('luk'));
+    // 왼쪽 스탯 패널 - 전투 능력
     document.getElementById('panel-atk').textContent = getPlayerAtk();
     document.getElementById('panel-crit').textContent = getCritChance() + '%';
     document.getElementById('panel-crit-dmg').textContent = getCritDamage() + '%';
@@ -2129,33 +2135,11 @@ function showBossRewardChoices() {
     }
 }
 
-// 유물 선택 (합성은 자동)
+// 유물 선택 (수동 합성 - 유물은 바로 추가)
 function selectRelic(relic) {
-    // 같은 유물이 있는지 확인 (같은 id + 같은 등급)
-    const existingIndex = gameState.tempRelics.findIndex(r => r.id === relic.id && r.rarity === relic.rarity);
-
-    if (existingIndex !== -1) {
-        // 같은 유물이 있으면 자동 합성
-        const existingRelic = gameState.tempRelics[existingIndex];
-        const nextRarity = getNextRarity(existingRelic.rarity);
-
-        if (nextRarity) {
-            // 업그레이드된 유물로 교체
-            const upgradedRelic = getUpgradedRelic(existingRelic);
-            gameState.tempRelics[existingIndex] = upgradedRelic;
-
-            // 합성 결과 표시
-            showCombineResult(existingRelic, upgradedRelic);
-        } else {
-            // 전설이면 그냥 새 유물 추가
-            gameState.tempRelics.push({ ...relic });
-            proceedAfterRelicChoice();
-        }
-    } else {
-        // 같은 유물이 없으면 바로 추가 (개수 제한 없음)
-        gameState.tempRelics.push({ ...relic });
-        proceedAfterRelicChoice();
-    }
+    // 유물 바로 추가 (합성은 수동으로)
+    gameState.tempRelics.push({ ...relic });
+    proceedAfterRelicChoice();
 }
 
 // 합성 결과 표시
