@@ -1307,6 +1307,36 @@ h2 {
     font-size: 0.85rem;
 }
 
+/* 보스 클리어 확인 섹션 */
+#boss-confirm-section {
+    text-align: center;
+    padding: 30px 15px;
+}
+
+.boss-confirm-msg {
+    font-size: 1.2rem;
+    color: #ffd700;
+    margin-bottom: 25px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.btn-boss-confirm {
+    padding: 15px 50px;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-boss-confirm:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.6);
+}
+
 /* 스킬 스킵 버튼 */
 .btn-skip-skill {
     width: 100%;

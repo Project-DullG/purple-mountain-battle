@@ -998,7 +998,18 @@ function generateStartingSkills() {
 }
 
 function showBossClearScreen() {
-    // 유물 선택과 스킬 교체 섹션 모두 표시
+    // 확인 버튼 섹션만 표시, 나머지는 숨김
+    document.getElementById('boss-confirm-section').classList.remove('hidden');
+    document.getElementById('relic-choice-section').classList.add('hidden');
+    document.getElementById('skill-rest-section').classList.add('hidden');
+    document.getElementById('relic-replace-section').classList.add('hidden');
+
+    showScreen('boss-clear-screen');
+}
+
+function showBossRewardChoices() {
+    // 확인 버튼 숨기고 선택지 표시
+    document.getElementById('boss-confirm-section').classList.add('hidden');
     document.getElementById('relic-choice-section').classList.remove('hidden');
     document.getElementById('skill-rest-section').classList.remove('hidden');
 
@@ -1046,8 +1057,6 @@ function showBossClearScreen() {
     } else {
         relicGrid.innerHTML = '<p class="no-relic-msg">획득 가능한 유물이 없습니다</p>';
     }
-
-    showScreen('boss-clear-screen');
 }
 
 // 유물 선택
@@ -1558,6 +1567,7 @@ function initEventListeners() {
     document.getElementById('btn-clear-return').addEventListener('click', () => returnToVillage(false));
 
     // 보스 클리어 화면
+    document.getElementById('btn-boss-confirm').addEventListener('click', showBossRewardChoices);
     document.getElementById('btn-skip-skill').addEventListener('click', skipSkillAndContinue);
     document.getElementById('btn-cancel-relic').addEventListener('click', cancelRelicReplace);
 }
