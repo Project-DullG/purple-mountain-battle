@@ -20,73 +20,85 @@ const gameState = {
     },
     dungeon: {
         currentFloor: 1,
-        maxUnlockedFloor: 1,
+        highestFloor: 0,
         pendingGold: 0,
         pendingExp: 0,
         inBattle: false
     },
     currentEnemy: null,
     equippedSkills: [null, null, null, null],
-    relics: [],
+    tempRelics: [], // 던전 내 임시 유물
     weapons: {
-        sword: 1,   // 대검 - 묘인 스킬
-        shield: 1,  // 방패 - 드워프 스킬
-        bow: 1,     // 활 - 인간 스킬
-        staff: 1    // 지팡이 - 엘프 스킬
+        sword: 1,
+        shield: 1,
+        bow: 1,
+        staff: 1
     },
     enhancementStones: 0,
-    armorLevel: 1
+    armorLevel: 1,
+    gameMode: 'normal', // easy, normal, hard, infinite
+    pendingRelic: null, // 보스 클리어 후 획득한 유물
+    skillChoices: [] // 보스 클리어 후 선택 가능한 스킬들
 };
 
 // 유물 데이터
 const relicsData = [
-    { id: 'relic_sword', name: '고대의 검날', desc: '공격력 +10', effect: 'atk', value: 10 },
-    { id: 'relic_shield', name: '수호의 방패', desc: '받는 피해 -10%', effect: 'def', value: 0.9 },
-    { id: 'relic_ring', name: '마력의 반지', desc: '최대 MP +5', effect: 'mp', value: 5 },
-    { id: 'relic_cloak', name: '그림자 망토', desc: '회피율 +10%', effect: 'dodge', value: 10 },
-    { id: 'relic_amulet', name: '행운의 부적', desc: '크리티컬 +10%', effect: 'crit', value: 10 },
-    { id: 'relic_boots', name: '신속의 장화', desc: '선제공격 확률 +20%', effect: 'first', value: 20 },
-    { id: 'relic_crown', name: '왕의 왕관', desc: '경험치 획득 +20%', effect: 'exp', value: 1.2 },
-    { id: 'relic_coin', name: '황금 동전', desc: '골드 획득 +20%', effect: 'gold', value: 1.2 }
+    { id: 'relic_sword', name: '고대의 검날', desc: '공격력 +10', effect: 'atk', value: 10, icon: '⚔️' },
+    { id: 'relic_shield', name: '수호의 방패', desc: '받는 피해 -10%', effect: 'def', value: 0.9, icon: '🛡️' },
+    { id: 'relic_ring', name: '마력의 반지', desc: '최대 MP +5', effect: 'mp', value: 5, icon: '💍' },
+    { id: 'relic_cloak', name: '그림자 망토', desc: '회피율 +10%', effect: 'dodge', value: 10, icon: '🧥' },
+    { id: 'relic_amulet', name: '행운의 부적', desc: '크리티컬 +10%', effect: 'crit', value: 10, icon: '🔮' },
+    { id: 'relic_boots', name: '신속의 장화', desc: '선제공격 확률 +20%', effect: 'first', value: 20, icon: '👢' },
+    { id: 'relic_crown', name: '왕의 왕관', desc: '경험치 획득 +20%', effect: 'exp', value: 1.2, icon: '👑' },
+    { id: 'relic_coin', name: '황금 동전', desc: '골드 획득 +20%', effect: 'gold', value: 1.2, icon: '🪙' }
 ];
 
 // 스킬 데이터
 const skillsData = {
     cat: [
-        { id: 'cat_slash', name: '강타', mpCost: 2, damage: 25, type: 'active', desc: '25 데미지. 반격 받음' },
-        { id: 'cat_fury', name: '연속베기', mpCost: 4, damage: 15, hits: 3, type: 'active', desc: '15 데미지 x3. 반격 1회' },
-        { id: 'cat_rage', name: '광폭화', mpCost: 0, type: 'passive', effect: 'atkUp', value: 1.2, desc: '패시브: 공격력 20% 증가' }
+        { id: 'cat_slash', name: '강타', mpCost: 2, damage: 25, type: 'active', desc: '25 데미지. 반격 받음', char: '묘인' },
+        { id: 'cat_fury', name: '연속베기', mpCost: 4, damage: 15, hits: 3, type: 'active', desc: '15 데미지 x3. 반격 1회', char: '묘인' },
+        { id: 'cat_rage', name: '광폭화', mpCost: 0, type: 'passive', effect: 'atkUp', value: 1.2, desc: '패시브: 공격력 20% 증가', char: '묘인' }
     ],
     elf: [
-        { id: 'elf_fire', name: '화염', mpCost: 3, damage: 30, type: 'active', desc: '30 데미지. 반격 받음' },
-        { id: 'elf_heal', name: '치유', mpCost: 2, heal: 40, type: 'active', desc: 'HP 40 회복. 반격 없음' },
-        { id: 'elf_mana', name: '마력증폭', mpCost: 0, type: 'passive', effect: 'mpUp', value: 3, desc: '패시브: 최대 MP +3' }
+        { id: 'elf_fire', name: '화염', mpCost: 3, damage: 30, type: 'active', desc: '30 데미지. 반격 받음', char: '엘프' },
+        { id: 'elf_heal', name: '치유', mpCost: 2, heal: 40, type: 'active', desc: 'HP 40 회복. 반격 없음', char: '엘프' },
+        { id: 'elf_mana', name: '마력증폭', mpCost: 0, type: 'passive', effect: 'mpUp', value: 3, desc: '패시브: 최대 MP +3', char: '엘프' }
     ],
     dwarf: [
-        { id: 'dwarf_guard', name: '방어', mpCost: 1, type: 'active', effect: 'guard', desc: '적 공격 유도 + 피해 70% 감소' },
-        { id: 'dwarf_bash', name: '방패치기', mpCost: 2, damage: 15, type: 'active', effect: 'stun', desc: '15 데미지 + 적 1턴 스턴' },
-        { id: 'dwarf_wall', name: '철벽', mpCost: 0, type: 'passive', effect: 'defUp', value: 0.85, desc: '패시브: 받는 피해 15% 감소' }
+        { id: 'dwarf_guard', name: '방어', mpCost: 1, type: 'active', effect: 'guard', desc: '적 공격 유도 + 피해 70% 감소', char: '드워프' },
+        { id: 'dwarf_bash', name: '방패치기', mpCost: 2, damage: 15, type: 'active', effect: 'stun', desc: '15 데미지 + 적 1턴 스턴', char: '드워프' },
+        { id: 'dwarf_wall', name: '철벽', mpCost: 0, type: 'passive', effect: 'defUp', value: 0.85, desc: '패시브: 받는 피해 15% 감소', char: '드워프' }
     ],
     human: [
-        { id: 'human_snipe', name: '저격', mpCost: 2, damage: 20, type: 'active', effect: 'noCounter', desc: '20 데미지. 반격 없음!' },
-        { id: 'human_double', name: '속사', mpCost: 3, damage: 12, type: 'active', hits: 2, desc: '12 데미지 x2. 반격 1회' },
-        { id: 'human_focus', name: '집중', mpCost: 0, type: 'passive', effect: 'critUp', value: 0.15, desc: '패시브: 크리티컬 +15%' }
+        { id: 'human_snipe', name: '저격', mpCost: 2, damage: 20, type: 'active', effect: 'noCounter', desc: '20 데미지. 반격 없음!', char: '인간' },
+        { id: 'human_double', name: '속사', mpCost: 3, damage: 12, type: 'active', hits: 2, desc: '12 데미지 x2. 반격 1회', char: '인간' },
+        { id: 'human_focus', name: '집중', mpCost: 0, type: 'passive', effect: 'critUp', value: 0.15, desc: '패시브: 크리티컬 +15%', char: '인간' }
     ]
+};
+
+// 모드별 설정
+const modeSettings = {
+    easy: { enemyMult: 0.8, maxFloor: 50, name: '이지' },
+    normal: { enemyMult: 1.0, maxFloor: 50, name: '노말' },
+    hard: { enemyMult: 1.3, maxFloor: 50, name: '하드' },
+    infinite: { enemyMult: 1.0, maxFloor: Infinity, name: '무한' }
 };
 
 // 적 생성
 function generateEnemy(floor) {
     const isBoss = floor % 10 === 0;
     const isMiniBoss = floor % 5 === 0 && !isBoss;
+    const modeMult = modeSettings[gameState.gameMode].enemyMult;
 
     const baseHp = 30 + floor * 10;
     const baseAtk = 5 + floor * 2;
 
     return {
         name: getEnemyName(floor, isBoss, isMiniBoss),
-        hp: Math.floor(isBoss ? baseHp * 3 : isMiniBoss ? baseHp * 2 : baseHp),
-        maxHp: Math.floor(isBoss ? baseHp * 3 : isMiniBoss ? baseHp * 2 : baseHp),
-        atk: Math.floor(isBoss ? baseAtk * 2 : isMiniBoss ? baseAtk * 1.5 : baseAtk),
+        hp: Math.floor((isBoss ? baseHp * 3 : isMiniBoss ? baseHp * 2 : baseHp) * modeMult),
+        maxHp: Math.floor((isBoss ? baseHp * 3 : isMiniBoss ? baseHp * 2 : baseHp) * modeMult),
+        atk: Math.floor((isBoss ? baseAtk * 2 : isMiniBoss ? baseAtk * 1.5 : baseAtk) * modeMult),
         goldReward: Math.floor((10 + floor * 5) * (isBoss ? 3 : isMiniBoss ? 2 : 1)),
         expReward: Math.floor((20 + floor * 10) * (isBoss ? 3 : isMiniBoss ? 2 : 1)),
         isBoss,
@@ -105,26 +117,23 @@ function getEnemyName(floor, isBoss, isMiniBoss) {
     return normalEnemies[tier];
 }
 
-// 스탯 계산 (유물 효과 포함)
+// 스탯 계산
 function getPlayerAtk() {
     let atk = gameState.player.baseAtk + (gameState.player.stats.str * 2);
 
-    // 패시브 효과
     gameState.equippedSkills.forEach(skill => {
         if (skill?.type === 'passive' && skill.effect === 'atkUp') {
             atk *= skill.value;
         }
     });
 
-    // 유물 효과
-    gameState.relics.forEach(relic => {
+    gameState.tempRelics.forEach(relic => {
         if (relic.effect === 'atk') atk += relic.value;
     });
 
     return Math.floor(atk);
 }
 
-// 무기 보너스 계산 (캐릭터별)
 function getWeaponBonus(character) {
     const weaponMap = {
         cat: 'sword',
@@ -133,7 +142,7 @@ function getWeaponBonus(character) {
         elf: 'staff'
     };
     const weapon = weaponMap[character];
-    return weapon ? gameState.weapons[weapon] * 5 : 0; // 레벨당 5% 보너스
+    return weapon ? gameState.weapons[weapon] * 5 : 0;
 }
 
 function getMaxHp() {
@@ -149,7 +158,7 @@ function getMaxMp() {
         }
     });
 
-    gameState.relics.forEach(relic => {
+    gameState.tempRelics.forEach(relic => {
         if (relic.effect === 'mp') mp += relic.value;
     });
 
@@ -159,7 +168,7 @@ function getMaxMp() {
 function getDodgeChance() {
     let dodge = gameState.player.stats.dex * 1;
 
-    gameState.relics.forEach(relic => {
+    gameState.tempRelics.forEach(relic => {
         if (relic.effect === 'dodge') dodge += relic.value;
     });
 
@@ -175,7 +184,7 @@ function getCritChance() {
         }
     });
 
-    gameState.relics.forEach(relic => {
+    gameState.tempRelics.forEach(relic => {
         if (relic.effect === 'crit') chance += relic.value;
     });
 
@@ -185,19 +194,16 @@ function getCritChance() {
 function calculateDamageTaken(damage, guarding = false) {
     let finalDamage = damage;
 
-    // 패시브 효과
     gameState.equippedSkills.forEach(skill => {
         if (skill?.type === 'passive' && skill.effect === 'defUp') {
             finalDamage *= skill.value;
         }
     });
 
-    // 유물 효과
-    gameState.relics.forEach(relic => {
+    gameState.tempRelics.forEach(relic => {
         if (relic.effect === 'def') finalDamage *= relic.value;
     });
 
-    // 방어 스킬
     if (guarding) finalDamage *= 0.3;
 
     return Math.floor(finalDamage);
@@ -217,27 +223,48 @@ function checkLevelUp() {
     }
 }
 
+// 스킵 가능 층 계산
+function getSkipFloor() {
+    const highestBossCleared = Math.floor(gameState.dungeon.highestFloor / 10) * 10;
+    if (highestBossCleared >= 10) {
+        // 보스전 직전까지 (9, 19, 29...)
+        return highestBossCleared - 1;
+    }
+    return 0;
+}
+
 // UI 업데이트
 function updateVillageUI() {
     document.getElementById('player-level').textContent = gameState.player.level;
     document.getElementById('player-gold').textContent = gameState.player.gold;
     document.getElementById('player-exp').textContent = gameState.player.exp;
     document.getElementById('player-max-exp').textContent = getExpForLevel(gameState.player.level);
-    document.getElementById('unlocked-floor').textContent = gameState.dungeon.maxUnlockedFloor;
-    document.getElementById('start-floor').textContent = gameState.dungeon.maxUnlockedFloor;
+    document.getElementById('current-mode').textContent = modeSettings[gameState.gameMode].name;
 
     document.getElementById('stat-points').textContent = gameState.player.statPoints;
     document.getElementById('stat-str').textContent = gameState.player.stats.str;
     document.getElementById('stat-dex').textContent = gameState.player.stats.dex;
     document.getElementById('stat-int').textContent = gameState.player.stats.int;
     document.getElementById('stat-luk').textContent = gameState.player.stats.luk;
+
+    // 스킵 버튼 업데이트
+    const skipFloor = getSkipFloor();
+    const skipBtn = document.getElementById('btn-skip');
+    const skipInfo = document.getElementById('skip-info');
+
+    if (skipFloor > 0) {
+        skipBtn.disabled = false;
+        skipInfo.textContent = `${skipFloor}층까지 스킵 (최고 기록: ${gameState.dungeon.highestFloor}층)`;
+    } else {
+        skipBtn.disabled = true;
+        skipInfo.textContent = '10층 보스 클리어 후 스킵 가능';
+    }
 }
 
 function updateShopUI() {
     document.getElementById('shop-gold').textContent = gameState.player.gold;
     document.getElementById('shop-stones').textContent = gameState.enhancementStones;
 
-    // 4종 무기 강화
     const weaponTypes = ['sword', 'shield', 'bow', 'staff'];
     weaponTypes.forEach(weapon => {
         const level = gameState.weapons[weapon];
@@ -246,7 +273,6 @@ function updateShopUI() {
         document.querySelector(`.btn-upgrade[data-weapon="${weapon}"]`).disabled = gameState.enhancementStones < 1;
     });
 
-    // 방어구
     document.getElementById('armor-level').textContent = gameState.armorLevel;
     document.getElementById('armor-cost').textContent = gameState.armorLevel * 100;
     document.getElementById('potion-count').textContent = gameState.player.potions;
@@ -256,33 +282,21 @@ function updateShopUI() {
     document.getElementById('btn-buy-potion').disabled = gameState.player.gold < 50;
 }
 
-function updateInventoryUI() {
-    document.getElementById('relic-count').textContent = gameState.relics.length;
-
-    const relicList = document.getElementById('relic-list');
-    if (gameState.relics.length === 0) {
-        relicList.innerHTML = '<p class="empty-msg">보유한 유물이 없습니다.<br>보스 처치 시 낮은 확률로 획득!</p>';
-    } else {
-        relicList.innerHTML = gameState.relics.map(relic => `
-            <div class="relic-item">
-                <div class="relic-name">${relic.name}</div>
-                <div class="relic-desc">${relic.desc}</div>
-            </div>
-        `).join('');
-    }
-
-    // 능력치 요약
-    document.getElementById('total-atk').textContent = getPlayerAtk();
-    document.getElementById('total-hp').textContent = getMaxHp();
-    document.getElementById('total-mp').textContent = getMaxMp();
-    document.getElementById('total-crit').textContent = getCritChance();
-    document.getElementById('total-dodge').textContent = getDodgeChance();
-}
-
 function updateDungeonUI() {
     document.getElementById('current-floor').textContent = gameState.dungeon.currentFloor;
     document.getElementById('pending-gold').textContent = gameState.dungeon.pendingGold;
     document.getElementById('pending-exp').textContent = gameState.dungeon.pendingExp;
+
+    // 유물 표시
+    const relicsContainer = document.getElementById('current-relics');
+    const relicIcons = document.getElementById('relic-icons');
+
+    if (gameState.tempRelics.length > 0) {
+        relicsContainer.classList.remove('hidden');
+        relicIcons.textContent = gameState.tempRelics.map(r => r.icon).join(' ');
+    } else {
+        relicsContainer.classList.add('hidden');
+    }
 }
 
 function updateBattleUI() {
@@ -292,7 +306,6 @@ function updateBattleUI() {
     document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
     document.getElementById('enemy-atk').textContent = enemy.atk;
 
-    // 적 HP 바
     const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
     document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
 
@@ -345,6 +358,7 @@ function startBattle() {
     addBattleLog(`${gameState.dungeon.currentFloor}층 - ${gameState.currentEnemy.name} ${floorType ? `[${floorType}]` : ''}`);
 
     updateBattleUI();
+    updateDungeonUI();
     document.getElementById('battle-actions').classList.remove('hidden');
     document.getElementById('floor-clear-actions').classList.add('hidden');
 }
@@ -368,14 +382,12 @@ function playerAttack() {
 }
 
 function enemyCounterAttack() {
-    // 스턴 상태면 공격 안 함
     if (gameState.currentEnemy.stunned) {
         addBattleLog(`${gameState.currentEnemy.name}은(는) 스턴 상태!`);
         gameState.currentEnemy.stunned = false;
         return;
     }
 
-    // 회피 체크
     if (Math.random() * 100 < getDodgeChance()) {
         addBattleLog('회피 성공!');
         isGuarding = false;
@@ -403,7 +415,6 @@ function useSkill(slotIndex) {
         return;
     }
 
-    // 스킬의 캐릭터 타입 찾기
     const characters = ['cat', 'elf', 'dwarf', 'human'];
     let skillCharacter = null;
     for (const char of characters) {
@@ -416,7 +427,6 @@ function useSkill(slotIndex) {
     gameState.player.mp -= skill.mpCost;
     addBattleLog(`[${skill.name}] 사용!`);
 
-    // 방어 스킬 - 적이 공격하고 그 데미지 감소
     if (skill.effect === 'guard') {
         isGuarding = true;
         addBattleLog('방어 태세!');
@@ -425,7 +435,6 @@ function useSkill(slotIndex) {
         return;
     }
 
-    // 힐 스킬 - 반격 없음 (무기 보너스 적용)
     if (skill.heal) {
         const weaponBonus = getWeaponBonus(skillCharacter);
         const healAmount = Math.floor(skill.heal * (1 + weaponBonus / 100));
@@ -435,7 +444,6 @@ function useSkill(slotIndex) {
         return;
     }
 
-    // 공격 스킬 (무기 보너스 적용)
     if (skill.damage) {
         const hits = skill.hits || 1;
         const weaponBonus = getWeaponBonus(skillCharacter);
@@ -448,7 +456,6 @@ function useSkill(slotIndex) {
             addBattleLog(`${damage} 데미지${isCrit ? ' (크리티컬!)' : ''}`);
         }
 
-        // 스턴 효과
         if (skill.effect === 'stun') {
             gameState.currentEnemy.stunned = true;
             addBattleLog('적 스턴!');
@@ -478,11 +485,10 @@ function enemyDefeated() {
     const enemy = gameState.currentEnemy;
     gameState.dungeon.inBattle = false;
 
-    // 골드/경험치 보상 (유물 효과 적용)
     let goldReward = enemy.goldReward;
     let expReward = enemy.expReward;
 
-    gameState.relics.forEach(relic => {
+    gameState.tempRelics.forEach(relic => {
         if (relic.effect === 'gold') goldReward = Math.floor(goldReward * relic.value);
         if (relic.effect === 'exp') expReward = Math.floor(expReward * relic.value);
     });
@@ -493,7 +499,7 @@ function enemyDefeated() {
     addBattleLog(`${enemy.name} 처치!`);
     addBattleLog(`+${goldReward}G, +${expReward}EXP`);
 
-    // 강화석 드랍 (일반: 30%, 중간보스: 50%, 보스: 100%)
+    // 강화석 드랍
     let stoneDropChance = enemy.isBoss ? 1.0 : enemy.isMiniBoss ? 0.5 : 0.3;
     let stoneAmount = enemy.isBoss ? 3 : enemy.isMiniBoss ? 2 : 1;
 
@@ -502,27 +508,148 @@ function enemyDefeated() {
         addBattleLog(`강화석 +${stoneAmount}개 획득!`);
     }
 
-    // 보스 유물 드랍
-    if (enemy.isBoss) {
-        if (gameState.dungeon.currentFloor >= gameState.dungeon.maxUnlockedFloor) {
-            gameState.dungeon.maxUnlockedFloor = gameState.dungeon.currentFloor + 1;
-            addBattleLog(`다음 층 해금!`);
-        }
+    // 최고 기록 갱신
+    if (gameState.dungeon.currentFloor > gameState.dungeon.highestFloor) {
+        gameState.dungeon.highestFloor = gameState.dungeon.currentFloor;
+    }
 
-        // 30% 확률로 유물 드랍
-        if (Math.random() < 0.3) {
-            const availableRelics = relicsData.filter(r => !gameState.relics.find(owned => owned.id === r.id));
-            if (availableRelics.length > 0) {
-                const newRelic = availableRelics[Math.floor(Math.random() * availableRelics.length)];
-                gameState.relics.push(newRelic);
-                addBattleLog(`유물 획득: ${newRelic.name}!`);
-            }
-        }
+    // 보스 클리어 처리
+    if (enemy.isBoss) {
+        handleBossClear();
+        return;
     }
 
     updateDungeonUI();
     document.getElementById('battle-actions').classList.add('hidden');
     document.getElementById('floor-clear-actions').classList.remove('hidden');
+
+    // 전투 종료 후에만 복귀 가능
+    document.getElementById('btn-return').disabled = false;
+}
+
+function handleBossClear() {
+    const maxFloor = modeSettings[gameState.gameMode].maxFloor;
+
+    // 게임 클리어 체크 (무한모드가 아닌 경우)
+    if (gameState.dungeon.currentFloor >= maxFloor) {
+        handleGameClear();
+        return;
+    }
+
+    // 유물 드랍 (최대 4개까지)
+    gameState.pendingRelic = null;
+    if (gameState.tempRelics.length < 4 && Math.random() < 0.3) {
+        const availableRelics = relicsData.filter(r => !gameState.tempRelics.find(owned => owned.id === r.id));
+        if (availableRelics.length > 0) {
+            gameState.pendingRelic = availableRelics[Math.floor(Math.random() * availableRelics.length)];
+        }
+    }
+
+    // 스킬 선택지 생성
+    generateSkillChoices();
+
+    // 보스 클리어 화면 표시
+    showBossClearScreen();
+}
+
+function generateSkillChoices() {
+    const allSkills = [];
+    Object.keys(skillsData).forEach(char => {
+        skillsData[char].forEach(skill => {
+            // 이미 장착한 스킬은 제외
+            if (!gameState.equippedSkills.find(s => s && s.id === skill.id)) {
+                allSkills.push({ ...skill, character: char });
+            }
+        });
+    });
+
+    // 랜덤으로 3개 선택
+    gameState.skillChoices = [];
+    while (gameState.skillChoices.length < 3 && allSkills.length > 0) {
+        const idx = Math.floor(Math.random() * allSkills.length);
+        gameState.skillChoices.push(allSkills.splice(idx, 1)[0]);
+    }
+}
+
+function showBossClearScreen() {
+    // 유물 표시
+    const relicReward = document.getElementById('relic-reward');
+    if (gameState.pendingRelic) {
+        relicReward.classList.remove('hidden');
+        document.getElementById('new-relic-name').textContent = gameState.pendingRelic.icon + ' ' + gameState.pendingRelic.name;
+        document.getElementById('new-relic-desc').textContent = gameState.pendingRelic.desc;
+        gameState.tempRelics.push(gameState.pendingRelic);
+    } else {
+        relicReward.classList.add('hidden');
+    }
+
+    // 스킬 선택지 표시
+    const skillGrid = document.getElementById('skill-choice-grid');
+    skillGrid.innerHTML = '';
+
+    gameState.skillChoices.forEach(skill => {
+        const btn = document.createElement('button');
+        btn.className = 'skill-choice-btn';
+        btn.innerHTML = `
+            <div class="skill-choice-name">${skill.name} ${skill.type === 'passive' ? '[패시브]' : `(MP ${skill.mpCost})`}</div>
+            <div class="skill-choice-char">${skill.char}</div>
+            <div class="skill-choice-desc">${skill.desc}</div>
+        `;
+        btn.addEventListener('click', () => selectSkill(skill));
+        skillGrid.appendChild(btn);
+    });
+
+    showScreen('boss-clear-screen');
+}
+
+function selectSkill(skill) {
+    // 빈 슬롯 찾기
+    let emptySlot = gameState.equippedSkills.findIndex(s => s === null);
+
+    if (emptySlot === -1) {
+        // 빈 슬롯이 없으면 가장 오래된 스킬 교체
+        emptySlot = 0;
+    }
+
+    gameState.equippedSkills[emptySlot] = skill;
+    updateSkillButtons();
+
+    // MP 회복
+    gameState.player.maxMp = getMaxMp();
+    gameState.player.mp = gameState.player.maxMp;
+
+    // 다음 층으로
+    gameState.dungeon.currentFloor++;
+    showScreen('dungeon-screen');
+    startBattle();
+}
+
+function restAndContinue() {
+    // HP 30% 회복
+    const healAmount = Math.floor(gameState.player.maxHp * 0.3);
+    gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
+
+    // MP 회복
+    gameState.player.maxMp = getMaxMp();
+    gameState.player.mp = gameState.player.maxMp;
+
+    // 다음 층으로
+    gameState.dungeon.currentFloor++;
+    showScreen('dungeon-screen');
+    startBattle();
+}
+
+function handleGameClear() {
+    gameState.player.gold += gameState.dungeon.pendingGold;
+    gameState.player.exp += gameState.dungeon.pendingExp;
+    checkLevelUp();
+
+    document.getElementById('clear-mode').textContent = modeSettings[gameState.gameMode].name;
+    document.getElementById('clear-floor').textContent = gameState.dungeon.currentFloor;
+    document.getElementById('clear-gold').textContent = gameState.dungeon.pendingGold;
+    document.getElementById('clear-exp').textContent = gameState.dungeon.pendingExp;
+
+    showScreen('clear-screen');
 }
 
 function playerDefeated() {
@@ -548,9 +675,12 @@ function returnToVillage(fromDeath = false) {
         checkLevelUp();
     }
 
+    // 던전 상태 초기화
     gameState.dungeon.pendingGold = 0;
     gameState.dungeon.pendingExp = 0;
-    gameState.dungeon.currentFloor = gameState.dungeon.maxUnlockedFloor;
+    gameState.dungeon.currentFloor = 1;
+    gameState.tempRelics = []; // 유물 초기화
+    gameState.equippedSkills = [null, null, null, null]; // 스킬 초기화
 
     // HP/MP 회복
     gameState.player.maxHp = getMaxHp();
@@ -559,56 +689,20 @@ function returnToVillage(fromDeath = false) {
     gameState.player.mp = gameState.player.maxMp;
 
     updateVillageUI();
+    updateSkillButtons();
     showScreen('village-screen');
 }
 
 function nextFloor() {
+    // 복귀 버튼 비활성화
+    document.getElementById('btn-return').disabled = true;
+
     gameState.dungeon.currentFloor++;
     updateDungeonUI();
     startBattle();
 }
 
 // 스킬 UI
-function initSkillsUI() {
-    Object.keys(skillsData).forEach(character => {
-        const select = document.querySelector(`.skill-select[data-character="${character}"]`);
-        select.innerHTML = '<option value="">-</option>';
-        skillsData[character].forEach(skill => {
-            const option = document.createElement('option');
-            option.value = skill.id;
-            const typeLabel = skill.type === 'passive' ? '[P]' : `MP${skill.mpCost}`;
-            option.textContent = `${skill.name} (${typeLabel})`;
-            select.appendChild(option);
-        });
-
-        select.addEventListener('change', () => {
-            const skillId = select.value;
-            const descEl = document.getElementById(`skill-desc-${character}`);
-            if (skillId) {
-                const skill = skillsData[character].find(s => s.id === skillId);
-                descEl.textContent = skill.desc;
-            } else {
-                descEl.textContent = '스킬을 선택하세요';
-            }
-            saveSkillSelection();
-        });
-    });
-}
-
-function saveSkillSelection() {
-    const characters = ['cat', 'elf', 'dwarf', 'human'];
-    characters.forEach((char, index) => {
-        const select = document.querySelector(`.skill-select[data-character="${char}"]`);
-        const skillId = select.value;
-        if (skillId) {
-            gameState.equippedSkills[index] = skillsData[char].find(s => s.id === skillId);
-        } else {
-            gameState.equippedSkills[index] = null;
-        }
-    });
-    updateSkillButtons();
-}
-
 function updateSkillButtons() {
     for (let i = 0; i < 4; i++) {
         const btn = document.getElementById(`btn-skill-${i + 1}`);
@@ -631,14 +725,44 @@ function updateSkillButtons() {
 
 // 이벤트
 function initEventListeners() {
-    // 메인 메뉴
+    // 모드 선택
+    document.querySelectorAll('.btn-mode').forEach(btn => {
+        btn.addEventListener('click', () => {
+            gameState.gameMode = btn.dataset.mode;
+            updateVillageUI();
+            showScreen('village-screen');
+        });
+    });
+
+    // 던전 입장
     document.getElementById('btn-dungeon').addEventListener('click', () => {
-        gameState.dungeon.currentFloor = gameState.dungeon.maxUnlockedFloor;
+        gameState.dungeon.currentFloor = 1;
+        gameState.tempRelics = [];
+        gameState.equippedSkills = [null, null, null, null];
         gameState.player.maxHp = getMaxHp();
         gameState.player.maxMp = getMaxMp();
         gameState.player.hp = gameState.player.maxHp;
         gameState.player.mp = gameState.player.maxMp;
         updateDungeonUI();
+        updateSkillButtons();
+        showScreen('dungeon-screen');
+        startBattle();
+    });
+
+    // 스킵 입장
+    document.getElementById('btn-skip').addEventListener('click', () => {
+        const skipFloor = getSkipFloor();
+        if (skipFloor <= 0) return;
+
+        gameState.dungeon.currentFloor = skipFloor;
+        gameState.tempRelics = [];
+        gameState.equippedSkills = [null, null, null, null];
+        gameState.player.maxHp = getMaxHp();
+        gameState.player.maxMp = getMaxMp();
+        gameState.player.hp = Math.floor(gameState.player.maxHp * 0.5); // 50% HP
+        gameState.player.mp = gameState.player.maxMp;
+        updateDungeonUI();
+        updateSkillButtons();
         showScreen('dungeon-screen');
         startBattle();
     });
@@ -646,11 +770,6 @@ function initEventListeners() {
     document.getElementById('btn-shop').addEventListener('click', () => {
         updateShopUI();
         showScreen('shop-screen');
-    });
-
-    document.getElementById('btn-inventory').addEventListener('click', () => {
-        updateInventoryUI();
-        showScreen('inventory-screen');
     });
 
     // 스탯 올리기
@@ -700,10 +819,6 @@ function initEventListeners() {
         showScreen('village-screen');
     });
 
-    document.getElementById('btn-inventory-back').addEventListener('click', () => {
-        showScreen('village-screen');
-    });
-
     // 전투
     document.getElementById('btn-attack').addEventListener('click', playerAttack);
 
@@ -716,6 +831,10 @@ function initEventListeners() {
     document.getElementById('btn-next-floor').addEventListener('click', nextFloor);
     document.getElementById('btn-return').addEventListener('click', () => returnToVillage(false));
     document.getElementById('btn-gameover-return').addEventListener('click', () => returnToVillage(true));
+    document.getElementById('btn-clear-return').addEventListener('click', () => returnToVillage(false));
+
+    // 보스 클리어 화면
+    document.getElementById('btn-rest').addEventListener('click', restAndContinue);
 }
 
 // 초기화
@@ -725,11 +844,9 @@ function initGame() {
     gameState.player.hp = gameState.player.maxHp;
     gameState.player.mp = gameState.player.maxMp;
 
-    initSkillsUI();
     initEventListeners();
-    updateVillageUI();
     updateSkillButtons();
-    showScreen('village-screen');
+    showScreen('mode-screen');
 }
 
 document.addEventListener('DOMContentLoaded', initGame);

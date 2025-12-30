@@ -8,8 +8,33 @@
 </head>
 <body>
     <div id="game-container">
+        <!-- 모드 선택 화면 -->
+        <div id="mode-screen" class="screen">
+            <h1>보랏빛 산지의 전투</h1>
+            <p class="mode-subtitle">게임 모드를 선택하세요</p>
+
+            <div class="mode-grid">
+                <button class="btn-mode" data-mode="easy">
+                    <span class="mode-name">이지 모드</span>
+                    <span class="mode-desc">적 능력치 -20%<br>50층 클리어</span>
+                </button>
+                <button class="btn-mode" data-mode="normal">
+                    <span class="mode-name">노말 모드</span>
+                    <span class="mode-desc">기본 난이도<br>50층 클리어</span>
+                </button>
+                <button class="btn-mode" data-mode="hard">
+                    <span class="mode-name">하드 모드</span>
+                    <span class="mode-desc">적 능력치 +30%<br>50층 클리어</span>
+                </button>
+                <button class="btn-mode" data-mode="infinite">
+                    <span class="mode-name">무한 모드</span>
+                    <span class="mode-desc">끝없는 도전<br>최고 기록 갱신</span>
+                </button>
+            </div>
+        </div>
+
         <!-- 메인 화면 -->
-        <div id="village-screen" class="screen">
+        <div id="village-screen" class="screen hidden">
             <h1>보랏빛 산지의 전투</h1>
 
             <!-- 플레이어 정보 -->
@@ -20,7 +45,7 @@
                 </div>
                 <div class="info-row">
                     <span>EXP: <span id="player-exp">0</span>/<span id="player-max-exp">100</span></span>
-                    <span>해금: <span id="unlocked-floor">1</span>층</span>
+                    <span>모드: <span id="current-mode">노말</span></span>
                 </div>
             </div>
 
@@ -63,49 +88,17 @@
                 </div>
             </div>
 
-            <!-- 스킬 섹션 -->
-            <div class="section">
-                <h2>스킬 세팅</h2>
-                <div id="skill-grid">
-                    <div class="skill-item" data-character="cat">
-                        <div class="skill-header">
-                            <span class="char-name">묘인</span>
-                            <select class="skill-select" data-character="cat"></select>
-                        </div>
-                        <p class="skill-desc" id="skill-desc-cat">스킬을 선택하세요</p>
-                    </div>
-                    <div class="skill-item" data-character="elf">
-                        <div class="skill-header">
-                            <span class="char-name">엘프</span>
-                            <select class="skill-select" data-character="elf"></select>
-                        </div>
-                        <p class="skill-desc" id="skill-desc-elf">스킬을 선택하세요</p>
-                    </div>
-                    <div class="skill-item" data-character="dwarf">
-                        <div class="skill-header">
-                            <span class="char-name">드워프</span>
-                            <select class="skill-select" data-character="dwarf"></select>
-                        </div>
-                        <p class="skill-desc" id="skill-desc-dwarf">스킬을 선택하세요</p>
-                    </div>
-                    <div class="skill-item" data-character="human">
-                        <div class="skill-header">
-                            <span class="char-name">인간</span>
-                            <select class="skill-select" data-character="human"></select>
-                        </div>
-                        <p class="skill-desc" id="skill-desc-human">스킬을 선택하세요</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- 메뉴 버튼들 -->
             <div class="menu-buttons">
                 <button id="btn-shop" class="btn-menu">상점</button>
-                <button id="btn-inventory" class="btn-menu">인벤토리</button>
             </div>
 
             <!-- 던전 입장 -->
-            <button id="btn-dungeon" class="btn-enter">던전 입장 (<span id="start-floor">1</span>층~)</button>
+            <div class="dungeon-entry">
+                <button id="btn-dungeon" class="btn-enter">던전 입장 (1층~)</button>
+                <button id="btn-skip" class="btn-skip">스킵 (50% HP)</button>
+            </div>
+            <p id="skip-info" class="skip-info"></p>
         </div>
 
         <!-- 상점 화면 -->
@@ -179,36 +172,17 @@
             <button id="btn-shop-back" class="btn-back">돌아가기</button>
         </div>
 
-        <!-- 인벤토리 화면 -->
-        <div id="inventory-screen" class="screen hidden">
-            <h1>인벤토리</h1>
-
-            <div class="section">
-                <h2>보유 유물 (<span id="relic-count">0</span>개)</h2>
-                <div id="relic-list" class="relic-grid">
-                    <p class="empty-msg">보유한 유물이 없습니다.<br>보스 처치 시 낮은 확률로 획득!</p>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>능력치 요약</h2>
-                <div class="stats-summary">
-                    <p>공격력: <span id="total-atk">25</span></p>
-                    <p>최대 HP: <span id="total-hp">100</span></p>
-                    <p>최대 MP: <span id="total-mp">5</span></p>
-                    <p>크리티컬: <span id="total-crit">5</span>%</p>
-                    <p>회피율: <span id="total-dodge">5</span>%</p>
-                </div>
-            </div>
-
-            <button id="btn-inventory-back" class="btn-back">돌아가기</button>
-        </div>
-
         <!-- 던전 화면 -->
         <div id="dungeon-screen" class="screen hidden">
             <div id="dungeon-header">
                 <span class="floor-info"><span id="current-floor">1</span>층</span>
                 <span class="pending-info">+<span id="pending-gold">0</span>G / +<span id="pending-exp">0</span>EXP</span>
+            </div>
+
+            <!-- 현재 유물 표시 -->
+            <div id="current-relics" class="current-relics hidden">
+                <span class="relic-label">유물:</span>
+                <span id="relic-icons"></span>
             </div>
 
             <div id="battle-area">
@@ -260,7 +234,33 @@
 
             <div id="floor-clear-actions" class="hidden">
                 <button id="btn-next-floor">다음 층</button>
-                <button id="btn-return">복귀 (100%)</button>
+                <button id="btn-return" disabled>복귀 (100%)</button>
+            </div>
+        </div>
+
+        <!-- 보스 클리어 화면 (스킬/유물 선택) -->
+        <div id="boss-clear-screen" class="screen hidden">
+            <h1>보스 클리어!</h1>
+
+            <!-- 유물 획득 -->
+            <div id="relic-reward" class="section hidden">
+                <h2>유물 획득!</h2>
+                <div class="relic-reward-card">
+                    <div class="relic-name" id="new-relic-name"></div>
+                    <div class="relic-desc" id="new-relic-desc"></div>
+                </div>
+            </div>
+
+            <!-- 스킬 선택 -->
+            <div class="section">
+                <h2>스킬 선택 (1개 선택)</h2>
+                <div id="skill-choice-grid" class="skill-choice-grid"></div>
+            </div>
+
+            <!-- 휴식 옵션 -->
+            <div class="section">
+                <h2>휴식</h2>
+                <button id="btn-rest" class="btn-rest">HP 30% 회복 후 진행</button>
             </div>
         </div>
 
@@ -273,6 +273,18 @@
                 <p>+<span id="death-exp">0</span> 경험치</p>
             </div>
             <button id="btn-gameover-return">마을로</button>
+        </div>
+
+        <!-- 게임 클리어 화면 -->
+        <div id="clear-screen" class="screen hidden">
+            <h1>클리어!</h1>
+            <p class="clear-msg">축하합니다! <span id="clear-mode"></span> 모드를 클리어했습니다!</p>
+            <div class="clear-rewards">
+                <p>최종 층: <span id="clear-floor">50</span>층</p>
+                <p>+<span id="clear-gold">0</span> 골드</p>
+                <p>+<span id="clear-exp">0</span> 경험치</p>
+            </div>
+            <button id="btn-clear-return">마을로</button>
         </div>
     </div>
 
