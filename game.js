@@ -561,9 +561,18 @@ const modeSettings = {
 
 // 적 타입
 const enemyTypes = [
-    { id: 'power', name: '파워', icon: '💪', hpMult: 0.8, atkMult: 1.4, dodge: 0, crit: 5 },
-    { id: 'tank', name: '탱커', icon: '🛡️', hpMult: 1.5, atkMult: 0.8, dodge: 0, crit: 0 },
-    { id: 'lucky', name: '행운', icon: '🍀', hpMult: 0.9, atkMult: 1.0, dodge: 20, crit: 20 }
+    { id: 'power', name: '파워', prefix: '강력한 ', hpMult: 0.8, atkMult: 1.4, dodge: 0, crit: 5 },
+    { id: 'speed', name: '스피드', prefix: '날렵한 ', hpMult: 0.9, atkMult: 1.0, dodge: 15, crit: 10 },
+    { id: 'lucky', name: '행운', prefix: '행운의 ', hpMult: 0.9, atkMult: 1.0, dodge: 20, crit: 20 }
+];
+
+// 보스 버프 목록
+const bossBuffs = [
+    { id: 'rage', name: '격노', desc: '공격력 +30%', atkMult: 1.3, hpMult: 1.0 },
+    { id: 'fortify', name: '강화', desc: '체력 +50%', atkMult: 1.0, hpMult: 1.5 },
+    { id: 'swift', name: '신속', desc: '회피 +15%, 치명타 +10%', atkMult: 1.0, hpMult: 1.0, dodge: 15, crit: 10 },
+    { id: 'berserk', name: '광폭화', desc: '공격력 +50%, 체력 -20%', atkMult: 1.5, hpMult: 0.8 },
+    { id: 'resilient', name: '불굴', desc: '체력 +30%, 공격력 +15%', atkMult: 1.15, hpMult: 1.3 }
 ];
 
 // 적 생성
@@ -576,20 +585,30 @@ function generateEnemy(floor) {
     // 랜덤 타입 선택
     const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
 
+    // 보스/중보스에게 랜덤 버프 부여
+    const buff = (isBoss || isMiniBoss) ? bossBuffs[Math.floor(Math.random() * bossBuffs.length)] : null;
+
     const baseHp = 30 + floor * 10;
     const baseAtk = 5 + floor * 2;
 
     const tierMult = isBoss ? 3 : isMiniBoss ? 2 : 1;
     const atkTierMult = isBoss ? 2 : isMiniBoss ? 1.5 : 1;
 
+    // 버프 적용
+    const buffHpMult = buff ? buff.hpMult : 1;
+    const buffAtkMult = buff ? buff.atkMult : 1;
+    const buffDodge = buff?.dodge || 0;
+    const buffCrit = buff?.crit || 0;
+
     return {
         name: getEnemyName(floor, isBoss, isMiniBoss),
         type: type,
-        hp: Math.floor(baseHp * tierMult * type.hpMult * modeMult),
-        maxHp: Math.floor(baseHp * tierMult * type.hpMult * modeMult),
-        atk: Math.floor(baseAtk * atkTierMult * type.atkMult * modeMult),
-        dodge: type.dodge,
-        crit: type.crit,
+        buff: buff,
+        hp: Math.floor(baseHp * tierMult * type.hpMult * modeMult * buffHpMult),
+        maxHp: Math.floor(baseHp * tierMult * type.hpMult * modeMult * buffHpMult),
+        atk: Math.floor(baseAtk * atkTierMult * type.atkMult * modeMult * buffAtkMult),
+        dodge: type.dodge + buffDodge,
+        crit: type.crit + buffCrit,
         goldReward: Math.floor((10 + floor * 5) * tierMult),
         expReward: Math.floor((20 + floor * 10) * tierMult),
         isBoss,
@@ -1463,8 +1482,9 @@ function updateBattleUI() {
     const enemy = gameState.currentEnemy;
     if (!enemy) return;
 
-    const typeIcon = enemy.type ? enemy.type.icon : '';
-    document.getElementById('enemy-name').textContent = typeIcon + enemy.name + (enemy.stunned ? ' [스턴]' : '');
+    const typePrefix = enemy.type ? enemy.type.prefix : '';
+    const buffTag = enemy.buff ? ` [${enemy.buff.name}]` : '';
+    document.getElementById('enemy-name').textContent = typePrefix + enemy.name + buffTag + (enemy.stunned ? ' [스턴]' : '');
     document.getElementById('enemy-hp').textContent = Math.max(0, Math.floor(enemy.hp));
     document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
     document.getElementById('enemy-atk').textContent = enemy.atk;
@@ -1527,8 +1547,16 @@ function startBattle() {
     // 도주 버튼 활성화
     document.getElementById('btn-return').disabled = false;
 
-    const floorType = gameState.currentEnemy.isBoss ? '보스' : gameState.currentEnemy.isMiniBoss ? '중간보스' : '';
-    addBattleLog(`${gameState.dungeon.currentFloor}층 - ${gameState.currentEnemy.name} ${floorType ? `[${floorType}]` : ''} 등장!`);
+    const enemy = gameState.currentEnemy;
+    const floorType = enemy.isBoss ? '보스' : enemy.isMiniBoss ? '중간보스' : '';
+    const typePrefix = enemy.type ? enemy.type.prefix : '';
+    addBattleLog(`${gameState.dungeon.currentFloor}층 - ${typePrefix}${enemy.name} ${floorType ? `[${floorType}]` : ''} 등장!`);
+
+    // 보스/중보스 버프 표시
+    if (enemy.buff) {
+        addBattleLog(`⚡ 버프: ${enemy.buff.name} - ${enemy.buff.desc}`);
+    }
+
     addBattleLog(`적 선제공격까지 ${enemyAttackCounter}턴`);
 
     // 활성 버프 표시
