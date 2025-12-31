@@ -2635,6 +2635,195 @@ h2 {
     color: #ff6b6b;
 }
 
+/* 리더보드 섹션 */
+.leaderboard-section {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(50, 50, 80, 0.4) 100%);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.leaderboard-locked {
+    text-align: center;
+    padding: 20px;
+}
+
+.leaderboard-desc {
+    color: #d4c4ff;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.current-record {
+    color: #ffd93d;
+    font-size: 1.1rem;
+}
+
+.leaderboard-unlocked {
+    padding: 10px 0;
+}
+
+.leaderboard-intro {
+    color: #d4c4ff;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.my-record {
+    background: rgba(255, 215, 0, 0.15);
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.my-record strong {
+    color: #ffd93d;
+    font-size: 1.2rem;
+}
+
+.submit-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#input-nickname {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-size: 1rem;
+}
+
+#input-nickname::placeholder {
+    color: #888;
+}
+
+#input-nickname:focus {
+    outline: none;
+    border-color: #ffd93d;
+}
+
+.btn-submit {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ffd93d, #f0b800);
+    border: none;
+    border-radius: 6px;
+    color: #1a1a2e;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, #ffdf5d, #f0c800);
+}
+
+.submit-status {
+    font-size: 0.85rem;
+    min-height: 1.2em;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.submit-status.success {
+    color: #55efc4;
+}
+
+.submit-status.error {
+    color: #ff6b6b;
+}
+
+.leaderboard-table {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.leaderboard-header {
+    display: grid;
+    grid-template-columns: 50px 1fr 70px 70px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: bold;
+    color: #aaa;
+    font-size: 0.85rem;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 70px 70px;
+    padding: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    align-items: center;
+}
+
+.leaderboard-row.rank-1 {
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), transparent);
+}
+
+.leaderboard-row.rank-2 {
+    background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), transparent);
+}
+
+.leaderboard-row.rank-3 {
+    background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), transparent);
+}
+
+.leaderboard-row .rank {
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.leaderboard-row .nickname {
+    color: #fff;
+    font-weight: 500;
+}
+
+.leaderboard-row .floor {
+    color: #ffd93d;
+    text-align: center;
+}
+
+.leaderboard-row .level {
+    color: #55efc4;
+    text-align: center;
+}
+
+.leaderboard-updated {
+    font-size: 0.75rem;
+    color: #888;
+    text-align: right;
+    margin-top: 5px;
+}
+
+.leaderboard-error, .leaderboard-empty {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-style: italic;
+}
+
+.btn-refresh {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #636e72, #b2bec3);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-refresh:hover {
+    background: linear-gradient(135deg, #74838a, #c4cdd0);
+}
+
 /* 퍼센트 강화 그리드 */
 .percent-upgrade-grid {
     display: grid;

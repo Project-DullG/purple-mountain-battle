@@ -21,6 +21,7 @@ const gameState = {
     dungeon: {
         currentFloor: 1,
         highestFloor: 0,
+        infiniteHighestFloor: 0,  // 무한의 전장 최고 기록
         pendingGold: 0,
         pendingExp: 0,
         pendingStones: 0,
@@ -1807,6 +1808,9 @@ function updateInnUI() {
     document.getElementById('stat-point-cost').textContent = statPointCost;
     document.getElementById('stat-points-purchased').textContent = gameState.statPointsPurchased;
     document.getElementById('btn-buy-stat-point').disabled = gameState.originStones < statPointCost;
+
+    // 리더보드 UI 업데이트
+    updateLeaderboardUI();
 }
 
 function updateDungeonUI() {
@@ -2622,6 +2626,11 @@ function enemyDefeated() {
     // 최고 기록 갱신
     if (gameState.dungeon.currentFloor > gameState.dungeon.highestFloor) {
         gameState.dungeon.highestFloor = gameState.dungeon.currentFloor;
+    }
+
+    // 무한의 전장 최고 기록 갱신
+    if (gameState.gameMode === 'infinite' && gameState.dungeon.currentFloor > gameState.dungeon.infiniteHighestFloor) {
+        gameState.dungeon.infiniteHighestFloor = gameState.dungeon.currentFloor;
     }
 
     // 5층마다 유물 보상 (5, 10, 15, 20...)
@@ -4129,6 +4138,13 @@ function initEventListeners() {
     document.getElementById('btn-save-game').addEventListener('click', saveGame);
     document.getElementById('btn-load-game').addEventListener('click', loadGame);
 
+    // 리더보드
+    document.getElementById('btn-refresh-leaderboard')?.addEventListener('click', () => {
+        leaderboardData = null;
+        fetchLeaderboard();
+    });
+    document.getElementById('btn-submit-score')?.addEventListener('click', submitScore);
+
     // 전투
     document.getElementById('btn-attack').addEventListener('click', playerAttack);
 
@@ -4214,7 +4230,8 @@ function getSaveData() {
             baseAtk: gameState.player.baseAtk
         },
         dungeon: {
-            highestFloor: gameState.dungeon.highestFloor
+            highestFloor: gameState.dungeon.highestFloor,
+            infiniteHighestFloor: gameState.dungeon.infiniteHighestFloor
         },
         weapons: { ...gameState.weapons },
         talismanPurchases: { ...gameState.talismanPurchases },
@@ -4240,6 +4257,7 @@ function applySaveData(data) {
 
     // 던전 기록
     gameState.dungeon.highestFloor = data.dungeon.highestFloor;
+    gameState.dungeon.infiniteHighestFloor = data.dungeon.infiniteHighestFloor || 0;
     gameState.dungeon.currentFloor = 1;
     gameState.dungeon.inBattle = false;
 
@@ -4338,6 +4356,188 @@ function loadGame() {
 // 저장 데이터 존재 여부 확인
 function hasSaveData() {
     return localStorage.getItem(SAVE_KEY) !== null;
+}
+
+// === 리더보드 시스템 (Firebase Firestore) ===
+const firebaseConfig = {
+    apiKey: "AIzaSyBwHIITHru4Od1fjwg6OOMNTjRFbvwpVkg",
+    authDomain: "boardgame-1a3dd.firebaseapp.com",
+    projectId: "boardgame-1a3dd",
+    storageBucket: "boardgame-1a3dd.firebasestorage.app",
+    messagingSenderId: "278191503167",
+    appId: "1:278191503167:web:f1258978f7c3814639058a"
+};
+
+let firebaseApp = null;
+let db = null;
+let leaderboardData = null;
+
+// Firebase 초기화
+function initFirebase() {
+    if (!firebaseApp && typeof firebase !== 'undefined') {
+        firebaseApp = firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+    }
+}
+
+// 리더보드 데이터 가져오기
+async function fetchLeaderboard() {
+    try {
+        initFirebase();
+        if (!db) throw new Error('Firebase 연결 실패');
+
+        const snapshot = await db.collection('leaderboard')
+            .orderBy('floor', 'desc')
+            .limit(20)
+            .get();
+
+        const entries = [];
+        snapshot.forEach(doc => {
+            entries.push({ id: doc.id, ...doc.data() });
+        });
+
+        leaderboardData = { leaderboard: entries };
+        renderLeaderboard(leaderboardData);
+        return true;
+    } catch (e) {
+        console.log('리더보드 로드 실패:', e);
+        const listEl = document.getElementById('leaderboard-list');
+        if (listEl) {
+            listEl.innerHTML = '<p class="leaderboard-error">순위표를 불러올 수 없습니다.</p>';
+        }
+        return false;
+    }
+}
+
+// 점수 제출
+async function submitScore() {
+    const nicknameInput = document.getElementById('input-nickname');
+    const statusEl = document.getElementById('submit-status');
+    const nickname = nicknameInput?.value.trim();
+
+    if (!nickname) {
+        if (statusEl) {
+            statusEl.textContent = '닉네임을 입력해주세요.';
+            statusEl.className = 'submit-status error';
+        }
+        return;
+    }
+
+    if (nickname.length > 12) {
+        if (statusEl) {
+            statusEl.textContent = '닉네임은 12자 이하로 입력해주세요.';
+            statusEl.className = 'submit-status error';
+        }
+        return;
+    }
+
+    try {
+        initFirebase();
+        if (!db) throw new Error('Firebase 연결 실패');
+
+        const floor = gameState.dungeon.infiniteHighestFloor;
+        const level = gameState.player.level;
+
+        // 동일 닉네임 기존 기록 확인
+        const existing = await db.collection('leaderboard')
+            .where('nickname', '==', nickname)
+            .get();
+
+        if (!existing.empty) {
+            const doc = existing.docs[0];
+            const oldFloor = doc.data().floor;
+            if (floor <= oldFloor) {
+                if (statusEl) {
+                    statusEl.textContent = `이미 더 높은 기록(${oldFloor}층)이 등록되어 있습니다.`;
+                    statusEl.className = 'submit-status error';
+                }
+                return;
+            }
+            // 기존 기록 업데이트
+            await doc.ref.update({ floor, level, timestamp: Date.now() });
+        } else {
+            // 새 기록 추가
+            await db.collection('leaderboard').add({
+                nickname,
+                floor,
+                level,
+                timestamp: Date.now()
+            });
+        }
+
+        if (statusEl) {
+            statusEl.textContent = '기록이 등록되었습니다!';
+            statusEl.className = 'submit-status success';
+        }
+
+        // 리더보드 새로고침
+        await fetchLeaderboard();
+    } catch (e) {
+        console.log('점수 제출 실패:', e);
+        if (statusEl) {
+            statusEl.textContent = '등록 실패: ' + e.message;
+            statusEl.className = 'submit-status error';
+        }
+    }
+}
+
+// 리더보드 렌더링
+function renderLeaderboard(data) {
+    const listEl = document.getElementById('leaderboard-list');
+    if (!listEl || !data || !data.leaderboard) return;
+
+    if (data.leaderboard.length === 0) {
+        listEl.innerHTML = '<p class="leaderboard-empty">아직 등록된 기록이 없습니다.</p>';
+        return;
+    }
+
+    let html = '<div class="leaderboard-table">';
+    html += '<div class="leaderboard-header"><span>순위</span><span>닉네임</span><span>층수</span><span>레벨</span></div>';
+
+    data.leaderboard.forEach((entry, idx) => {
+        const rankClass = idx < 3 ? `rank-${idx + 1}` : '';
+        const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}`;
+        html += `
+            <div class="leaderboard-row ${rankClass}">
+                <span class="rank">${rankIcon}</span>
+                <span class="nickname">${entry.nickname}</span>
+                <span class="floor">${entry.floor}층</span>
+                <span class="level">Lv.${entry.level}</span>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    if (data.updatedAt) {
+        html += `<p class="leaderboard-updated">마지막 업데이트: ${data.updatedAt}</p>`;
+    }
+    listEl.innerHTML = html;
+}
+
+// 리더보드 UI 업데이트
+function updateLeaderboardUI() {
+    const lockedEl = document.getElementById('leaderboard-locked');
+    const unlockedEl = document.getElementById('leaderboard-unlocked');
+    const infiniteRecordEl = document.getElementById('infinite-record');
+    const myFloorEl = document.getElementById('my-floor');
+    const myLevelEl = document.getElementById('my-level');
+
+    const infiniteFloor = gameState.dungeon.infiniteHighestFloor;
+    const isUnlocked = infiniteFloor >= 50;
+
+    // 현재 기록 표시
+    if (infiniteRecordEl) infiniteRecordEl.textContent = infiniteFloor;
+    if (myFloorEl) myFloorEl.textContent = infiniteFloor;
+    if (myLevelEl) myLevelEl.textContent = gameState.player.level;
+
+    // 잠금/해제 상태
+    if (lockedEl) lockedEl.classList.toggle('hidden', isUnlocked);
+    if (unlockedEl) unlockedEl.classList.toggle('hidden', !isUnlocked);
+
+    // 해제된 경우 리더보드 로드
+    if (isUnlocked && !leaderboardData) {
+        fetchLeaderboard();
+    }
 }
 
 // 초기화

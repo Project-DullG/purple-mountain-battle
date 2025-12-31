@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>잿빛 용병단</title>
     <link rel="stylesheet" href="style.css?v=20251231h">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div id="game-container">
@@ -351,6 +354,27 @@
                     <button id="btn-load-game" class="btn-load">불러오기</button>
                 </div>
                 <p id="save-status" class="save-status"></p>
+            </div>
+
+            <div class="section leaderboard-section">
+                <h2>🏆 근원 살펴보기</h2>
+                <div id="leaderboard-locked" class="leaderboard-locked">
+                    <p class="leaderboard-desc">"무한의 전장에서 50층 이상 도달하면 근원을 살펴볼 수 있어~"</p>
+                    <p class="current-record">현재 최고 기록: <span id="infinite-record">0</span>층</p>
+                </div>
+                <div id="leaderboard-unlocked" class="leaderboard-unlocked hidden">
+                    <p class="leaderboard-intro">"다른 용병들의 기록이야~ 대단하지?"</p>
+                    <div class="my-record">
+                        <span>내 기록: <strong id="my-floor">0</strong>층 (Lv.<span id="my-level">1</span>)</span>
+                    </div>
+                    <div class="submit-section">
+                        <input type="text" id="input-nickname" maxlength="12" placeholder="닉네임 (최대 12자)">
+                        <button id="btn-submit-score" class="btn-submit">기록 등록</button>
+                    </div>
+                    <p id="submit-status" class="submit-status"></p>
+                    <div id="leaderboard-list" class="leaderboard-list"></div>
+                    <button id="btn-refresh-leaderboard" class="btn-refresh">새로고침</button>
+                </div>
             </div>
 
             <button id="btn-inn-back" class="btn-back">돌아가기</button>
