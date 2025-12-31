@@ -42,7 +42,6 @@ const gameState = {
     originStones: 0,
     statPointsPurchased: 0,  // 구매한 스탯 포인트 수 (비용 증가용)
     originEnhancement: 0,  // 근원 강화 레벨 (유물 효과 +0.5% per level, max 200 = 100%)
-    armorLevel: 1,
     // 부적 구매 횟수 (비용 증가용)
     talismanPurchases: {
         exp: 0,           // 경험치 부적 구매 횟수
@@ -340,7 +339,7 @@ function updateTagCombineUI() {
             <div class="relic-icon">${relic.icon}</div>
             <div class="relic-name">${relic.name}</div>
             <div class="relic-rarity">[${rarityNames[relic.rarity]}]</div>
-            <div class="relic-desc">${getRelicDescWithEnhancement(relic)}</div>
+            <div class="relic-desc">${getRelicDescFull(relic)}</div>
             <div class="relic-tags">${tagsHtml}</div>
         `;
 
@@ -834,7 +833,7 @@ function getWeaponBonus(character) {
 }
 
 function getMaxHp() {
-    const baseHp = 50 + (gameState.player.level - 1) * 5 + (gameState.armorLevel - 1) * 10;
+    const baseHp = 50 + (gameState.player.level - 1) * 5;
     const strHp = getEffectiveStat('str') * 1;
     const dexHp = getEffectiveStat('dex') * 0.25;
     const intHp = getEffectiveStat('int') * 0.5;
@@ -1509,12 +1508,6 @@ function updateShopUI() {
     document.getElementById('shop-gold').textContent = gameState.player.gold;
     document.getElementById('shop-stones').textContent = gameState.enhancementStones;
     document.getElementById('shop-origins').textContent = gameState.originStones;
-
-    // 방어구 (초반 단가 감소: 100 -> 50)
-    document.getElementById('armor-level').textContent = gameState.armorLevel;
-    const armorCost = gameState.armorLevel * 50;
-    document.getElementById('armor-cost').textContent = armorCost;
-    document.getElementById('btn-upgrade-armor').disabled = gameState.player.gold < armorCost;
 
     // 부적 (경험치, 골드)
     const expBonus = gameState.talismanPurchases.exp * 3;
@@ -2422,7 +2415,7 @@ function showBossRewardChoices() {
                 <div class="relic-rarity rarity-${relic.rarity}">${rarityNames[relic.rarity]}</div>
                 <div class="relic-icon">${relic.icon}</div>
                 <div class="relic-name">${relic.name}</div>
-                <div class="relic-desc">${getRelicDescWithEnhancement(relic)}</div>
+                <div class="relic-desc">${getRelicDescFull(relic)}</div>
                 <div class="relic-tags">${tagsHtml}</div>
                 ${ownedCount > 0 ? `<div class="relic-owned">보유: ${ownedCount}개</div>` : ''}
             `;
@@ -2622,7 +2615,7 @@ function showCombineResultChoices() {
             <div class="relic-rarity rarity-${relic.rarity}">${rarityNames[relic.rarity]}</div>
             <div class="relic-icon">${relic.icon}</div>
             <div class="relic-name">${relic.name}</div>
-            <div class="relic-desc">${getRelicDescWithEnhancement(relic)}</div>
+            <div class="relic-desc">${getRelicDescFull(relic)}</div>
             <div class="relic-tags">${tagsHtml}</div>
         `;
         btn.addEventListener('click', () => selectCombineResult(idx));
@@ -2690,7 +2683,7 @@ function showTier2RelicChoices() {
             <div class="relic-rarity rarity-${relic.rarity}">${rarityNames[relic.rarity]}</div>
             <div class="relic-icon">${relic.icon}</div>
             <div class="relic-name">${relic.name}</div>
-            <div class="relic-desc">${getRelicDescWithEnhancement(relic)}</div>
+            <div class="relic-desc">${getRelicDescFull(relic)}</div>
             <div class="relic-tags">${tagsHtml}</div>
             ${ownedCount > 0 ? `<div class="relic-owned">보유: ${ownedCount}개</div>` : ''}
         `;
@@ -3000,6 +2993,54 @@ function getRelicDescWithEnhancement(relic) {
     }
 
     return relic.desc;
+}
+
+// 효과 설명 (효과가 무엇인지 부가 설명)
+function getEffectExplanation(effectType) {
+    const explanations = {
+        // 공격
+        'atkMult': '기본 공격력 증가',
+        'crit': '치명타 발생 확률',
+        'critDmg': '치명타 시 추가 피해',
+        'firstHit': '전투 첫 공격에 추가 피해',
+        'bossKiller': '보스/중보스에게 추가 피해',
+        'multiHit': '공격 후 같은 확률로 재공격',
+        'lifeSteal': '피해량의 일부를 HP로 회복',
+        'execute': '적 HP 30% 이하 시 추가 피해',
+        // 방어
+        'hpMult': '최대 HP 증가',
+        'def': '받는 피해 감소',
+        'dodge': '적 공격 회피 확률',
+        'reflect': '받은 피해를 적에게 반사',
+        'strMult': '힘 스탯 증가 (공격력)',
+        'dexMult': '민첩 스탯 증가 (회피/치명타)',
+        'vitMult': '활력 스탯 증가 (피해감소)',
+        'killHeal': '적 처치 시 HP 회복',
+        // 특수
+        'reward': '획득 골드/경험치 증가',
+        'intMult': '지능 스탯 증가 (MP/스킬)',
+        'lukMult': '행운 스탯 증가 (보상/치명타)',
+        'killMana': '적 처치 시 MP 회복',
+        'bleed': '턴마다 공격력 50% 피해 (중첩)',
+        'weaken': '적 공격력↓ 받는피해↑ (중첩)',
+        'stun': '반격 불가 + 선제공격 +1',
+        'freeze': '선제공격 +2 (중첩)',
+        // 기타
+        'allStats': '모든 스탯 증가',
+        'skillDmg': '스킬 피해량 증가'
+    };
+    return explanations[effectType] || '';
+}
+
+// 유물 설명 + 효과 설명 포함
+function getRelicDescFull(relic) {
+    const mainDesc = getRelicDescWithEnhancement(relic);
+    const effectExplanation = getEffectExplanation(relic.effect);
+
+    if (effectExplanation) {
+        return `${mainDesc}<div class="effect-explanation">${effectExplanation}</div>`;
+    }
+    return mainDesc;
 }
 
 // 합성 결과 확인 후 진행
@@ -3399,7 +3440,7 @@ function updateInfoPanel() {
                             <span class="relic-info-name">${relic.name}</span>
                             <span class="relic-info-rarity rarity-${relic.rarity}">${rarityName}</span>
                         </div>
-                        <div class="relic-info-desc">${getRelicDescWithEnhancement(relic)}</div>
+                        <div class="relic-info-desc">${getRelicDescFull(relic)}</div>
                     </div>
                 </div>
             `;
@@ -3586,17 +3627,6 @@ function initEventListeners() {
                 updateBlacksmithUI();
             }
         });
-    });
-
-    // 상점 - 방어구 강화 (골드 사용, 초반 단가 감소)
-    document.getElementById('btn-upgrade-armor').addEventListener('click', () => {
-        const cost = gameState.armorLevel * 50;
-        if (gameState.player.gold >= cost) {
-            gameState.player.gold -= cost;
-            gameState.armorLevel++;
-            gameState.player.maxHp = getMaxHp();
-            updateShopUI();
-        }
     });
 
     // 상점 - 부적 구매 (재화 부적)
