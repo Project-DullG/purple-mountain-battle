@@ -1702,7 +1702,8 @@ function updateBattleUI() {
     document.getElementById('enemy-hp').textContent = Math.max(0, Math.floor(enemy.hp));
     document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
     document.getElementById('enemy-atk').textContent = enemy.atk;
-    
+    document.getElementById('enemy-preempt-counter').textContent = enemyAttackCounter;
+
     const enemyHpPercent = (Math.max(0, enemy.hp) / enemy.maxHp) * 100;
     document.getElementById('enemy-hp-bar').style.width = `${enemyHpPercent}%`;
 
