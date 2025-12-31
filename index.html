@@ -159,49 +159,23 @@
 
             <div class="section">
                 <h2>📜 부적</h2>
-                <p class="section-desc">구매할수록 가격이 올라갑니다 (최대 +99%)</p>
+                <p class="section-desc">구매할수록 가격이 올라갑니다 (최대 100번)</p>
                 <div class="talisman-grid two-col">
                     <div class="talisman-card">
                         <div class="talisman-icon">✨</div>
                         <div class="talisman-name">경험의 부적</div>
                         <div class="talisman-effect">경험치 +<span id="exp-bonus">0</span>%</div>
-                        <div class="talisman-desc">+3%씩 증가</div>
+                        <div class="talisman-desc">+2%씩 증가</div>
                         <button class="btn-talisman" data-talisman="exp"><span id="cost-exp">100</span>G</button>
                     </div>
                     <div class="talisman-card">
                         <div class="talisman-icon">💰</div>
                         <div class="talisman-name">재물의 부적</div>
                         <div class="talisman-effect">골드 +<span id="gold-bonus">0</span>%</div>
-                        <div class="talisman-desc">+3%씩 증가</div>
+                        <div class="talisman-desc">+2%씩 증가</div>
                         <button class="btn-talisman" data-talisman="gold"><span id="cost-gold-talisman">100</span>G</button>
                     </div>
                 </div>
-            </div>
-
-            <div class="section">
-                <h2>💎 재화 교환</h2>
-                <p class="section-desc">구매할수록 가격이 올라갑니다</p>
-                <div class="talisman-grid two-col">
-                    <div class="talisman-card">
-                        <div class="talisman-icon">💎</div>
-                        <div class="talisman-name">강화석 교환</div>
-                        <div class="talisman-effect">강화석 1개 획득</div>
-                        <div class="talisman-desc">골드로 구매</div>
-                        <button class="btn-talisman" data-talisman="stone"><span id="cost-stone">200</span>G</button>
-                    </div>
-                    <div class="talisman-card">
-                        <div class="talisman-icon">🔮</div>
-                        <div class="talisman-name">근원석 교환</div>
-                        <div class="talisman-effect">근원석 1개 획득</div>
-                        <div class="talisman-desc">골드로 구매</div>
-                        <button class="btn-talisman" data-talisman="origin"><span id="cost-origin">500</span>G</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>🔮 능력 부적</h2>
-                <p class="section-desc">영구 능력치 강화 (최대 200번 구매)</p>
                 <div class="percent-upgrade-grid">
                     <div class="percent-upgrade-card">
                         <div class="upgrade-icon">⚔️</div>
@@ -246,6 +220,27 @@
                         <div class="upgrade-bar"><div class="upgrade-fill" id="fill-def"></div></div>
                         <div class="upgrade-cap">상점 최대 15% (총합 50%)</div>
                         <button class="btn-percent-upgrade" data-stat="def"><span id="cost-def">100</span>G</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>💎 재화 교환</h2>
+                <p class="section-desc">구매할수록 가격이 올라갑니다</p>
+                <div class="talisman-grid two-col">
+                    <div class="talisman-card">
+                        <div class="talisman-icon">💎</div>
+                        <div class="talisman-name">강화석 교환</div>
+                        <div class="talisman-effect">강화석 1개 획득</div>
+                        <div class="talisman-desc">골드로 구매</div>
+                        <button class="btn-talisman" data-talisman="stone"><span id="cost-stone">200</span>G</button>
+                    </div>
+                    <div class="talisman-card">
+                        <div class="talisman-icon">🔮</div>
+                        <div class="talisman-name">근원석 교환</div>
+                        <div class="talisman-effect">근원석 1개 획득</div>
+                        <div class="talisman-desc">골드로 구매</div>
+                        <button class="btn-talisman" data-talisman="origin"><span id="cost-origin">500</span>G</button>
                     </div>
                 </div>
             </div>

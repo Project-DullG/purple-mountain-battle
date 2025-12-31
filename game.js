@@ -687,14 +687,18 @@ function getOriginEnhancementBonus() {
     return Math.min(gameState.originEnhancement * 5, 100) / 100;
 }
 
-// 근원 강화 비용 (처음 싸게 시작, 점점 비싸짐)
+// 근원 강화 비용 (처음 싸게 시작, 점점 많이 비싸짐)
 function getOriginEnhanceCost() {
     const level = gameState.originEnhancement;
-    // 1-5: 1개, 6-10: 2개, 11-15: 4개, 16-20: 8개
-    if (level < 5) return 1;
-    if (level < 10) return 2;
-    if (level < 15) return 4;
-    return 8; // 15-20
+    // 1-3: 1개, 4-6: 5개, 7-9: 15개, 10-12: 30개, 13-15: 60개, 16-18: 100개, 19-20: 200개
+    // 총 비용: 3 + 15 + 45 + 90 + 180 + 300 + 400 = 1033개
+    if (level < 3) return 1;
+    if (level < 6) return 5;
+    if (level < 9) return 15;
+    if (level < 12) return 30;
+    if (level < 15) return 60;
+    if (level < 18) return 100;
+    return 200; // 19-20
 }
 
 function getRelicEffectValue(relic, effectType) {
@@ -1107,8 +1111,8 @@ function getGoldBonus() {
         }
     });
 
-    // 부적 효과 (3% per purchase)
-    bonus += gameState.talismanPurchases.gold * 3;
+    // 부적 효과 (2% per purchase)
+    bonus += gameState.talismanPurchases.gold * 2;
 
     return Math.floor(bonus);
 }
@@ -1126,8 +1130,8 @@ function getExpBonus() {
         }
     });
 
-    // 부적 효과 (3% per purchase)
-    bonus += gameState.talismanPurchases.exp * 3;
+    // 부적 효과 (2% per purchase)
+    bonus += gameState.talismanPurchases.exp * 2;
 
     return Math.floor(bonus);
 }
@@ -1488,17 +1492,35 @@ function updateVillageUI() {
 }
 
 function getPercentUpgradeCost(currentPercent) {
-    // 비용: 기본 50 + 10*단계 + 10%씩 증가 (0.5%씩 증가하므로 단계 = currentPercent * 2)
+    // 비용: 50번까지 적당히, 이후 급격히 증가 (0.5%씩 증가하므로 단계 = currentPercent * 2)
     const purchases = currentPercent * 2;
     const base = 50;
-    return Math.floor(base * (1 + purchases * 0.1) + 10 * purchases);
+
+    if (purchases < 100) {
+        // 100번(50%)까지: 적당한 증가
+        return Math.floor(base * (1 + purchases * 0.05) + purchases * 5);
+    } else {
+        // 100번 이후: 급격한 비용 증가
+        const over100 = purchases - 100;
+        const base100Cost = Math.floor(base * (1 + 99 * 0.05) + 99 * 5);
+        return Math.floor(base100Cost * (1 + over100 * 0.3) + over100 * 50);
+    }
 }
 
 function getTalismanCost(type, purchases) {
-    // 부적별 기본 비용: 초반 단가 감소 + 10*단계 + 10% 증가
+    // 부적별 기본 비용: 50번까지 적당히, 이후 급격히 증가
     const baseCosts = { exp: 50, gold: 50, stone: 100, origin: 300 };
     const base = baseCosts[type];
-    return Math.floor(base * (1 + purchases * 0.1) + 10 * purchases);
+
+    if (purchases < 50) {
+        // 50번까지: 기본가 + 구매수*5 + 5% 증가
+        return Math.floor(base * (1 + purchases * 0.05) + purchases * 5);
+    } else {
+        // 50번 이후: 급격한 비용 증가
+        const over50 = purchases - 50;
+        const base50Cost = Math.floor(base * (1 + 49 * 0.05) + 49 * 5);
+        return Math.floor(base50Cost * (1 + over50 * 0.3) + over50 * 50);
+    }
 }
 
 function updateShopUI() {
@@ -1506,19 +1528,19 @@ function updateShopUI() {
     document.getElementById('shop-stones').textContent = gameState.enhancementStones;
     document.getElementById('shop-origins').textContent = gameState.originStones;
 
-    // 부적 (경험치, 골드)
-    const expBonus = gameState.talismanPurchases.exp * 3;
+    // 부적 (경험치, 골드) - 2%씩, 최대 100회 (200%)
+    const expBonus = gameState.talismanPurchases.exp * 2;
     const expCost = getTalismanCost('exp', gameState.talismanPurchases.exp);
-    const isExpMax = expBonus >= 99;
+    const isExpMax = gameState.talismanPurchases.exp >= 100;
     document.getElementById('exp-bonus').textContent = expBonus;
     document.getElementById('cost-exp').textContent = isExpMax ? 'MAX' : expCost;
     const expBtn = document.querySelector('.btn-talisman[data-talisman="exp"]');
     expBtn.disabled = isExpMax || gameState.player.gold < expCost;
     if (isExpMax) expBtn.textContent = 'MAX';
 
-    const goldBonus = gameState.talismanPurchases.gold * 3;
+    const goldBonus = gameState.talismanPurchases.gold * 2;
     const goldTalismanCost = getTalismanCost('gold', gameState.talismanPurchases.gold);
-    const isGoldMax = goldBonus >= 99;
+    const isGoldMax = gameState.talismanPurchases.gold >= 100;
     document.getElementById('gold-bonus').textContent = goldBonus;
     document.getElementById('cost-gold-talisman').textContent = isGoldMax ? 'MAX' : goldTalismanCost;
     const goldBtn = document.querySelector('.btn-talisman[data-talisman="gold"]');
@@ -2176,8 +2198,8 @@ function enemyDefeated() {
     });
 
     // 부적 효과 (+3% per purchase)
-    const expTalismanBonus = 1 + (gameState.talismanPurchases.exp * 0.03);
-    const goldTalismanBonus = 1 + (gameState.talismanPurchases.gold * 0.03);
+    const expTalismanBonus = 1 + (gameState.talismanPurchases.exp * 0.02);
+    const goldTalismanBonus = 1 + (gameState.talismanPurchases.gold * 0.02);
     expReward = Math.floor(expReward * expTalismanBonus);
     goldReward = Math.floor(goldReward * goldTalismanBonus);
 
@@ -2992,39 +3014,22 @@ function getRelicDescWithEnhancement(relic) {
     return relic.desc;
 }
 
-// 효과 설명 (효과가 무엇인지 부가 설명)
+// 효과 설명 (용어 설명이 필요한 특수 효과만)
 function getEffectExplanation(effectType) {
     const explanations = {
-        // 공격
-        'atkMult': '기본 공격력 증가',
-        'crit': '치명타 발생 확률',
-        'critDmg': '치명타 시 추가 피해',
-        'firstHit': '전투 첫 공격에 추가 피해',
-        'bossKiller': '보스/중보스에게 추가 피해',
-        'multiHit': '공격 후 같은 확률로 재공격',
-        'lifeSteal': '피해량의 일부를 HP로 회복',
-        'execute': '적 HP 30% 이하 시 추가 피해',
-        // 방어
-        'hpMult': '최대 HP 증가',
-        'def': '받는 피해 감소',
-        'dodge': '적 공격 회피 확률',
-        'reflect': '받은 피해를 적에게 반사',
-        'strMult': '힘 스탯 증가 (공격력)',
-        'dexMult': '민첩 스탯 증가 (회피/치명타)',
-        'vitMult': '활력 스탯 증가 (피해감소)',
-        'killHeal': '적 처치 시 HP 회복',
-        // 특수
-        'reward': '획득 골드/경험치 증가',
-        'intMult': '지능 스탯 증가 (MP/스킬)',
-        'lukMult': '행운 스탯 증가 (보상/치명타)',
-        'killMana': '적 처치 시 MP 회복',
-        'bleed': '턴마다 공격력 50% 피해 (중첩)',
-        'weaken': '적 공격력↓ 받는피해↑ (중첩)',
-        'stun': '반격 불가 + 선제공격 +1',
-        'freeze': '선제공격 +2 (중첩)',
-        // 기타
-        'allStats': '모든 스탯 증가',
-        'skillDmg': '스킬 피해량 증가'
+        // 특수 용어가 필요한 효과들만
+        'bleed': '출혈: 매 턴 (공격력×50%×중첩) 피해, 턴마다 1중첩 감소',
+        'weaken': '쇠약: 중첩당 적 공격력 -10%, 받는 피해 +10%',
+        'stun': '스턴: 적 반격 불가, 적 선제공격 +1턴',
+        'freeze': '빙결: 적 선제공격 +2턴 (중첩 가능)',
+        'execute': '처형: 적 HP 30% 이하일 때만 추가 피해',
+        'firstHit': '첫타: 전투의 첫 번째 공격에만 적용',
+        'bossKiller': '보스킬러: 보스/중보스에게만 적용',
+        'multiHit': '추가공격: 성공 시 같은 확률로 연속 재공격',
+        'lifeSteal': '흡혈: 피해량의 일정 비율을 HP로 회복',
+        'reflect': '반사: 받은 피해의 일정 비율을 적에게 반사',
+        'killHeal': '처치회복: 적 처치 시 최대HP의 일정% 회복',
+        'killMana': '처치마나: 적 처치 시 최대MP의 일정% 회복'
     };
     return explanations[effectType] || '';
 }
