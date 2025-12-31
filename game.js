@@ -53,7 +53,8 @@ const gameState = {
         exp: 0,           // 경험치 부적 구매 횟수
         gold: 0,          // 골드 부적 구매 횟수
         stone: 0,         // 강화석 구매 횟수
-        origin: 0         // 근원석 구매 횟수
+        origin: 0,        // 근원석 구매 횟수
+        curse: 0          // 저주 부적 구매 횟수 (적 최대체력 -0.3%, 최대 100개)
     },
     // 퍼센트 강화 (골드 사용, 각 최대 100% = 2배)
     percentBonus: {
@@ -518,8 +519,8 @@ const skillsData = {
         },
         {
             id: 'elf_arrow', name: '마력 화살', mpCost: 0, damageMult: 0.4, type: 'active', subtype: 'sub', cooldown: 0,
-            effect: 'magicDamage', mpRestore: 1, mpRestoreChance: 10,
-            desc: '40% 마법 피해, MP 1 회복 (10%)', char: '엘프'
+            effect: 'magicDamage', mpRestorePercent: 10,
+            desc: '40% 마법 피해, MP 10% 회복', char: '엘프'
         },
         {
             id: 'elf_focus', name: '용감한 영혼', mpCost: 0, type: 'buff', cooldown: 3,
@@ -632,7 +633,13 @@ const bossBuffs = [
     { id: 'fortify', name: '강화', desc: '체력 +50%', atkMult: 1.0, hpMult: 1.5 },
     { id: 'swift', name: '신속', desc: '회피 +15%, 치명타 확률 +10%', atkMult: 1.0, hpMult: 1.0, dodge: 15, crit: 10 },
     { id: 'berserk', name: '광폭화', desc: '공격력 +50%, 체력 -20%', atkMult: 1.5, hpMult: 0.8 },
-    { id: 'resilient', name: '불굴', desc: '체력 +30%, 공격력 +15%', atkMult: 1.15, hpMult: 1.3 }
+    { id: 'resilient', name: '불굴', desc: '체력 +30%, 공격력 +15%', atkMult: 1.15, hpMult: 1.3 },
+    { id: 'regen', name: '재생', desc: '매 턴 체력 5% 회복', atkMult: 1.0, hpMult: 1.0, regenPercent: 5 },
+    { id: 'superRegen', name: '초재생', desc: '매 턴 체력 15% 회복', atkMult: 1.0, hpMult: 1.0, regenPercent: 15 },
+    { id: 'ambush', name: '기습', desc: '선제공격 피해 3배', atkMult: 1.0, hpMult: 1.0, preemptiveMult: 3 },
+    { id: 'assassin', name: '암살', desc: '선제공격 피해 6배', atkMult: 1.0, hpMult: 1.0, preemptiveMult: 6 },
+    { id: 'vampiric', name: '흡혈', desc: '선제공격 피해량만큼 회복', atkMult: 1.0, hpMult: 1.0, vampiric: true },
+    { id: 'reflect', name: '반사', desc: '받은 피해의 30% 반사', atkMult: 1.0, hpMult: 1.0, reflectPercent: 30 }
 ];
 
 // 적 생성
@@ -645,27 +652,59 @@ function generateEnemy(floor) {
     // 가중치 기반 타입 선택
     const type = selectEnemyType();
 
-    // 보스/중보스에게 랜덤 버프 부여
-    const buff = (isBoss || isMiniBoss) ? bossBuffs[Math.floor(Math.random() * bossBuffs.length)] : null;
+    // 보스/중보스에게 랜덤 버프 부여 (보스: 2개, 중보스: 1개)
+    let buffs = [];
+    if (isBoss) {
+        // 보스는 서로 다른 버프 2개
+        const shuffled = [...bossBuffs].sort(() => Math.random() - 0.5);
+        buffs = [shuffled[0], shuffled[1]];
+    } else if (isMiniBoss) {
+        // 중보스는 버프 1개
+        buffs = [bossBuffs[Math.floor(Math.random() * bossBuffs.length)]];
+    }
 
-    const baseHp = 30 + floor * 10;
-    const baseAtk = 5 + floor * 2;
+    // 기본 스탯 + 후반부 스케일링 (지수적 증가)
+    let baseHp = 30 + floor * 15;
+    let baseAtk = 5 + floor * 3;
+
+    // 후반부 스케일링: 층이 높아질수록 급격히 강해짐
+    if (floor > 10) {
+        const scaleFactor = Math.pow(1.03, floor - 10); // 10층 이후 3%씩 복리 증가
+        baseHp = Math.floor(baseHp * scaleFactor);
+        baseAtk = Math.floor(baseAtk * scaleFactor);
+    }
+    if (floor > 50) {
+        const scaleFactor = Math.pow(1.05, floor - 50); // 50층 이후 5%씩 복리 추가
+        baseHp = Math.floor(baseHp * scaleFactor);
+        baseAtk = Math.floor(baseAtk * scaleFactor);
+    }
+    if (floor > 80) {
+        const scaleFactor = Math.pow(1.08, floor - 80); // 80층 이후 8%씩 복리 추가
+        baseHp = Math.floor(baseHp * scaleFactor);
+        baseAtk = Math.floor(baseAtk * scaleFactor);
+    }
 
     const tierMult = isBoss ? 3 : isMiniBoss ? 2 : 1;
     const atkTierMult = isBoss ? 2 : isMiniBoss ? 1.5 : 1;
 
-    // 버프 적용
-    const buffHpMult = buff ? buff.hpMult : 1;
-    const buffAtkMult = buff ? buff.atkMult : 1;
-    const buffDodge = buff?.dodge || 0;
-    const buffCrit = buff?.crit || 0;
+    // 버프 효과 합산
+    let buffHpMult = 1, buffAtkMult = 1, buffDodge = 0, buffCrit = 0;
+    buffs.forEach(b => {
+        buffHpMult *= b.hpMult;
+        buffAtkMult *= b.atkMult;
+        buffDodge += b.dodge || 0;
+        buffCrit += b.crit || 0;
+    });
+
+    // 저주 부적 효과 (적 최대체력 -0.3% per purchase, 최대 30%)
+    const curseReduction = 1 - Math.min(gameState.talismanPurchases.curse * 0.003, 0.3);
 
     return {
         name: getEnemyName(floor, isBoss, isMiniBoss),
         type: type,
-        buff: buff,
-        hp: Math.floor(baseHp * tierMult * type.hpMult * modeMult * buffHpMult),
-        maxHp: Math.floor(baseHp * tierMult * type.hpMult * modeMult * buffHpMult),
+        buffs: buffs,
+        hp: Math.floor(baseHp * tierMult * type.hpMult * modeMult * buffHpMult * curseReduction),
+        maxHp: Math.floor(baseHp * tierMult * type.hpMult * modeMult * buffHpMult * curseReduction),
         atk: Math.floor(baseAtk * atkTierMult * type.atkMult * modeMult * buffAtkMult),
         dodge: type.dodge + buffDodge,
         crit: type.crit + buffCrit,
@@ -1618,7 +1657,7 @@ function tickMpRegen() {
         }
         // 오만한 정신: 현재 MP의 일정 비율만큼 HP 회복
         if (skill?.type === 'passive' && skill.effect === 'mpToHpRegen') {
-            const healAmount = Math.floor(gameState.player.mp * (getPassiveValue(skill) / 100));
+            const healAmount = Math.max(1, Math.ceil(gameState.player.mp * (getPassiveValue(skill) / 100)));
             if (healAmount > 0) {
                 gameState.player.hp = Math.min(getMaxHp(), gameState.player.hp + healAmount);
                 addBattleLog(`HP +${healAmount} (오만한 정신)`);
@@ -1630,7 +1669,7 @@ function tickMpRegen() {
     if (totalMpRestored > 0) {
         gameState.equippedSkills.forEach(skill => {
             if (skill?.type === 'passive' && skill.effect === 'mpToHpOnRestore') {
-                const healAmount = Math.floor(totalMpRestored * (getPassiveValue(skill) / 100));
+                const healAmount = Math.max(1, Math.ceil(totalMpRestored * (getPassiveValue(skill) / 100)));
                 if (healAmount > 0) {
                     gameState.player.hp = Math.min(getMaxHp(), gameState.player.hp + healAmount);
                     addBattleLog(`HP +${healAmount} (건강한 신체)`);
@@ -1718,23 +1757,28 @@ function updateVillageUI() {
 }
 
 function getPercentUpgradeCost(purchases, stat) {
-    // 비용: 50번까지 적당히, 이후 급격히 증가
-    const base = 50;
+    // 비용: 50번까지 적당히, 50-100번 중간, 100번 이후 급격히 증가
+    const base = 100;
 
     if (purchases < 50) {
         // 50번까지: 적당한 증가
-        return Math.floor(base * (1 + purchases * 0.05) + purchases * 5);
-    } else {
-        // 50번 이후: 급격한 비용 증가
+        return Math.floor(base * (1 + purchases * 0.1) + purchases * 10);
+    } else if (purchases < 100) {
+        // 50-100번: 점진적 증가
         const over50 = purchases - 50;
-        const base50Cost = Math.floor(base * (1 + 49 * 0.05) + 49 * 5);
-        return Math.floor(base50Cost * (1 + over50 * 0.3) + over50 * 50);
+        const base50Cost = Math.floor(base * (1 + 49 * 0.1) + 49 * 10);
+        return Math.floor(base50Cost * (1 + over50 * 0.2) + over50 * 100);
+    } else {
+        // 100번 이후: 매우 급격한 비용 증가 (지수적)
+        const over100 = purchases - 100;
+        const base100Cost = Math.floor((base * (1 + 49 * 0.1) + 49 * 10) * (1 + 49 * 0.2) + 49 * 100);
+        return Math.floor(base100Cost * Math.pow(1.15, over100) + over100 * 500);
     }
 }
 
 function getTalismanCost(type, purchases) {
     // 부적별 기본 비용: 50번까지 적당히, 이후 급격히 증가
-    const baseCosts = { exp: 50, gold: 50, stone: 100, origin: 300 };
+    const baseCosts = { exp: 50, gold: 50, stone: 100, origin: 300, curse: 200 };
     const base = baseCosts[type];
 
     if (purchases < 50) {
@@ -1777,10 +1821,22 @@ function updateShopUI() {
     document.getElementById('cost-origin').textContent = originCost;
     document.querySelector('.btn-talisman[data-talisman="origin"]').disabled = gameState.player.gold < originCost;
 
+    // 저주 부적 (적 최대체력 -0.3%, 최대 100개)
+    const cursePurchases = gameState.talismanPurchases.curse;
+    const curseBonus = (cursePurchases * 0.3).toFixed(1);
+    const curseCost = getTalismanCost('curse', cursePurchases);
+    const curseMax = cursePurchases >= 100;
+    document.getElementById('curse-bonus').textContent = curseBonus;
+    document.getElementById('curse-count').textContent = cursePurchases;
+    document.getElementById('cost-curse').textContent = curseMax ? 'MAX' : curseCost;
+    const curseBtn = document.querySelector('.btn-talisman[data-talisman="curse"]');
+    curseBtn.disabled = curseMax || gameState.player.gold < curseCost;
+    if (curseMax) curseBtn.textContent = 'MAX';
+
     // 능력 부적 (스탯별 다른 증가량)
     const increments = { atk: 1, hp: 1, crit: 0.5, critDmg: 2, dodge: 0.5, def: 0.15 };
-    // 공격력, 체력, 치명타피해, 골드, 경험치는 무제한
-    const maxValues = { atk: Infinity, hp: Infinity, crit: 100, critDmg: Infinity, dodge: 100, def: 15 };
+    // 공격력, 체력, 치명타피해는 무제한, 치명타확률 40%, 회피율 50%, 피해감소 15%
+    const maxValues = { atk: Infinity, hp: Infinity, crit: 40, critDmg: Infinity, dodge: 50, def: 15 };
     const stats = ['atk', 'hp', 'crit', 'critDmg', 'dodge', 'def'];
 
     stats.forEach(stat => {
@@ -1987,7 +2043,7 @@ function updateBattleUI() {
     if (!enemy) return;
 
     const typePrefix = enemy.type ? enemy.type.prefix : '';
-    const buffTag = enemy.buff ? ` [${enemy.buff.name}]` : '';
+    const buffTag = enemy.buffs?.length > 0 ? ` [${enemy.buffs.map(b => b.name).join('/')}]` : '';
     document.getElementById('enemy-name').textContent = typePrefix + enemy.name + buffTag + (enemy.stunned ? ' [스턴]' : '');
     document.getElementById('enemy-hp').textContent = Math.max(0, Math.floor(enemy.hp));
     document.getElementById('enemy-max-hp').textContent = enemy.maxHp;
@@ -2047,8 +2103,10 @@ function startBattle() {
     addBattleLog(`${gameState.dungeon.currentFloor}구역 - ${typePrefix}${enemy.name} ${floorType ? `[${floorType}]` : ''} 등장!`);
 
     // 보스/중보스 버프 표시
-    if (enemy.buff) {
-        addBattleLog(`버프: ${enemy.buff.name} - ${enemy.buff.desc}`);
+    if (enemy.buffs?.length > 0) {
+        enemy.buffs.forEach(buff => {
+            addBattleLog(`버프: ${buff.name} - ${buff.desc}`);
+        });
     }
 
     addBattleLog(`적 선제공격까지 ${enemyAttackCounter}턴`);
@@ -2122,7 +2180,15 @@ function enemyPreemptiveAttack() {
     const isCrit = Math.random() * 100 < enemyCrit;
     const isDodge = Math.random() * 100 < getDodgeChance();
 
-    const originalDamage = isCrit ? Math.floor(enemyAtk * 1.5) : enemyAtk;
+    let originalDamage = isCrit ? Math.floor(enemyAtk * 1.5) : enemyAtk;
+
+    // 기습/암살 버프: 선제공격 피해 배율 (가장 높은 것 적용)
+    const buffs = gameState.currentEnemy.buffs || [];
+    const preemptiveMult = Math.max(1, ...buffs.map(b => b.preemptiveMult || 1));
+    if (preemptiveMult > 1) {
+        originalDamage = Math.floor(originalDamage * preemptiveMult);
+    }
+
     let baseDamage = originalDamage;
     if (isDodge) baseDamage = Math.floor(baseDamage * 0.5);
     const damage = calculateDamageTaken(baseDamage, false, false, originalDamage);
@@ -2131,7 +2197,16 @@ function enemyPreemptiveAttack() {
     const logParts = [`${damage} 피해를 받았다!`];
     if (isCrit) logParts.push('(치명타!)');
     if (isDodge) logParts.push('(부분 회피!)');
+    if (preemptiveMult > 1) logParts.push(`(${preemptiveMult}배!)`);
     addBattleLog(logParts.join(' '));
+
+    // 흡혈 버프: 피해량만큼 회복
+    const hasVampiric = buffs.some(b => b.vampiric);
+    if (hasVampiric && damage > 0) {
+        const healAmount = damage;
+        gameState.currentEnemy.hp = Math.min(gameState.currentEnemy.maxHp, gameState.currentEnemy.hp + healAmount);
+        addBattleLog(`적이 ${healAmount} 회복! (흡혈)`);
+    }
 
     // 반사 피해 (멍청한 희생) - 감소 이전 피해량 기준
     applyThornsDamage(originalDamage);
@@ -2248,6 +2323,9 @@ function executePlayerAttack(isSkill = false, skillDamage = 0) {
     // 흡혈 효과
     applyLifeSteal(damage);
 
+    // 적 반사 버프 효과
+    applyEnemyReflect(damage);
+
     // 치명타 시 MP 회복 (마력 폭발)
     if (isCrit) {
         applyCritMpRestore();
@@ -2257,6 +2335,20 @@ function executePlayerAttack(isSkill = false, skillDamage = 0) {
     tryApplyDebuffs();
 
     return damage;
+}
+
+// 적 반사 버프 효과
+function applyEnemyReflect(damage) {
+    const buffs = gameState.currentEnemy?.buffs || [];
+    const totalReflectPercent = buffs.reduce((sum, b) => sum + (b.reflectPercent || 0), 0);
+    if (totalReflectPercent > 0 && damage > 0) {
+        const reflectDamage = Math.max(1, Math.ceil(damage * totalReflectPercent / 100));
+        gameState.player.hp -= reflectDamage;
+        addBattleLog(`반사 피해 ${reflectDamage}! (적 반사)`);
+        if (gameState.player.hp <= 0) {
+            playerDefeated();
+        }
+    }
 }
 
 // 치명타 시 MP 회복 (마력 폭발 패시브)
@@ -2284,7 +2376,7 @@ function processPlayerTurn() {
 function applyLifeSteal(damage) {
     const { chance, healPercent } = getLifeStealInfo();
     if (chance > 0 && checkProbabilityWithReroll(chance)) {
-        const heal = Math.floor(damage * healPercent);
+        const heal = Math.max(1, Math.ceil(damage * healPercent));
         if (heal > 0) {
             gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + heal);
             addBattleLog(`HP +${heal} (흡혈)`);
@@ -2382,6 +2474,20 @@ function enemyCounterAttack() {
 // 턴 종료 처리 (버프 틱)
 function endPlayerTurn() {
     tickBuffs();
+
+    // 적 재생 버프 효과 (여러 재생 버프 합산)
+    const buffs = gameState.currentEnemy?.buffs || [];
+    const totalRegenPercent = buffs.reduce((sum, b) => sum + (b.regenPercent || 0), 0);
+    if (totalRegenPercent > 0 && gameState.currentEnemy.hp > 0) {
+        const regenAmount = Math.max(1, Math.ceil(gameState.currentEnemy.maxHp * totalRegenPercent / 100));
+        const prevHp = gameState.currentEnemy.hp;
+        gameState.currentEnemy.hp = Math.min(gameState.currentEnemy.maxHp, gameState.currentEnemy.hp + regenAmount);
+        const actualRegen = gameState.currentEnemy.hp - prevHp;
+        if (actualRegen > 0) {
+            addBattleLog(`적이 ${actualRegen} 회복! (재생)`);
+        }
+    }
+
     updateSkillButtons();
 }
 
@@ -2521,6 +2627,9 @@ function useSkill(slotIndex) {
         // 흡혈 효과
         applyLifeSteal(hpDamage);
 
+        // 적 반사 버프 효과
+        applyEnemyReflect(hpDamage);
+
         if (gameState.currentEnemy.hp <= 0) {
             enemyDefeated();
         } else {
@@ -2605,6 +2714,9 @@ function useSkill(slotIndex) {
         // 흡혈 효과
         applyLifeSteal(totalDamage);
 
+        // 적 반사 버프 효과
+        applyEnemyReflect(totalDamage);
+
         // 스킬 자체 흡혈 효과 (물어 뜯기)
         if (skill.effect === 'skillLifeSteal' && skill.healPercent) {
             const effectiveHealPercent = skill.healPercent * (1 + weaponBonus / 100);
@@ -2616,11 +2728,10 @@ function useSkill(slotIndex) {
         }
 
         // 스킬 사용 시 MP 회복 (마력 화살)
-        if (skill.mpRestore && skill.mpRestoreChance) {
-            if (Math.random() * 100 < skill.mpRestoreChance) {
-                gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + skill.mpRestore);
-                addBattleLog(`MP +${skill.mpRestore}`);
-            }
+        if (skill.mpRestorePercent) {
+            const mpRestore = Math.max(1, Math.ceil(gameState.player.maxMp * skill.mpRestorePercent / 100));
+            gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + mpRestore);
+            addBattleLog(`MP +${mpRestore}`);
         }
 
         // 스턴 효과
@@ -2692,7 +2803,7 @@ function enemyDefeated() {
     // 처치 시 HP 회복 (killHeal)
     const killHealPercent = getKillHealPercent();
     if (killHealPercent > 0) {
-        const healAmount = Math.floor(gameState.player.maxHp * killHealPercent);
+        const healAmount = Math.max(1, Math.ceil(gameState.player.maxHp * killHealPercent));
         gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
         addBattleLog(`HP +${healAmount} (처치 회복)`);
     }
@@ -2700,7 +2811,7 @@ function enemyDefeated() {
     // 처치 시 MP 회복 (killMana)
     const killManaPercent = getKillManaPercent();
     if (killManaPercent > 0) {
-        const manaAmount = Math.floor(gameState.player.maxMp * killManaPercent);
+        const manaAmount = Math.max(1, Math.ceil(gameState.player.maxMp * killManaPercent));
         gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + manaAmount);
         addBattleLog(`MP +${manaAmount} (처치 회복)`);
     }
@@ -3216,14 +3327,14 @@ function showSkillChoicesOnly() {
 
     const charToWeapon = { cat: 'sword', elf: 'staff', dwarf: 'shield', human: 'bow' };
     const weaponNames = { sword: '검', staff: '지팡이', shield: '방패', bow: '활' };
-    const typeNames = { attack: '공격', utility: '유틸', buff: '버프', passive: '패시브' };
+    const typeNames = { attack: '공격', utility: '유틸', buff: '버프', passive: '패시브', active: '액티브' };
 
     gameState.skillChoices.forEach(skill => {
         const btn = document.createElement('button');
         btn.className = 'skill-choice-btn';
 
         // 스킬 타입 표시
-        const skillType = skill.subtype ? typeNames[skill.subtype] : typeNames[skill.type];
+        const skillType = typeNames[skill.type];
         const typeLabel = skill.type === 'passive' ? '[패시브]' : `[${skillType}]`;
 
         // 무기 보너스 표시
@@ -3798,7 +3909,7 @@ function returnToVillage(fromDeath = false) {
 function updateSkillButtons() {
     const charToWeapon = { cat: 'sword', elf: 'staff', dwarf: 'shield', human: 'bow' };
     const weaponNames = { sword: '검', staff: '지팡이', shield: '방패', bow: '활' };
-    const typeNames = { attack: '공격', utility: '유틸', buff: '버프', passive: '패시브' };
+    const typeNames = { attack: '공격', utility: '유틸', buff: '버프', passive: '패시브', active: '액티브' };
 
     for (let i = 0; i < 4; i++) {
         const btn = document.getElementById(`btn-skill-${i + 1}`);
@@ -3824,7 +3935,7 @@ function updateSkillButtons() {
         const weaponName = weaponNames[weapon] || '';
 
         // 스킬 타입 표시
-        const skillType = skill.subtype ? typeNames[skill.subtype] : typeNames[skill.type];
+        const skillType = typeNames[skill.type];
 
         const enhancedDesc = getEnhancedSkillDesc(skill);
 
@@ -4188,7 +4299,7 @@ function initEventListeners() {
             const current = gameState.percentBonus[stat];
             // 스탯별 증가량: 공격력/체력 1%, 치명타확률/회피율 0.5%, 치명타피해 2%, 피해감소 0.15%
             const increments = { atk: 1, hp: 1, crit: 0.5, critDmg: 2, dodge: 0.5, def: 0.15 };
-            const maxValues = { atk: 100, hp: 100, crit: 100, critDmg: 200, dodge: 100, def: 15 };
+            const maxValues = { atk: Infinity, hp: Infinity, crit: 40, critDmg: Infinity, dodge: 50, def: 15 };
             const increment = increments[stat];
             const maxValue = maxValues[stat];
             const purchases = Math.round(current / increment);
