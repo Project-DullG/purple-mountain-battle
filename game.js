@@ -1870,15 +1870,10 @@ function updateShopUI() {
     const curseMax = cursePurchases >= 100;
     document.getElementById('curse-bonus').textContent = curseBonus;
     document.getElementById('curse-count').textContent = cursePurchases;
-    document.getElementById('cost-curse').textContent = curseMax ? 'MAX' : curseCost;
     const curseBtn = document.querySelector('.btn-talisman[data-talisman="curse"]');
     curseBtn.disabled = curseMax || gameState.player.gold < curseCost;
     // 버튼 텍스트 설정 (MAX 또는 비용)
-    if (curseMax) {
-        curseBtn.innerHTML = 'MAX';
-    } else {
-        curseBtn.innerHTML = `<span id="cost-curse">${curseCost}</span>G`;
-    }
+    curseBtn.innerHTML = curseMax ? 'MAX' : `<span id="cost-curse">${curseCost}</span>G`;
 
     // 능력 부적 (스탯별 다른 증가량)
     const increments = { atk: 1, hp: 1, crit: 0.5, critDmg: 2, dodge: 0.5, def: 0.15 };
@@ -1895,7 +1890,6 @@ function updateShopUI() {
         const isMax = maxValue !== Infinity && current >= maxValue;
 
         document.getElementById(`percent-${stat}`).textContent = current.toFixed(1);
-        document.getElementById(`cost-${stat}`).textContent = isMax ? 'MAX' : cost;
         // 진행바: 무제한 스탯은 100을 기준으로, 유한 스탯은 최대값 기준
         const barMax = maxValue === Infinity ? Math.max(100, current) : maxValue;
         const fillPercent = Math.min(100, (current / barMax) * 100);
@@ -1903,9 +1897,8 @@ function updateShopUI() {
 
         const btn = document.querySelector(`.btn-percent-upgrade[data-stat="${stat}"]`);
         btn.disabled = isMax || gameState.player.gold < cost;
-        if (isMax) {
-            btn.textContent = 'MAX';
-        }
+        // 버튼 내용 갱신 (MAX 또는 비용)
+        btn.innerHTML = isMax ? 'MAX' : `<span id="cost-${stat}">${cost}</span>G`;
     });
 }
 
