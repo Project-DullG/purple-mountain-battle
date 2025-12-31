@@ -3076,6 +3076,10 @@ h2 {
     grid-template-columns: repeat(2, 1fr);
 }
 
+.talisman-grid.three-col {
+    grid-template-columns: repeat(3, 1fr);
+}
+
 .talisman-card {
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(30, 30, 50, 0.9) 100%);
     border: 1px solid #ffd93d;

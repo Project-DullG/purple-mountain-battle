@@ -1822,7 +1822,7 @@ function updateShopUI() {
     document.querySelector('.btn-talisman[data-talisman="origin"]').disabled = gameState.player.gold < originCost;
 
     // 저주 부적 (적 최대체력 -0.3%, 최대 100개)
-    const cursePurchases = gameState.talismanPurchases.curse;
+    const cursePurchases = gameState.talismanPurchases.curse || 0;
     const curseBonus = (cursePurchases * 0.3).toFixed(1);
     const curseCost = getTalismanCost('curse', cursePurchases);
     const curseMax = cursePurchases >= 100;
@@ -1831,7 +1831,12 @@ function updateShopUI() {
     document.getElementById('cost-curse').textContent = curseMax ? 'MAX' : curseCost;
     const curseBtn = document.querySelector('.btn-talisman[data-talisman="curse"]');
     curseBtn.disabled = curseMax || gameState.player.gold < curseCost;
-    if (curseMax) curseBtn.textContent = 'MAX';
+    // 버튼 텍스트 설정 (MAX 또는 비용)
+    if (curseMax) {
+        curseBtn.innerHTML = 'MAX';
+    } else {
+        curseBtn.innerHTML = `<span id="cost-curse">${curseCost}</span>G`;
+    }
 
     // 능력 부적 (스탯별 다른 증가량)
     const increments = { atk: 1, hp: 1, crit: 0.5, critDmg: 2, dodge: 0.5, def: 0.15 };
@@ -4277,6 +4282,11 @@ function initEventListeners() {
             const type = btn.dataset.talisman;
             const cost = getTalismanCost(type, gameState.talismanPurchases[type]);
 
+            // 저주 부적은 최대 100개 제한
+            if (type === 'curse' && gameState.talismanPurchases.curse >= 100) {
+                return;
+            }
+
             if (gameState.player.gold >= cost) {
                 gameState.player.gold -= cost;
                 gameState.talismanPurchases[type]++;
@@ -4510,6 +4520,10 @@ function applySaveData(data) {
     // 장비/자원
     gameState.weapons = { ...data.weapons };
     gameState.talismanPurchases = { ...data.talismanPurchases };
+    // 기존 세이브 데이터 호환성: curse가 없으면 0으로 설정
+    if (gameState.talismanPurchases.curse === undefined) {
+        gameState.talismanPurchases.curse = 0;
+    }
     gameState.percentBonus = { ...data.percentBonus };
     gameState.enhancementStones = data.enhancementStones;
     gameState.originStones = data.originStones;
