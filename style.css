@@ -3227,6 +3227,112 @@ h2 {
     }
 }
 
+/* 타이틀 행 */
+.title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+}
+
+.title-row h1 {
+    margin: 0;
+}
+
+.btn-help {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #a29bfe;
+    background: rgba(108, 92, 231, 0.2);
+    color: #a29bfe;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-help:hover {
+    background: rgba(108, 92, 231, 0.4);
+    transform: scale(1.1);
+}
+
+/* 도움말 모달 */
+.help-content {
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(162, 155, 254, 0.3);
+    margin-bottom: 15px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #a29bfe;
+}
+
+.btn-modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-modal-close:hover {
+    background: rgba(255, 107, 107, 0.4);
+}
+
+.help-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.help-section {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.help-section h3 {
+    color: #ffd93d;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+}
+
+.help-section p {
+    color: #ccc;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.help-section ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.help-section li {
+    color: #bbb;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+.help-section li strong {
+    color: #a29bfe;
+}
+
 /* BGM 토글 버튼 */
 .bgm-toggle {
     position: fixed;

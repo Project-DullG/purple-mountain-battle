@@ -4252,6 +4252,19 @@ function initEventListeners() {
         showScreen('village-screen');
     });
 
+    // 도움말 모달
+    document.getElementById('btn-help')?.addEventListener('click', () => {
+        document.getElementById('help-modal').classList.remove('hidden');
+    });
+    document.getElementById('btn-help-close')?.addEventListener('click', () => {
+        document.getElementById('help-modal').classList.add('hidden');
+    });
+    document.getElementById('help-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'help-modal') {
+            document.getElementById('help-modal').classList.add('hidden');
+        }
+    });
+
     // 세이브/로드 (로컬)
     document.getElementById('btn-save-game').addEventListener('click', saveGame);
     document.getElementById('btn-load-game').addEventListener('click', loadGame);

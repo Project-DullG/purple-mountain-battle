@@ -20,7 +20,10 @@
     <div id="game-container">
         <!-- 메인 화면 -->
         <div id="village-screen" class="screen">
-            <h1>잿빛 용병단</h1>
+            <div class="title-row">
+                <h1>잿빛 용병단</h1>
+                <button id="btn-help" class="btn-help" title="게임 설명">❓</button>
+            </div>
 
             <!-- 플레이어 정보 -->
             <div id="player-info">
@@ -707,6 +710,93 @@
                 <p>+<span id="clear-origin-stones">0</span> 근원석 🔮</p>
             </div>
             <button id="btn-clear-return">마을로</button>
+        </div>
+
+        <!-- 도움말 모달 -->
+        <div id="help-modal" class="modal hidden">
+            <div class="modal-content help-content">
+                <div class="modal-header">
+                    <h2>📖 게임 가이드</h2>
+                    <button id="btn-help-close" class="btn-modal-close">✕</button>
+                </div>
+                <div class="help-body">
+                    <div class="help-section">
+                        <h3>🎮 기본 진행</h3>
+                        <p>보랏빛 산지에 입장하여 적을 처치하고 보상을 획득하세요.</p>
+                        <ul>
+                            <li><strong>난이도</strong>: 초입부(x1) → 중심부(x2) → 끝(x3) → 무한(x4)</li>
+                            <li><strong>구역</strong>: 10구역마다 보스 등장, 50구역 클리어 시 완료</li>
+                            <li><strong>무한 모드</strong>: 끝없이 도전, 리더보드 등록 가능</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>⚔️ 전투 시스템</h3>
+                        <ul>
+                            <li><strong>기본 공격</strong>: MP 1 회복, 적이 반격</li>
+                            <li><strong>스킬</strong>: MP 소모, 다양한 효과 (반격 무시, 회복 등)</li>
+                            <li><strong>치명타</strong>: DEX 기반 확률, 1.5배 피해</li>
+                            <li><strong>회피</strong>: DEX 기반 확률, 피해 무효</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>📊 스탯</h3>
+                        <ul>
+                            <li><strong>STR (힘)</strong>: 공격력 +3, HP +1</li>
+                            <li><strong>DEX (민첩)</strong>: 치명타/회피 +0.5%, HP +0.25</li>
+                            <li><strong>INT (지능)</strong>: 마법 피해 +2%, MP +1, HP +0.5</li>
+                            <li><strong>VIT (체력)</strong>: HP +2, 피해 감소</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>🎭 스킬 타입</h3>
+                        <ul>
+                            <li><strong>강공격</strong>: 높은 피해, 쿨타임 있음</li>
+                            <li><strong>보조</strong>: 낮은 피해, 추가 효과</li>
+                            <li><strong>버프</strong>: 일정 턴 동안 강화 효과</li>
+                            <li><strong>패시브</strong>: 항상 또는 조건부 발동</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>✨ 유물</h3>
+                        <p>전투 중 획득하는 임시 아이템입니다.</p>
+                        <ul>
+                            <li><strong>등급</strong>: 일반 → 고급 → 희귀 → 영웅 → 전설</li>
+                            <li><strong>태그</strong>: 공격(빨강) / 방어(파랑) / 특수(보라)</li>
+                            <li><strong>합성</strong>: 같은 등급 3개 → 상위 등급 1개</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>🏠 마을 시설</h3>
+                        <ul>
+                            <li><strong>부적 상점</strong>: 골드로 영구 스탯 증가 구매</li>
+                            <li><strong>대장간</strong>: 강화석으로 무기 강화 (스킬 효과 +5%/레벨)</li>
+                            <li><strong>숙소</strong>: 근원석으로 유물 효과 강화 (태그별 +5%/레벨)</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>💎 자원</h3>
+                        <ul>
+                            <li><strong>골드</strong>: 부적 구매</li>
+                            <li><strong>강화석 💎</strong>: 대장간 무기 강화</li>
+                            <li><strong>근원석 🔮</strong>: 숙소에서 근원 강화, 스탯 포인트 구매</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>💾 저장</h3>
+                        <ul>
+                            <li><strong>로컬 저장</strong>: 현재 기기에 저장</li>
+                            <li><strong>클라우드</strong>: 닉네임 + 4자리 코드로 어디서든 불러오기</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
