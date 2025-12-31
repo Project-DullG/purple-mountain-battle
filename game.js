@@ -1098,22 +1098,40 @@ function getKillManaPercent() {
     return percent;
 }
 
-// 보상 증가율 계산 (행운 + 유물 + 부적)
-function getTotalRewardBonus() {
+// 골드 증가율 계산 (행운 + 유물 + 부적)
+function getGoldBonus() {
     // 행운 스탯 보너스 (1% per point)
     let bonus = getEffectiveStat('luk') * 1;
 
-    // 유물 효과
+    // 유물 효과 (reward는 골드/경험치 둘 다)
     gameState.tempRelics.forEach(relic => {
         const rewardVal = getRelicEffectValue(relic, 'reward');
         if (rewardVal !== null) {
-            bonus += (rewardVal - 1) * 100; // 1.05 -> 5%
+            bonus += (rewardVal - 1) * 100;
         }
     });
 
-    // 부적 효과 (3% per purchase, 둘 중 평균 사용)
-    const talismanBonus = ((gameState.talismanPurchases.exp + gameState.talismanPurchases.gold) / 2) * 3;
-    bonus += talismanBonus;
+    // 부적 효과 (3% per purchase)
+    bonus += gameState.talismanPurchases.gold * 3;
+
+    return Math.floor(bonus);
+}
+
+// 경험치 증가율 계산 (행운 + 유물 + 부적)
+function getExpBonus() {
+    // 행운 스탯 보너스 (1% per point)
+    let bonus = getEffectiveStat('luk') * 1;
+
+    // 유물 효과 (reward는 골드/경험치 둘 다)
+    gameState.tempRelics.forEach(relic => {
+        const rewardVal = getRelicEffectValue(relic, 'reward');
+        if (rewardVal !== null) {
+            bonus += (rewardVal - 1) * 100;
+        }
+    });
+
+    // 부적 효과 (3% per purchase)
+    bonus += gameState.talismanPurchases.exp * 3;
 
     return Math.floor(bonus);
 }
@@ -1690,7 +1708,8 @@ function updateBattleUI() {
     // 획득 보상 표시
     document.getElementById('panel-gold').textContent = gameState.dungeon.pendingGold || 0;
     document.getElementById('panel-exp').textContent = gameState.dungeon.pendingExp || 0;
-    document.getElementById('panel-reward-bonus').textContent = '+' + getTotalRewardBonus() + '%';
+    document.getElementById('panel-gold-bonus').textContent = '+' + getGoldBonus() + '%';
+    document.getElementById('panel-exp-bonus').textContent = '+' + getExpBonus() + '%';
 
     // 적 정보 업데이트 (적이 있을 때만)
     const enemy = gameState.currentEnemy;
