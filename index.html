@@ -724,75 +724,91 @@
                         <h3>🎮 기본 진행</h3>
                         <p>보랏빛 산지에 입장하여 적을 처치하고 보상을 획득하세요.</p>
                         <ul>
-                            <li><strong>난이도</strong>: 초입부(x1) → 중심부(x2) → 끝(x3) → 무한(x4)</li>
-                            <li><strong>구역</strong>: 10구역마다 보스 등장, 50구역 클리어 시 완료</li>
-                            <li><strong>무한 모드</strong>: 끝없이 도전, 리더보드 등록 가능</li>
+                            <li><strong>전장 초입부</strong>: 적 x0.5, 보상 x1 (입문용)</li>
+                            <li><strong>전장 중심부</strong>: 적 x5, 보상 x5</li>
+                            <li><strong>전장의 끝</strong>: 적 x30, 보상 x10 (강화석 2배)</li>
+                            <li><strong>무한의 전장</strong>: 적 x10, 보상 x10, 끝없이 도전</li>
+                            <li><strong>구역</strong>: 5구역마다 중간보스, 10구역마다 보스</li>
+                            <li><strong>스킵</strong>: 클리어한 구역까지 50% HP로 즉시 이동</li>
                         </ul>
                     </div>
 
                     <div class="help-section">
                         <h3>⚔️ 전투 시스템</h3>
                         <ul>
-                            <li><strong>기본 공격</strong>: MP 1 회복, 적이 반격</li>
-                            <li><strong>스킬</strong>: MP 소모, 다양한 효과 (반격 무시, 회복 등)</li>
-                            <li><strong>치명타</strong>: DEX 기반 확률, 1.5배 피해</li>
-                            <li><strong>회피</strong>: DEX 기반 확률, 피해 무효</li>
+                            <li><strong>기본 공격</strong>: MP 1 회복, 적이 반격함</li>
+                            <li><strong>스킬</strong>: MP 소모, 쿨타임 있음, 일부는 반격 무시</li>
+                            <li><strong>기본 치명타</strong>: 10% 확률, 130% 피해 (DEX/LUK로 증가)</li>
+                            <li><strong>기본 회피</strong>: 10% 확률 (LUK로 증가, 최대 80%)</li>
+                            <li><strong>치명타 100% 초과</strong>: 초과분이 치명타 데미지로 전환</li>
                         </ul>
                     </div>
 
                     <div class="help-section">
                         <h3>📊 스탯</h3>
                         <ul>
-                            <li><strong>STR (힘)</strong>: 공격력 +3, HP +1</li>
-                            <li><strong>DEX (민첩)</strong>: 치명타/회피 +0.5%, HP +0.25</li>
-                            <li><strong>INT (지능)</strong>: 마법 피해 +2%, MP +1, HP +0.5</li>
-                            <li><strong>VIT (체력)</strong>: HP +2, 피해 감소</li>
+                            <li><strong>STR (힘)</strong>: 공격력 +1, HP +1, 치명타 데미지 +0.5%</li>
+                            <li><strong>DEX (민첩)</strong>: 공격력 +1, 치명타 확률 +1%, HP +0.25</li>
+                            <li><strong>INT (지능)</strong>: 마법 피해 +2%, MP +0.5, HP +0.5, 치명타 데미지 +2%</li>
+                            <li><strong>VIT (체력)</strong>: HP +2, 받는 피해 -0.2% (최대 -20%)</li>
+                            <li><strong>LUK (행운)</strong>: 치명타/회피 +0.5%, 보상 +1%</li>
                         </ul>
                     </div>
 
                     <div class="help-section">
-                        <h3>🎭 스킬 타입</h3>
+                        <h3>🎭 스킬 (4종류)</h3>
                         <ul>
-                            <li><strong>강공격</strong>: 높은 피해, 쿨타임 있음</li>
-                            <li><strong>보조</strong>: 낮은 피해, 추가 효과</li>
-                            <li><strong>버프</strong>: 일정 턴 동안 강화 효과</li>
-                            <li><strong>패시브</strong>: 항상 또는 조건부 발동</li>
+                            <li><strong>강공격</strong>: 높은 피해, 쿨타임 2턴</li>
+                            <li><strong>보조</strong>: 낮은 피해, 쿨타임 없음, 추가 효과</li>
+                            <li><strong>버프</strong>: 일정 턴간 강화 효과 부여</li>
+                            <li><strong>패시브</strong>: 항상 적용 또는 조건부 발동</li>
+                            <li><strong>대장간 강화</strong>: 캐릭터 무기 +1당 스킬 효과 +5%</li>
                         </ul>
                     </div>
 
                     <div class="help-section">
                         <h3>✨ 유물</h3>
-                        <p>전투 중 획득하는 임시 아이템입니다.</p>
+                        <p>전투 중 획득, 던전 종료 시 사라지는 임시 아이템</p>
                         <ul>
                             <li><strong>등급</strong>: 일반 → 고급 → 희귀 → 영웅 → 전설</li>
                             <li><strong>태그</strong>: 공격(빨강) / 방어(파랑) / 특수(보라)</li>
-                            <li><strong>합성</strong>: 같은 등급 3개 → 상위 등급 1개</li>
+                            <li><strong>근원 합성</strong>: 같은 등급 3개 → 상위 등급 1개</li>
+                            <li><strong>근원 강화</strong>: 태그별로 +1당 유물 효과 +5%</li>
                         </ul>
                     </div>
 
                     <div class="help-section">
                         <h3>🏠 마을 시설</h3>
                         <ul>
-                            <li><strong>부적 상점</strong>: 골드로 영구 스탯 증가 구매</li>
-                            <li><strong>대장간</strong>: 강화석으로 무기 강화 (스킬 효과 +5%/레벨)</li>
-                            <li><strong>숙소</strong>: 근원석으로 유물 효과 강화 (태그별 +5%/레벨)</li>
+                            <li><strong>부적 상점</strong>: 골드로 영구 스탯 증가 (레벨당 비용 증가)</li>
+                            <li><strong>대장간</strong>: 강화석으로 무기 강화 (최대 20레벨, +100%)</li>
+                            <li><strong>숙소</strong>: 근원석으로 유물/스탯 강화, 리더보드 확인</li>
                         </ul>
                     </div>
 
                     <div class="help-section">
-                        <h3>💎 자원</h3>
+                        <h3>💎 자원 획득</h3>
                         <ul>
-                            <li><strong>골드</strong>: 부적 구매</li>
-                            <li><strong>강화석 💎</strong>: 대장간 무기 강화</li>
-                            <li><strong>근원석 🔮</strong>: 숙소에서 근원 강화, 스탯 포인트 구매</li>
+                            <li><strong>골드</strong>: 적 처치 시 획득 → 부적 구매</li>
+                            <li><strong>강화석 💎</strong>: 보스 처치 시 획득 → 대장간 강화</li>
+                            <li><strong>근원석 🔮</strong>: 10구역 보스 처치 시 획득 → 숙소 강화</li>
                         </ul>
                     </div>
 
                     <div class="help-section">
                         <h3>💾 저장</h3>
                         <ul>
-                            <li><strong>로컬 저장</strong>: 현재 기기에 저장</li>
+                            <li><strong>로컬 저장</strong>: 현재 기기 브라우저에 저장</li>
                             <li><strong>클라우드</strong>: 닉네임 + 4자리 코드로 어디서든 불러오기</li>
+                            <li><strong>저장 항목</strong>: 레벨, 골드, 스탯, 스킬, 강화, 최고 기록</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>🏆 리더보드</h3>
+                        <ul>
+                            <li><strong>해금 조건</strong>: 무한의 전장 50구역 이상 도달</li>
+                            <li><strong>등록</strong>: 숙소 → 근원 살펴보기 → 기록 등록</li>
                         </ul>
                     </div>
                 </div>
