@@ -4503,7 +4503,9 @@ async function cloudSaveGame() {
         statusEl.textContent = '저장 중...';
         statusEl.className = 'save-status';
 
-        const db = firebase.firestore();
+        initFirebase();
+        if (!db) throw new Error('Firebase 연결 실패');
+
         const docId = `${nickname}_${secret}`;
         const saveData = getSaveData();
 
@@ -4546,7 +4548,9 @@ async function cloudLoadGame() {
         statusEl.textContent = '불러오는 중...';
         statusEl.className = 'save-status';
 
-        const db = firebase.firestore();
+        initFirebase();
+        if (!db) throw new Error('Firebase 연결 실패');
+
         const docId = `${nickname}_${secret}`;
         const doc = await db.collection('saves').doc(docId).get();
 
