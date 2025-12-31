@@ -640,7 +640,7 @@ function generateEnemy(floor) {
         debuffs: {
             bleed: 0,       // 출혈: 턴당 플레이어 공격력의 50% 데미지 (중첩 가능)
             weaken: 0,      // 쇠약: 공격력 -10%, 받는 피해 +10% (중첩 가능)
-            stun: 0,        // 스턴: 반격 불가 1턴, 선제공격 +1
+            stun: 0,        // 스턴: 반격 1회 무효화
             freeze: 0       // 빙결: 선제공격 +2
         }
     };
@@ -1249,13 +1249,13 @@ function checkStunBlockCounter() {
     return false;
 }
 
-// 디버프로 인한 적 선제공격 증가 (스턴 +1, 빙결 +2)
+// 디버프로 인한 적 선제공격 증가 (빙결 +2)
 function getEnemyPriorityPenalty() {
     const enemy = gameState.currentEnemy;
     if (!enemy) return 0;
 
     let penalty = 0;
-    if (enemy.debuffs.stun > 0) penalty += 1;
+    // 스턴은 반격만 무효화, 선제공격에는 영향 없음
     penalty += (enemy.debuffs.freeze || 0) * 2;
     return penalty;
 }
@@ -3044,7 +3044,7 @@ function getEffectExplanation(effectType) {
         // 특수 용어가 필요한 효과들만
         'bleed': '출혈: 매 턴 (공격력×50%×중첩) 피해, 턴마다 1중첩 감소',
         'weaken': '쇠약: 중첩당 적 공격력 -10%, 받는 피해 +10%',
-        'stun': '스턴: 적 반격 불가, 적 선제공격 +1턴',
+        'stun': '스턴: 적 반격 1회 무효화',
         'freeze': '빙결: 적 선제공격 +2턴 (중첩 가능)',
         'execute': '처형: 적 HP 30% 이하일 때만 추가 피해',
         'firstHit': '첫타: 전투의 첫 번째 공격에만 적용',
