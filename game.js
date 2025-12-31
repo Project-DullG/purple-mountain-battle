@@ -830,7 +830,7 @@ function getWeaponBonus(character) {
         elf: 'staff'
     };
     const weapon = weaponMap[character];
-    return weapon ? gameState.weapons[weapon] * 0.5 : 0;
+    return weapon ? gameState.weapons[weapon] * 5 : 0;
 }
 
 function getMaxHp() {
@@ -1587,13 +1587,13 @@ function updateShopUI() {
 }
 
 function getEnhanceSuccessRate(level) {
-    // 1강: 100%, 100강: 1% (선형 감소)
-    return Math.max(1, 100 - (level - 1));
+    // 1강: 100%, 20강: 5% (선형 감소)
+    return Math.max(5, 100 - (level - 1) * 5);
 }
 
 function getEnhanceGoldCost(level) {
-    // 골드 비용: 현재 레벨 * 50
-    return level * 50;
+    // 골드 비용: 기본 200 + 레벨당 증가 (근원 강화보다 비싸게)
+    return 200 + level * 100 + Math.floor(level * level * 10);
 }
 
 function showEnhanceResult(weapon, success, level) {
@@ -1628,11 +1628,11 @@ function updateBlacksmithUI() {
         const level = gameState.weapons[weapon];
         const successRate = getEnhanceSuccessRate(level);
         const goldCost = getEnhanceGoldCost(level);
-        const isMaxLevel = level >= 100;
+        const isMaxLevel = level >= 20;
         const canAfford = gameState.enhancementStones >= 1 && gameState.player.gold >= goldCost;
 
         document.getElementById(`${weapon}-level`).textContent = level;
-        document.getElementById(`${weapon}-bonus`).textContent = (level * 0.5).toFixed(1);
+        document.getElementById(`${weapon}-bonus`).textContent = (level * 5).toFixed(0);
         document.getElementById(`${weapon}-rate`).textContent = successRate;
         document.getElementById(`${weapon}-gold`).textContent = goldCost;
 
