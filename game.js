@@ -303,22 +303,11 @@ function executeTagCombine(indices) {
     return randomRelic;
 }
 
-// 특정 태그를 가진 특정 등급 유물 중 무작위 선택
+// 특정 등급 유물 중 무작위 선택 (근원 합성: 태그 무관하게 랜덤)
 function getRandomRelicWithTag(tag, rarity) {
-    // 해당 등급의 유물 중 해당 태그를 가진 것 필터
-    const candidates = relicsData.filter(r => {
-        if (r.rarity !== rarity) return false;
-        const tags = getRelicTags(r);
-        return tags.includes(tag);
-    });
-
-    // 후보가 없으면 해당 등급 전체에서 무작위
-    if (candidates.length === 0) {
-        const allOfRarity = relicsData.filter(r => r.rarity === rarity);
-        return { ...allOfRarity[Math.floor(Math.random() * allOfRarity.length)] };
-    }
-
-    return { ...candidates[Math.floor(Math.random() * candidates.length)] };
+    // 해당 등급의 모든 유물 중 무작위 선택
+    const allOfRarity = relicsData.filter(r => r.rarity === rarity);
+    return { ...allOfRarity[Math.floor(Math.random() * allOfRarity.length)] };
 }
 
 // 태그 합성 UI 업데이트
