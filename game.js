@@ -1592,8 +1592,8 @@ function getEnhanceSuccessRate(level) {
 }
 
 function getEnhanceGoldCost(level) {
-    // 골드 비용: 기본 200 + 레벨당 증가 (근원 강화보다 비싸게)
-    return 200 + level * 100 + Math.floor(level * level * 10);
+    // 골드 비용: 확률 실패가 있으므로 근원 강화보다 저렴하게
+    return 50 + level * 30;
 }
 
 function showEnhanceResult(weapon, success, level) {
