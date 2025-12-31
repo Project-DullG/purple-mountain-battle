@@ -41,7 +41,7 @@ const gameState = {
     enhancementStones: 0,
     originStones: 0,
     statPointsPurchased: 0,  // 구매한 스탯 포인트 수 (비용 증가용)
-    originEnhancement: 0,  // 근원 강화 레벨 (유물 효과 +0.5% per level, max 200 = 100%)
+    originEnhancement: 0,  // 근원 강화 레벨 (유물 효과 +5% per level, max 20 = 100%)
     // 부적 구매 횟수 (비용 증가용)
     talismanPurchases: {
         exp: 0,           // 경험치 부적 구매 횟수
@@ -682,22 +682,19 @@ function getEnemyName(floor, isBoss, isMiniBoss) {
 }
 
 // 유물에서 특정 효과의 값을 가져오는 헬퍼 함수 (복합 효과 지원)
-// 근원 강화 보너스 (0.5% per level, max 100%)
+// 근원 강화 보너스 (5% per level, max 100%)
 function getOriginEnhancementBonus() {
-    return Math.min(gameState.originEnhancement * 0.5, 100) / 100;
+    return Math.min(gameState.originEnhancement * 5, 100) / 100;
 }
 
-// 근원 강화 비용 (단계별 증가)
+// 근원 강화 비용 (처음 싸게 시작, 점점 비싸짐)
 function getOriginEnhanceCost() {
     const level = gameState.originEnhancement;
-    if (level < 25) return 1;
-    if (level < 50) return 2;
-    if (level < 75) return 3;
-    if (level < 100) return 5;
-    if (level < 125) return 7;
-    if (level < 150) return 10;
-    if (level < 175) return 15;
-    return 20; // 175-200
+    // 1-5: 1개, 6-10: 2개, 11-15: 4개, 16-20: 8개
+    if (level < 5) return 1;
+    if (level < 10) return 2;
+    if (level < 15) return 4;
+    return 8; // 15-20
 }
 
 function getRelicEffectValue(relic, effectType) {
@@ -741,9 +738,9 @@ function checkProbabilityWithReroll(baseChance) {
     // 기본 확률 체크
     if (Math.random() < Math.min(baseChance, 1.0)) return true;
 
-    // 근원 강화 재판정 (기본확률 * 근원강화레벨/100)
+    // 근원 강화 재판정 (기본확률 * 근원강화레벨*5/100, 레벨당 5%)
     const enhancementLevel = gameState.originEnhancement || 0;
-    const rerollChance = baseChance * (enhancementLevel / 100);
+    const rerollChance = baseChance * (enhancementLevel * 5 / 100);
     if (rerollChance > 0 && Math.random() < Math.min(rerollChance, 1.0)) return true;
 
     return false;
@@ -1621,15 +1618,15 @@ function updateInnUI() {
 
     // 근원 강화 표시
     const enhancementLevel = gameState.originEnhancement;
-    const enhancementBonus = Math.min(enhancementLevel * 0.5, 100);
+    const enhancementBonus = Math.min(enhancementLevel * 5, 100);
     const enhanceCost = getOriginEnhanceCost();
     document.getElementById('origin-enhancement-level').textContent = enhancementLevel;
-    document.getElementById('origin-enhancement-bonus').textContent = Math.floor(enhancementBonus) + '%';
+    document.getElementById('origin-enhancement-bonus').textContent = enhancementBonus + '%';
 
-    // 근원 강화 버튼 상태 및 비용 표시 (최대 200레벨)
+    // 근원 강화 버튼 상태 및 비용 표시 (최대 20레벨)
     const enhanceBtn = document.getElementById('btn-origin-enhance');
     if (enhanceBtn) {
-        enhanceBtn.disabled = gameState.originStones < enhanceCost || enhancementLevel >= 200;
+        enhanceBtn.disabled = gameState.originStones < enhanceCost || enhancementLevel >= 20;
         enhanceBtn.textContent = `강화 (${enhanceCost}🔮)`;
     }
 
@@ -2902,8 +2899,8 @@ function getRelicDescWithEnhancement(relic) {
         const isProbability = probabilityEffects.includes(effect);
 
         if (isProbability) {
-            // 확률형: 기본확률 (+재판정확률)
-            const rerollChance = baseValue * (enhancementLevel / 100);
+            // 확률형: 기본확률 (+재판정확률), 레벨당 5%
+            const rerollChance = baseValue * (enhancementLevel * 5 / 100);
             const basePercent = formatValue(baseValue);
             const rerollPercent = formatValue(rerollChance);
 
@@ -3673,10 +3670,10 @@ function initEventListeners() {
         });
     });
 
-    // 숙소 - 근원 강화 (근원석 사용, 유물 효과 +0.5%)
+    // 숙소 - 근원 강화 (근원석 사용, 유물 효과 +5%)
     document.getElementById('btn-origin-enhance')?.addEventListener('click', () => {
         const cost = getOriginEnhanceCost();
-        if (gameState.originStones >= cost && gameState.originEnhancement < 200) {
+        if (gameState.originStones >= cost && gameState.originEnhancement < 20) {
             gameState.originStones -= cost;
             gameState.originEnhancement++;
             updateInnUI();
