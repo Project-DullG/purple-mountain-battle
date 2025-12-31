@@ -3011,7 +3011,7 @@ function showCombineResultChoices() {
         resultSection = document.createElement('div');
         resultSection.id = 'combine-result-section';
         resultSection.className = 'reward-section';
-        document.getElementById('reward-screen').appendChild(resultSection);
+        document.getElementById('boss-clear-screen').appendChild(resultSection);
     }
 
     resultSection.innerHTML = `
