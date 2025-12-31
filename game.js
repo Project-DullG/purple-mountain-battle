@@ -485,8 +485,8 @@ const skillsData = {
         },
         {
             id: 'cat_scratch', name: '물어 뜯기', mpCost: 1, damageMult: 0.25, type: 'active', subtype: 'sub', cooldown: 0,
-            effect: 'skillLifeSteal', healPercent: 5,
-            desc: '25% 피해, 피해량 5% 회복', char: '묘인'
+            effect: 'skillLifeSteal', healPercent: 8,
+            desc: '25% 피해, 피해량 8% 회복', char: '묘인'
         },
         {
             id: 'cat_bleed', name: '친절한 조언', mpCost: 2, type: 'buff', cooldown: 4,
@@ -495,8 +495,8 @@ const skillsData = {
         },
         {
             id: 'cat_brutal', name: '난폭한 힘', mpCost: 0, type: 'passive', subtype: 'always',
-            effect: 'critDmgUp', value: 25,
-            desc: '치명타 피해 +25%', char: '묘인'
+            effect: 'critDmgUp', value: 35,
+            desc: '치명타 피해 +35%', char: '묘인'
         },
         {
             id: 'cat_instinct', name: '야수의 본능', mpCost: 0, type: 'passive', subtype: 'conditional',
@@ -551,8 +551,8 @@ const skillsData = {
         },
         {
             id: 'dwarf_stupid', name: '멍청한 희생', mpCost: 0, type: 'passive', subtype: 'always',
-            effect: 'thorns', damageIncrease: 10, reflectPercent: 20,
-            desc: '받는 피해 +10%, 반사 피해 20%', char: '드워프'
+            effect: 'thorns', damageIncrease: 0, reflectPercent: 35,
+            desc: '받은 피해의 35% 반사', char: '드워프'
         },
         {
             id: 'dwarf_healthy', name: '건강한 신체', mpCost: 0, type: 'passive', subtype: 'conditional',
@@ -579,13 +579,13 @@ const skillsData = {
         },
         {
             id: 'human_dirty', name: '비열한 사격', mpCost: 0, type: 'passive', subtype: 'always',
-            effect: 'firstHitBonus', value: 12,
-            desc: '첫 공격 피해 +12%', char: '인간'
+            effect: 'firstHitBonus', value: 30,
+            desc: '첫 공격 피해 +30%', char: '인간'
         },
         {
             id: 'human_execute', name: '처형자', mpCost: 0, type: 'passive', subtype: 'conditional',
-            effect: 'executioner', value: 0.2,
-            desc: '적 HP 30% 이하 시 피해 +20%', char: '인간'
+            effect: 'executioner', value: 0.35,
+            desc: '적 HP 30% 이하 시 피해 +35%', char: '인간'
         }
     ]
 };
@@ -2766,14 +2766,13 @@ function generateSkillChoices() {
     }
 }
 
-// 던전 시작 시 기본 스킬 4개 지급 (각 캐릭터의 고정 액티브 스킬)
+// 던전 시작 시 기본 스킬 4개 지급 (각 캐릭터별 1개, 균형 잡힌 구성)
 function generateStartingSkills() {
-    // 고정 시작 스킬: 각 캐릭터의 공격 액티브 스킬
     return [
-        { ...skillsData.cat[0], character: 'cat' },      // 폭렬참 (1.5배 데미지)
-        { ...skillsData.elf[0], character: 'elf' },      // 별빛 화살 (마법 데미지)
-        { ...skillsData.dwarf[0], character: 'dwarf' },  // 방패 강타 (스턴)
-        { ...skillsData.human[0], character: 'human' }   // 정밀 사격 (반격없음)
+        { ...skillsData.cat[0], character: 'cat' },      // 폭렬참 (강공격 125%)
+        { ...skillsData.elf[1], character: 'elf' },      // 마력 화살 (보조공격 + MP회복)
+        { ...skillsData.dwarf[2], character: 'dwarf' },  // 올바른 벽 (버프 피해감소)
+        { ...skillsData.human[3], character: 'human' }   // 비열한 사격 (패시브 첫타+30%)
     ];
 }
 
