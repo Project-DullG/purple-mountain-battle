@@ -2985,3 +2985,90 @@ h2 {
         grid-template-columns: 1fr;
     }
 }
+
+/* 모바일 세로 모드 경고 오버레이 */
+#rotate-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    color: #eee;
+    text-align: center;
+    padding: 20px;
+}
+
+#rotate-overlay .rotate-icon {
+    font-size: 4rem;
+    animation: rotate-phone 2s ease-in-out infinite;
+}
+
+#rotate-overlay .rotate-text {
+    font-size: 1.2rem;
+    color: #b388ff;
+    font-weight: bold;
+}
+
+#rotate-overlay .rotate-subtext {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+@keyframes rotate-phone {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-15deg); }
+    75% { transform: rotate(15deg); }
+}
+
+/* 모바일 세로 모드일 때 오버레이 표시 */
+@media screen and (max-width: 900px) and (orientation: portrait) {
+    #rotate-overlay {
+        display: flex;
+    }
+
+    #game-container {
+        display: none;
+    }
+}
+
+/* 모바일 가로 모드 최적화 */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    body {
+        padding: 5px;
+        align-items: flex-start;
+    }
+
+    #game-container {
+        padding: 10px;
+        max-width: 100%;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+        margin-bottom: 3px;
+    }
+
+    h2 {
+        font-size: 0.85rem;
+    }
+
+    .screen {
+        gap: 8px;
+    }
+
+    .section {
+        padding: 8px;
+    }
+
+    button {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+}
