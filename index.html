@@ -144,7 +144,7 @@
                 </div>
                 <p class="mode-desc-text" id="mode-desc-text">보상 x1</p>
                 <div class="dungeon-entry">
-                    <button id="btn-dungeon" class="btn-enter">출격 (1층~)</button>
+                    <button id="btn-dungeon" class="btn-enter">출격 (1구역~)</button>
                     <button id="btn-skip" class="btn-skip">스킵 (50% HP)</button>
                 </div>
                 <p id="skip-info" class="skip-info"></p>
@@ -359,13 +359,13 @@
             <div class="section leaderboard-section">
                 <h2>🏆 근원 살펴보기</h2>
                 <div id="leaderboard-locked" class="leaderboard-locked">
-                    <p class="leaderboard-desc">"무한의 전장에서 50층을 넘으면... 근원을 자세히 들여다볼 수 있어."</p>
-                    <p class="current-record">현재 최고 기록: <span id="infinite-record">0</span>층</p>
+                    <p class="leaderboard-desc">"무한의 전장에서 50구역을 넘으면... 근원을 자세히 들여다볼 수 있어."</p>
+                    <p class="current-record">현재 최고 기록: <span id="infinite-record">0</span>구역</p>
                 </div>
                 <div id="leaderboard-unlocked" class="leaderboard-unlocked hidden">
                     <p class="leaderboard-intro">"이곳을 거쳐간 기록들이야."</p>
                     <div class="my-record">
-                        <span>내 기록: <strong id="my-floor">0</strong>층 (Lv.<span id="my-level">1</span>)</span>
+                        <span>내 기록: <strong id="my-floor">0</strong>구역 (Lv.<span id="my-level">1</span>)</span>
                     </div>
                     <div class="submit-section">
                         <input type="text" id="input-nickname" maxlength="12" placeholder="닉네임 (최대 12자)">
@@ -383,7 +383,7 @@
         <!-- 던전 화면 -->
         <div id="dungeon-screen" class="screen hidden">
             <div id="dungeon-header">
-                <span class="floor-info"><span id="current-floor">1</span>층</span>
+                <span class="floor-info"><span id="current-floor">1</span>구역</span>
                 <div class="pending-rewards">
                     <span class="reward-label">누적 보상</span>
                     <span class="reward-values">
@@ -558,13 +558,13 @@
             </div>
         </div>
 
-        <!-- 층 클리어 화면 (유물/휴식 선택) -->
+        <!-- 구역 클리어 화면 (유물/휴식 선택) -->
         <div id="boss-clear-screen" class="screen hidden">
-            <h1>층 클리어!</h1>
+            <h1>구역 클리어!</h1>
 
             <!-- 확인 버튼 섹션 -->
             <div id="boss-confirm-section" class="section">
-                <h2>5층 클리어!</h2>
+                <h2>5구역 클리어!</h2>
                 <p class="boss-confirm-msg">유물을 선택하고 휴식을 취하세요!</p>
                 <button id="btn-boss-confirm" class="btn-boss-confirm">확인</button>
             </div>
@@ -607,7 +607,7 @@
                 </div>
             </div>
 
-            <!-- 옵션 2: 스킬 교체 + 휴식 (보스층만, 유물 대신) -->
+            <!-- 옵션 2: 스킬 교체 + 휴식 (보스구역만, 유물 대신) -->
             <div id="skill-rest-section" class="section hidden">
                 <h2>또는 스킬 교체</h2>
                 <p class="skill-swap-desc">스킬을 교체하거나 유지하세요</p>
@@ -619,7 +619,7 @@
         <!-- 마을 복귀 화면 -->
         <div id="return-screen" class="screen hidden">
             <h1>마을 복귀</h1>
-            <p class="return-msg"><span id="return-floor">0</span>층까지 도달했습니다</p>
+            <p class="return-msg"><span id="return-floor">0</span>구역까지 도달했습니다</p>
             <div class="return-rewards">
                 <p>+<span id="return-gold">0</span> 골드</p>
                 <p>+<span id="return-exp">0</span> 경험치</p>
@@ -647,7 +647,7 @@
             <h1>클리어!</h1>
             <p class="clear-msg">축하합니다! <span id="clear-mode"></span> 모드를 클리어했습니다!</p>
             <div class="clear-rewards">
-                <p>최종 층: <span id="clear-floor">50</span>층</p>
+                <p>최종 구역: <span id="clear-floor">50</span>구역</p>
                 <p>+<span id="clear-gold">0</span> 골드</p>
                 <p>+<span id="clear-exp">0</span> 경험치</p>
                 <p>+<span id="clear-stones">0</span> 강화석 💎</p>

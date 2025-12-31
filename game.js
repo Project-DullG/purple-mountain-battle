@@ -1622,10 +1622,10 @@ function updateVillageUI() {
 
     if (skipFloor > 0) {
         skipBtn.disabled = false;
-        skipInfo.textContent = `5→${skipFloor}층 보스전만 진행 (최고: ${gameState.dungeon.highestFloor}층)`;
+        skipInfo.textContent = `5→${skipFloor}구역 보스전만 진행 (최고: ${gameState.dungeon.highestFloor}구역)`;
     } else {
         skipBtn.disabled = true;
-        skipInfo.textContent = '5층 클리어 후 스킵 가능';
+        skipInfo.textContent = '5구역 클리어 후 스킵 가능';
     }
 }
 
@@ -1946,7 +1946,7 @@ function startBattle() {
     const enemy = gameState.currentEnemy;
     const floorType = enemy.isBoss ? '보스' : enemy.isMiniBoss ? '중간보스' : '';
     const typePrefix = enemy.type ? enemy.type.prefix : '';
-    addBattleLog(`${gameState.dungeon.currentFloor}층 - ${typePrefix}${enemy.name} ${floorType ? `[${floorType}]` : ''} 등장!`);
+    addBattleLog(`${gameState.dungeon.currentFloor}구역 - ${typePrefix}${enemy.name} ${floorType ? `[${floorType}]` : ''} 등장!`);
 
     // 보스/중보스 버프 표시
     if (enemy.buff) {
@@ -2776,10 +2776,10 @@ function showBossClearScreen(isBossFloor = false) {
     document.getElementById('skill-rest-section').classList.add('hidden');
     document.getElementById('relic-replace-section').classList.add('hidden');
 
-    // 현재 층 정보 표시
+    // 현재 구역 정보 표시
     const floorType = isBossFloor ? '보스' : '중간보스';
     document.getElementById('boss-confirm-section').querySelector('h2').textContent =
-        `${gameState.dungeon.currentFloor}층 ${floorType} 클리어!`;
+        `${gameState.dungeon.currentFloor}구역 ${floorType} 클리어!`;
 
     // 보상 안내 메시지
     const rewardMsg = isBossFloor
@@ -4448,7 +4448,7 @@ async function submitScore() {
             const oldFloor = doc.data().floor;
             if (floor <= oldFloor) {
                 if (statusEl) {
-                    statusEl.textContent = `이미 더 높은 기록(${oldFloor}층)이 등록되어 있습니다.`;
+                    statusEl.textContent = `이미 더 높은 기록(${oldFloor}구역)이 등록되어 있습니다.`;
                     statusEl.className = 'submit-status error';
                 }
                 return;
@@ -4499,7 +4499,7 @@ function renderLeaderboard(data) {
     }
 
     let html = '<div class="leaderboard-table">';
-    html += '<div class="leaderboard-header"><span>순위</span><span>닉네임</span><span>층수</span><span>레벨</span></div>';
+    html += '<div class="leaderboard-header"><span>순위</span><span>닉네임</span><span>구역</span><span>레벨</span></div>';
 
     data.leaderboard.forEach((entry, idx) => {
         const rankClass = idx < 3 ? `rank-${idx + 1}` : '';
@@ -4509,7 +4509,7 @@ function renderLeaderboard(data) {
             <div class="leaderboard-row ${rankClass}">
                 <span class="rank">${rankIcon}</span>
                 <span class="nickname">${safeNickname}</span>
-                <span class="floor">${entry.floor}층</span>
+                <span class="floor">${entry.floor}구역</span>
                 <span class="level">Lv.${entry.level}</span>
             </div>
         `;
