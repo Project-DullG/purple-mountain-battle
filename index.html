@@ -140,9 +140,9 @@
                 </button>
             </div>
 
-            <!-- 전장 출격 -->
+            <!-- 보랏빛 산지 입장 -->
             <div class="section">
-                <h2>전장 출격</h2>
+                <h2>보랏빛 산지</h2>
                 <div class="mode-select-grid">
                     <button class="btn-mode-select selected" data-mode="easy">전장 초입부</button>
                     <button class="btn-mode-select" data-mode="normal">전장 중심부</button>
@@ -151,7 +151,7 @@
                 </div>
                 <p class="mode-desc-text" id="mode-desc-text">보상 x1</p>
                 <div class="dungeon-entry">
-                    <button id="btn-dungeon" class="btn-enter">출격 (1구역~)</button>
+                    <button id="btn-dungeon" class="btn-enter">보랏빛 산지 입장 (1구역~)</button>
                     <button id="btn-skip" class="btn-skip">스킵 (50% HP)</button>
                 </div>
                 <p id="skip-info" class="skip-info"></p>
@@ -333,14 +333,28 @@
             <div class="section origin-enhance-section">
                 <h2>🔮 근원 강화</h2>
                 <p class="enhance-desc">"유물에 깃든 힘을 끌어올려줄게."</p>
-                <div class="origin-enhance-display">
-                    <div class="enhance-info">
-                        <span class="enhance-level">Lv.<span id="origin-enhancement-level">0</span> / 20</span>
-                        <span class="enhance-bonus">유물 효과 +<span id="origin-enhancement-bonus">0%</span></span>
+
+                <div class="origin-enhance-row">
+                    <div class="origin-enhance-item">
+                        <span class="enhance-type">⚔️ 공격</span>
+                        <span class="enhance-level">Lv.<span id="origin-level-attack">0</span></span>
+                        <span class="enhance-bonus">+<span id="origin-bonus-attack">0</span>%</span>
+                        <button class="btn-origin-enhance" data-type="attack">강화 (<span id="origin-cost-attack">1</span>🔮)</button>
                     </div>
-                    <button id="btn-origin-enhance" class="btn-enhance">강화 (1🔮)</button>
+                    <div class="origin-enhance-item">
+                        <span class="enhance-type">🛡️ 방어</span>
+                        <span class="enhance-level">Lv.<span id="origin-level-defense">0</span></span>
+                        <span class="enhance-bonus">+<span id="origin-bonus-defense">0</span>%</span>
+                        <button class="btn-origin-enhance" data-type="defense">강화 (<span id="origin-cost-defense">1</span>🔮)</button>
+                    </div>
+                    <div class="origin-enhance-item">
+                        <span class="enhance-type">✨ 특수</span>
+                        <span class="enhance-level">Lv.<span id="origin-level-special">0</span></span>
+                        <span class="enhance-bonus">+<span id="origin-bonus-special">0</span>%</span>
+                        <button class="btn-origin-enhance" data-type="special">강화 (<span id="origin-cost-special">1</span>🔮)</button>
+                    </div>
                 </div>
-                <p class="enhance-note">레벨당 +5%, 최대 +100%</p>
+                <p class="enhance-note">레벨당 +5%, 최대 +100% (각 타입별)</p>
             </div>
 
             <div class="section">
@@ -356,11 +370,43 @@
             <div class="section save-section">
                 <h2>💾 근원 저장</h2>
                 <p class="save-desc">"여정의 기억을 근원에 새겨둘게. 언제든 돌아올 수 있어."</p>
-                <div class="save-buttons">
-                    <button id="btn-save-game" class="btn-save">저장하기</button>
-                    <button id="btn-load-game" class="btn-load">불러오기</button>
+
+                <!-- 로컬 저장 -->
+                <div class="save-subsection">
+                    <h3>📱 이 기기에 저장</h3>
+                    <div id="local-save-preview" class="save-preview hidden">
+                        <div class="preview-row">
+                            <span>레벨: <strong id="preview-level">1</strong></span>
+                            <span>골드: <strong id="preview-gold">0</strong></span>
+                        </div>
+                        <div class="preview-row">
+                            <span>최고 기록: <strong id="preview-floor">0</strong>층</span>
+                            <span>무한: <strong id="preview-infinite">0</strong>층</span>
+                        </div>
+                        <div class="preview-time">저장 시간: <span id="preview-time">-</span></div>
+                    </div>
+                    <div id="local-no-save" class="no-save-msg">저장된 데이터가 없습니다.</div>
+                    <div class="save-buttons">
+                        <button id="btn-save-game" class="btn-save">저장하기</button>
+                        <button id="btn-load-game" class="btn-load">불러오기</button>
+                    </div>
+                    <p id="save-status" class="save-status"></p>
                 </div>
-                <p id="save-status" class="save-status"></p>
+
+                <!-- 클라우드 저장 -->
+                <div class="save-subsection cloud-save">
+                    <h3>☁️ 클라우드 저장</h3>
+                    <p class="cloud-desc">닉네임과 비밀코드로 어디서든 불러올 수 있어.</p>
+                    <div class="cloud-inputs">
+                        <input type="text" id="cloud-nickname" maxlength="12" placeholder="닉네임">
+                        <input type="text" id="cloud-secret" maxlength="4" placeholder="비밀코드 4자리" pattern="[0-9]*" inputmode="numeric">
+                    </div>
+                    <div class="save-buttons">
+                        <button id="btn-cloud-save" class="btn-save">클라우드 저장</button>
+                        <button id="btn-cloud-load" class="btn-load">클라우드 불러오기</button>
+                    </div>
+                    <p id="cloud-status" class="save-status"></p>
+                </div>
             </div>
 
             <div class="section leaderboard-section">
@@ -664,6 +710,12 @@
         </div>
     </div>
 
-    <script src="game.js?v=20251231t"></script>
+    <!-- BGM -->
+    <audio id="bgm" loop>
+        <source src="게임 음악.mp3" type="audio/mpeg">
+    </audio>
+    <button id="btn-bgm-toggle" class="bgm-toggle" title="배경음악 켜기/끄기">🔇 음악 끔</button>
+
+    <script src="game.js?v=20251231u"></script>
 </body>
 </html>

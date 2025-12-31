@@ -2408,6 +2408,65 @@ h2 {
     margin-top: 5px;
 }
 
+/* 근원 강화 타입별 UI */
+.origin-enhance-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.origin-enhance-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #2d1b4e 0%, #1a1a2e 100%);
+    border: 1px solid #8b7bc7;
+    border-radius: 8px;
+    padding: 12px 15px;
+}
+
+.origin-enhance-item .enhance-type {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: #fff;
+    min-width: 70px;
+}
+
+.origin-enhance-item .enhance-level {
+    font-size: 0.9rem;
+    color: #a29bfe;
+    min-width: 50px;
+}
+
+.origin-enhance-item .enhance-bonus {
+    font-size: 0.9rem;
+    color: #00ff88;
+    min-width: 50px;
+}
+
+.btn-origin-enhance {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #8b7bc7, #6c5ce7);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-origin-enhance:hover:not(:disabled) {
+    background: linear-gradient(135deg, #9d8fd9, #7d6dd7);
+    transform: translateY(-1px);
+}
+
+.btn-origin-enhance:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* 능력치 포인트 구매 섹션 */
 .stat-point-purchase {
     margin-top: 15px;
@@ -2633,6 +2692,101 @@ h2 {
 
 .save-status.error {
     color: #ff6b6b;
+}
+
+/* 저장 서브섹션 */
+.save-subsection {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.save-subsection:last-child {
+    margin-bottom: 0;
+}
+
+.save-subsection h3 {
+    color: #a29bfe;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+.cloud-desc {
+    color: #888;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+}
+
+.cloud-inputs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.cloud-inputs input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #6c5ce7;
+    border-radius: 6px;
+    background: rgba(30, 30, 50, 0.8);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.cloud-inputs input::placeholder {
+    color: #666;
+}
+
+.cloud-inputs input:focus {
+    outline: none;
+    border-color: #a29bfe;
+    box-shadow: 0 0 8px rgba(162, 155, 254, 0.3);
+}
+
+#cloud-secret {
+    max-width: 120px;
+    text-align: center;
+    letter-spacing: 3px;
+}
+
+/* 저장 데이터 미리보기 */
+.save-preview {
+    background: rgba(108, 92, 231, 0.15);
+    border: 1px solid rgba(162, 155, 254, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.preview-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+.preview-row strong {
+    color: #a29bfe;
+}
+
+.preview-time {
+    font-size: 0.8rem;
+    color: #888;
+    text-align: center;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.no-save-msg {
+    color: #888;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin-bottom: 12px;
 }
 
 /* 리더보드 섹션 */
@@ -3070,5 +3224,42 @@ h2 {
     button {
         padding: 8px 12px;
         font-size: 0.85rem;
+    }
+}
+
+/* BGM 토글 버튼 */
+.bgm-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 16px;
+    background: rgba(30, 30, 50, 0.9);
+    border: 1px solid #6c5ce7;
+    border-radius: 25px;
+    color: #a29bfe;
+    font-size: 0.85rem;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.bgm-toggle:hover {
+    background: rgba(108, 92, 231, 0.3);
+    transform: translateY(-2px);
+}
+
+.bgm-toggle.active {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+    border-color: #a29bfe;
+}
+
+@media (max-width: 480px) {
+    .bgm-toggle {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        font-size: 0.8rem;
     }
 }

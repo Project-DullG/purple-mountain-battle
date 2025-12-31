@@ -42,7 +42,12 @@ const gameState = {
     enhancementStones: 0,
     originStones: 0,
     statPointsPurchased: 0,  // 구매한 스탯 포인트 수 (비용 증가용)
-    originEnhancement: 0,  // 근원 강화 레벨 (유물 효과 +5% per level, max 20 = 100%)
+    // 근원 강화 레벨 (유물 타입별, +5% per level, max 20 = 100%)
+    originEnhancement: {
+        attack: 0,   // 공격 유물 강화
+        defense: 0,  // 방어 유물 강화
+        special: 0   // 특수 유물 강화
+    },
     // 부적 구매 횟수 (비용 증가용)
     talismanPurchases: {
         exp: 0,           // 경험치 부적 구매 횟수
@@ -716,13 +721,38 @@ function getEnemyName(floor, isBoss, isMiniBoss) {
 
 // 유물에서 특정 효과의 값을 가져오는 헬퍼 함수 (복합 효과 지원)
 // 근원 강화 보너스 (5% per level, max 100%)
-function getOriginEnhancementBonus() {
-    return Math.min(gameState.originEnhancement * 5, 100) / 100;
+// tag: '공격', '방어', '특수' 또는 type: 'attack', 'defense', 'special'
+function getOriginEnhancementBonus(tagOrType) {
+    let type = tagOrType;
+    // 한글 태그를 영문 타입으로 변환
+    if (tagOrType === '공격') type = 'attack';
+    else if (tagOrType === '방어') type = 'defense';
+    else if (tagOrType === '특수') type = 'special';
+
+    // 타입이 없으면 전체 평균 반환 (하위 호환성)
+    if (!type || !gameState.originEnhancement[type]) {
+        const avg = (gameState.originEnhancement.attack +
+                     gameState.originEnhancement.defense +
+                     gameState.originEnhancement.special) / 3;
+        return Math.min(avg * 5, 100) / 100;
+    }
+
+    return Math.min(gameState.originEnhancement[type] * 5, 100) / 100;
+}
+
+// 근원 강화 레벨 반환
+function getOriginEnhancementLevel(tagOrType) {
+    let type = tagOrType;
+    if (tagOrType === '공격') type = 'attack';
+    else if (tagOrType === '방어') type = 'defense';
+    else if (tagOrType === '특수') type = 'special';
+
+    return gameState.originEnhancement[type] || 0;
 }
 
 // 근원 강화 비용 (처음 싸게 시작, 점점 많이 비싸짐)
-function getOriginEnhanceCost() {
-    const level = gameState.originEnhancement;
+function getOriginEnhanceCost(type) {
+    const level = gameState.originEnhancement[type] || 0;
     // 1-3: 1개, 4-6: 5개, 7-9: 15개, 10-12: 30개, 13-15: 60개, 16-18: 100개, 19-20: 200개
     // 총 비용: 3 + 15 + 45 + 90 + 180 + 300 + 400 = 1033개
     if (level < 3) return 1;
@@ -748,9 +778,10 @@ function getRelicEffectValue(relic, effectType) {
     }
 
     // 근원 강화 보너스 적용 (수치형 효과에만, 확률형 제외)
+    // 유물의 태그에 따라 해당 타입의 강화 보너스 적용
     const probabilityEffects = ['multiHit', 'lifeSteal', 'bleed', 'weaken', 'stun', 'freeze'];
     if (value !== null && typeof value === 'number' && !probabilityEffects.includes(effectType)) {
-        value *= (1 + getOriginEnhancementBonus());
+        value *= (1 + getOriginEnhancementBonus(relic.tag));
     }
 
     return value;
@@ -1096,8 +1127,8 @@ function getLifeStealInfo() {
         }
     });
 
-    // 근원 강화 적용 (회복량에 보너스)
-    const originBonus = getOriginEnhancementBonus();
+    // 근원 강화 적용 (회복량에 보너스) - 흡혈은 공격 계열
+    const originBonus = getOriginEnhancementBonus('attack');
     const healPercent = baseHealPercent * (1 + originBonus);
 
     return { chance, healPercent, baseHealPercent }; // 원본 확률 + 강화된 회복량
@@ -1318,9 +1349,9 @@ function getStunCounterReduction() {
     // 스턴 스택 소모
     enemy.debuffs.stun--;
 
-    // 기본 25% 감소, 근원 강화로 추가 감소 (최대 50%)
+    // 기본 25% 감소, 근원 강화로 추가 감소 (최대 50%) - 스턴은 특수 계열
     const baseReduction = 0.25;
-    const originBonus = getOriginEnhancementBonus();
+    const originBonus = getOriginEnhancementBonus('special');
     const reduction = baseReduction * (1 + originBonus);
 
     return Math.min(reduction, 0.50); // 최대 50%
@@ -1793,19 +1824,22 @@ function updateBlacksmithUI() {
 function updateInnUI() {
     document.getElementById('inn-origin-stones').textContent = gameState.originStones;
 
-    // 근원 강화 표시
-    const enhancementLevel = gameState.originEnhancement;
-    const enhancementBonus = Math.min(enhancementLevel * 5, 100);
-    const enhanceCost = getOriginEnhanceCost();
-    document.getElementById('origin-enhancement-level').textContent = enhancementLevel;
-    document.getElementById('origin-enhancement-bonus').textContent = enhancementBonus + '%';
+    // 근원 강화 표시 (타입별)
+    const types = ['attack', 'defense', 'special'];
+    types.forEach(type => {
+        const level = gameState.originEnhancement[type];
+        const bonus = Math.min(level * 5, 100);
+        const cost = getOriginEnhanceCost(type);
 
-    // 근원 강화 버튼 상태 및 비용 표시 (최대 20레벨)
-    const enhanceBtn = document.getElementById('btn-origin-enhance');
-    if (enhanceBtn) {
-        enhanceBtn.disabled = gameState.originStones < enhanceCost || enhancementLevel >= 20;
-        enhanceBtn.textContent = `강화 (${enhanceCost}🔮)`;
-    }
+        document.getElementById(`origin-level-${type}`).textContent = level;
+        document.getElementById(`origin-bonus-${type}`).textContent = bonus;
+        document.getElementById(`origin-cost-${type}`).textContent = cost;
+
+        const btn = document.querySelector(`.btn-origin-enhance[data-type="${type}"]`);
+        if (btn) {
+            btn.disabled = gameState.originStones < cost || level >= 20;
+        }
+    });
 
     // 스탯 포인트 구매 비용 (구매할수록 증가)
     const statPointCost = 1 + Math.floor(gameState.statPointsPurchased / 5);
@@ -1815,6 +1849,9 @@ function updateInnUI() {
 
     // 리더보드 UI 업데이트
     updateLeaderboardUI();
+
+    // 저장 데이터 미리보기 업데이트
+    updateSavePreview();
 }
 
 function updateDungeonUI() {
@@ -1875,11 +1912,17 @@ function updateBattleUI() {
     document.getElementById('panel-stun').textContent = Math.floor(getDebuffChance('stun') * 100) + '%';
     document.getElementById('panel-freeze').textContent = Math.floor(getDebuffChance('freeze') * 100) + '%';
 
-    // 근원 강화 보너스 표시
-    const originBonus = Math.floor(getOriginEnhancementBonus() * 100);
+    // 근원 강화 보너스 표시 (타입별)
     const originBonusEl = document.getElementById('panel-origin-bonus');
     if (originBonusEl) {
-        originBonusEl.textContent = originBonus > 0 ? `+${originBonus}%` : '';
+        const atkBonus = Math.floor(getOriginEnhancementBonus('attack') * 100);
+        const defBonus = Math.floor(getOriginEnhancementBonus('defense') * 100);
+        const spcBonus = Math.floor(getOriginEnhancementBonus('special') * 100);
+        if (atkBonus > 0 || defBonus > 0 || spcBonus > 0) {
+            originBonusEl.textContent = `공${atkBonus}/방${defBonus}/특${spcBonus}%`;
+        } else {
+            originBonusEl.textContent = '';
+        }
     }
 
     // 획득 보상 표시
@@ -3318,8 +3361,8 @@ function generateRelicDesc(relic) {
 
 // 유물 설명 + 근원 강화 보정 수치 표시
 function getRelicDescWithEnhancement(relic) {
-    const enhancementBonus = getOriginEnhancementBonus();
-    const enhancementLevel = gameState.originEnhancement || 0;
+    const enhancementBonus = getOriginEnhancementBonus(relic.tag);
+    const enhancementLevel = getOriginEnhancementLevel(relic.tag);
 
     // 확률형 효과 목록
     const probabilityEffects = ['multiHit', 'lifeSteal', 'bleed', 'weaken', 'stun', 'freeze'];
@@ -4111,14 +4154,21 @@ function initEventListeners() {
         });
     });
 
-    // 숙소 - 근원 강화 (근원석 사용, 유물 효과 +5%)
-    document.getElementById('btn-origin-enhance')?.addEventListener('click', () => {
-        const cost = getOriginEnhanceCost();
-        if (gameState.originStones >= cost && gameState.originEnhancement < 20) {
-            gameState.originStones -= cost;
-            gameState.originEnhancement++;
-            updateInnUI();
-        }
+    // 숙소 - 근원 강화 (근원석 사용, 유물 효과 +5%) - 타입별 버튼
+    document.querySelectorAll('.btn-origin-enhance').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.type; // 'attack', 'defense', 'special'
+            if (!type) return;
+
+            const cost = getOriginEnhanceCost(type);
+            const currentLevel = gameState.originEnhancement[type] || 0;
+
+            if (gameState.originStones >= cost && currentLevel < 20) {
+                gameState.originStones -= cost;
+                gameState.originEnhancement[type] = currentLevel + 1;
+                updateInnUI();
+            }
+        });
     });
 
     // 숙소 - 능력치 포인트 구매 (근원석 사용)
@@ -4149,9 +4199,13 @@ function initEventListeners() {
         showScreen('village-screen');
     });
 
-    // 세이브/로드
+    // 세이브/로드 (로컬)
     document.getElementById('btn-save-game').addEventListener('click', saveGame);
     document.getElementById('btn-load-game').addEventListener('click', loadGame);
+
+    // 세이브/로드 (클라우드)
+    document.getElementById('btn-cloud-save')?.addEventListener('click', cloudSaveGame);
+    document.getElementById('btn-cloud-load')?.addEventListener('click', cloudLoadGame);
 
     // 리더보드
     document.getElementById('btn-refresh-leaderboard')?.addEventListener('click', () => {
@@ -4219,7 +4273,7 @@ function resetStats() {
 
 // === 세이브/로드 시스템 ===
 const SAVE_KEY = 'grayMercenary_save';
-const SAVE_VERSION = 1;
+const SAVE_VERSION = 2;
 
 // 스킬 ID로 스킬 찾기
 function findSkillById(skillId) {
@@ -4282,9 +4336,23 @@ function applySaveData(data) {
     gameState.percentBonus = { ...data.percentBonus };
     gameState.enhancementStones = data.enhancementStones;
     gameState.originStones = data.originStones;
-    gameState.originEnhancement = data.originEnhancement;
     gameState.statPointsPurchased = data.statPointsPurchased;
     gameState.gameMode = data.gameMode;
+
+    // 근원 강화 마이그레이션 (구버전: 숫자 -> 신버전: 객체)
+    if (typeof data.originEnhancement === 'number') {
+        // 기존 레벨을 세 타입에 균등 분배
+        const oldLevel = data.originEnhancement;
+        gameState.originEnhancement = {
+            attack: oldLevel,
+            defense: oldLevel,
+            special: oldLevel
+        };
+    } else if (data.originEnhancement && typeof data.originEnhancement === 'object') {
+        gameState.originEnhancement = { ...data.originEnhancement };
+    } else {
+        gameState.originEnhancement = { attack: 0, defense: 0, special: 0 };
+    }
 
     // 스킬 복원
     gameState.equippedSkills = data.equippedSkills.map(id => findSkillById(id));
@@ -4315,6 +4383,7 @@ function saveGame() {
             statusEl.textContent = `저장 완료! (${timeStr})`;
             statusEl.className = 'save-status success';
         }
+        updateSavePreview();
         return true;
     } catch (e) {
         const statusEl = document.getElementById('save-status');
@@ -4371,6 +4440,144 @@ function loadGame() {
 // 저장 데이터 존재 여부 확인
 function hasSaveData() {
     return localStorage.getItem(SAVE_KEY) !== null;
+}
+
+// 저장 데이터 미리보기 업데이트
+function updateSavePreview() {
+    const previewEl = document.getElementById('local-save-preview');
+    const noSaveEl = document.getElementById('local-no-save');
+
+    if (!previewEl || !noSaveEl) return;
+
+    const saveStr = localStorage.getItem(SAVE_KEY);
+    if (!saveStr) {
+        previewEl.classList.add('hidden');
+        noSaveEl.classList.remove('hidden');
+        return;
+    }
+
+    try {
+        const data = JSON.parse(saveStr);
+
+        document.getElementById('preview-level').textContent = data.player?.level || 1;
+        document.getElementById('preview-gold').textContent = (data.player?.gold || 0).toLocaleString();
+        document.getElementById('preview-floor').textContent = data.dungeon?.highestFloor || 0;
+        document.getElementById('preview-infinite').textContent = data.dungeon?.infiniteHighestFloor || 0;
+
+        // 저장 시간 표시
+        if (data.timestamp) {
+            const date = new Date(data.timestamp);
+            const timeStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+            document.getElementById('preview-time').textContent = timeStr;
+        } else {
+            document.getElementById('preview-time').textContent = '-';
+        }
+
+        previewEl.classList.remove('hidden');
+        noSaveEl.classList.add('hidden');
+    } catch (e) {
+        previewEl.classList.add('hidden');
+        noSaveEl.classList.remove('hidden');
+    }
+}
+
+// === 클라우드 저장 시스템 (Firebase Firestore) ===
+async function cloudSaveGame() {
+    const nickname = document.getElementById('cloud-nickname').value.trim();
+    const secret = document.getElementById('cloud-secret').value.trim();
+    const statusEl = document.getElementById('cloud-status');
+
+    // 입력 검증
+    if (!nickname || nickname.length < 2) {
+        statusEl.textContent = '닉네임을 2자 이상 입력해주세요.';
+        statusEl.className = 'save-status error';
+        return false;
+    }
+    if (!secret || secret.length !== 4 || !/^\d{4}$/.test(secret)) {
+        statusEl.textContent = '비밀코드 4자리 숫자를 입력해주세요.';
+        statusEl.className = 'save-status error';
+        return false;
+    }
+
+    try {
+        statusEl.textContent = '저장 중...';
+        statusEl.className = 'save-status';
+
+        const db = firebase.firestore();
+        const docId = `${nickname}_${secret}`;
+        const saveData = getSaveData();
+
+        await db.collection('saves').doc(docId).set({
+            nickname: nickname,
+            saveData: saveData,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        const date = new Date();
+        const timeStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+        statusEl.textContent = `클라우드 저장 완료! (${timeStr})`;
+        statusEl.className = 'save-status success';
+        return true;
+    } catch (e) {
+        statusEl.textContent = '클라우드 저장 실패: ' + e.message;
+        statusEl.className = 'save-status error';
+        return false;
+    }
+}
+
+async function cloudLoadGame() {
+    const nickname = document.getElementById('cloud-nickname').value.trim();
+    const secret = document.getElementById('cloud-secret').value.trim();
+    const statusEl = document.getElementById('cloud-status');
+
+    // 입력 검증
+    if (!nickname || nickname.length < 2) {
+        statusEl.textContent = '닉네임을 2자 이상 입력해주세요.';
+        statusEl.className = 'save-status error';
+        return false;
+    }
+    if (!secret || secret.length !== 4 || !/^\d{4}$/.test(secret)) {
+        statusEl.textContent = '비밀코드 4자리 숫자를 입력해주세요.';
+        statusEl.className = 'save-status error';
+        return false;
+    }
+
+    try {
+        statusEl.textContent = '불러오는 중...';
+        statusEl.className = 'save-status';
+
+        const db = firebase.firestore();
+        const docId = `${nickname}_${secret}`;
+        const doc = await db.collection('saves').doc(docId).get();
+
+        if (!doc.exists) {
+            statusEl.textContent = '저장된 데이터가 없습니다. 닉네임과 비밀코드를 확인해주세요.';
+            statusEl.className = 'save-status error';
+            return false;
+        }
+
+        if (!confirm('현재 진행을 덮어쓰고 클라우드 데이터를 불러올까요?')) {
+            statusEl.textContent = '';
+            return false;
+        }
+
+        const data = doc.data();
+        applySaveData(data.saveData);
+
+        // UI 업데이트
+        updateSkillButtons();
+        updateVillageUI();
+        updateInnUI();
+        showScreen('village-screen');
+
+        statusEl.textContent = `클라우드 불러오기 완료! (${data.nickname})`;
+        statusEl.className = 'save-status success';
+        return true;
+    } catch (e) {
+        statusEl.textContent = '클라우드 불러오기 실패: ' + e.message;
+        statusEl.className = 'save-status error';
+        return false;
+    }
 }
 
 // === 리더보드 시스템 (Firebase Firestore) ===
@@ -4575,6 +4782,62 @@ function initGame() {
     updateSkillButtons();
     updateVillageUI();
     showScreen('village-screen');
+    initBGM();
+}
+
+// === BGM 시스템 ===
+let bgmEnabled = false;
+const bgm = document.getElementById('bgm');
+
+function initBGM() {
+    const btn = document.getElementById('btn-bgm-toggle');
+    if (!btn || !bgm) return;
+
+    // 로컬스토리지에서 설정 불러오기
+    const savedBgmState = localStorage.getItem('bgmEnabled');
+    if (savedBgmState === 'true') {
+        bgmEnabled = true;
+        updateBGMButton();
+    }
+
+    btn.addEventListener('click', toggleBGM);
+
+    // 첫 사용자 상호작용 시 자동 재생 시도 (브라우저 정책)
+    document.addEventListener('click', tryAutoPlayBGM, { once: true });
+}
+
+function tryAutoPlayBGM() {
+    if (bgmEnabled && bgm.paused) {
+        bgm.volume = 0.3;
+        bgm.play().catch(() => {});
+    }
+}
+
+function toggleBGM() {
+    bgmEnabled = !bgmEnabled;
+    localStorage.setItem('bgmEnabled', bgmEnabled);
+
+    if (bgmEnabled) {
+        bgm.volume = 0.3;
+        bgm.play().catch(() => {});
+    } else {
+        bgm.pause();
+    }
+
+    updateBGMButton();
+}
+
+function updateBGMButton() {
+    const btn = document.getElementById('btn-bgm-toggle');
+    if (!btn) return;
+
+    if (bgmEnabled) {
+        btn.textContent = '🔊 음악 켬';
+        btn.classList.add('active');
+    } else {
+        btn.textContent = '🔇 음악 끔';
+        btn.classList.remove('active');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', initGame);
