@@ -642,6 +642,28 @@ const bossBuffs = [
     { id: 'reflect', name: '반사', desc: '받은 피해의 30% 반사', atkMult: 1.0, hpMult: 1.0, reflectPercent: 30 }
 ];
 
+// 골드 보상 계산 (10층마다 증가율 감소)
+function calculateGoldReward(floor) {
+    let baseGold = 10;
+    let remaining = floor;
+
+    // 10층 단위로 증가율 감소: 5 → 4 → 3 → 2 → 1 (최소)
+    const rates = [5, 4, 3, 2, 1];
+
+    for (let i = 0; i < rates.length && remaining > 0; i++) {
+        const floorsInTier = Math.min(remaining, 10);
+        baseGold += floorsInTier * rates[i];
+        remaining -= floorsInTier;
+    }
+
+    // 50층 이후는 최소 증가율 1 유지
+    if (remaining > 0) {
+        baseGold += remaining * 1;
+    }
+
+    return baseGold;
+}
+
 // 적 생성
 function generateEnemy(floor) {
     const isBoss = floor % 10 === 0;
@@ -652,14 +674,17 @@ function generateEnemy(floor) {
     // 가중치 기반 타입 선택
     const type = selectEnemyType();
 
-    // 보스/중보스에게 랜덤 버프 부여 (보스: 2개, 중보스: 1개)
+    // 보스/중보스에게 랜덤 버프 부여
+    // 보스: 3개, 중보스: 2개, 일반 적: 30% 확률로 1개
     let buffs = [];
     if (isBoss) {
-        // 보스는 서로 다른 버프 2개
+        const shuffled = [...bossBuffs].sort(() => Math.random() - 0.5);
+        buffs = [shuffled[0], shuffled[1], shuffled[2]];
+    } else if (isMiniBoss) {
         const shuffled = [...bossBuffs].sort(() => Math.random() - 0.5);
         buffs = [shuffled[0], shuffled[1]];
-    } else if (isMiniBoss) {
-        // 중보스는 버프 1개
+    } else if (Math.random() < 0.3) {
+        // 일반 적도 30% 확률로 버프 1개
         buffs = [bossBuffs[Math.floor(Math.random() * bossBuffs.length)]];
     }
 
@@ -680,6 +705,23 @@ function generateEnemy(floor) {
     }
     if (floor > 80) {
         const scaleFactor = Math.pow(1.08, floor - 80); // 80층 이후 8%씩 복리 추가
+        baseHp = Math.floor(baseHp * scaleFactor);
+        baseAtk = Math.floor(baseAtk * scaleFactor);
+    }
+
+    // 100층 이상 추가 스케일링
+    if (floor > 100) {
+        const scaleFactor = Math.pow(1.10, floor - 100); // 100층 이후 10%씩 복리 추가
+        baseHp = Math.floor(baseHp * scaleFactor);
+        baseAtk = Math.floor(baseAtk * scaleFactor);
+    }
+    if (floor > 150) {
+        const scaleFactor = Math.pow(1.12, floor - 150); // 150층 이후 12%씩 복리 추가
+        baseHp = Math.floor(baseHp * scaleFactor);
+        baseAtk = Math.floor(baseAtk * scaleFactor);
+    }
+    if (floor > 200) {
+        const scaleFactor = Math.pow(1.15, floor - 200); // 200층 이후 15%씩 복리 추가
         baseHp = Math.floor(baseHp * scaleFactor);
         baseAtk = Math.floor(baseAtk * scaleFactor);
     }
@@ -708,8 +750,8 @@ function generateEnemy(floor) {
         atk: Math.floor(baseAtk * atkTierMult * type.atkMult * modeMult * buffAtkMult),
         dodge: type.dodge + buffDodge,
         crit: type.crit + buffCrit,
-        goldReward: Math.floor((10 + floor * 5) * tierMult),
-        expReward: Math.floor((20 + floor * 10) * tierMult),
+        goldReward: Math.floor(calculateGoldReward(floor) * tierMult),
+        expReward: Math.floor((30 + floor * 15) * tierMult),
         isBoss,
         isMiniBoss,
         stunned: false,
