@@ -65,7 +65,10 @@ const gameState = {
     skipMode: false, // 스킵 모드 (중간보스/보스전만 진행)
     skipTargetFloor: 0, // 스킵 목표 층
     tagCombineMode: false, // 태그 합성 모드
-    selectedForCombine: [] // 합성을 위해 선택된 유물 인덱스들
+    selectedForCombine: [], // 합성을 위해 선택된 유물 인덱스들
+    ignoreEnemyDodge: false, // 다음 공격 시 적 회피 무시 (그림자 도약)
+    beastInstinctBonus: 0, // 야수의 본능 치명타 보너스
+    skillCounterReduction: 0 // 스킬로 인한 반격 피해 감소 (방패 강타)
 };
 
 // 유물 데이터
@@ -484,75 +487,115 @@ const rarityNames = {
 // cooldown: 사용 후 쿨타임 (턴)
 // buffEffect: 버프 효과 종류, buffValue: 버프 수치, buffTurns: 버프 지속 턴
 const skillsData = {
+    // 묘인: 민첩한 근접 딜러, 치명타 특화
     cat: [
         {
-            id: 'cat_rage', name: '광폭화', mpCost: 2, type: 'buff', cooldown: 4,
-            buffEffect: 'atkBoost', buffValue: 0.25, buffTurns: 3, buffIcon: '🔥',
-            desc: '3턴간 공격력 +25% (쿨타임 4턴)', char: '묘인'
+            id: 'cat_slash', name: '폭렬참', mpCost: 3, damageMult: 1.25, type: 'active', subtype: 'strong', cooldown: 2,
+            desc: '공격력 125% 피해', char: '묘인'
         },
         {
-            id: 'cat_slash', name: '폭렬참', mpCost: 3, damageMult: 1.5, type: 'active', cooldown: 2,
-            desc: '공격력의 1.5배 피해 (적 반격 있음, 쿨타임 2턴)', char: '묘인'
+            id: 'cat_scratch', name: '물어 뜯기', mpCost: 1, damageMult: 0.25, type: 'active', subtype: 'sub', cooldown: 0,
+            effect: 'skillLifeSteal', healPercent: 5,
+            desc: '25% 피해, 피해량 5% 회복', char: '묘인'
         },
         {
-            id: 'cat_bleed', name: '피의 갈증', mpCost: 0, type: 'passive',
-            effect: 'lifeSteal', value: 0.1,
-            desc: '[패시브] 공격 시 피해의 10%를 HP로 회복', char: '묘인'
+            id: 'cat_bleed', name: '친절한 조언', mpCost: 2, type: 'buff', cooldown: 4,
+            buffEffect: 'lifeSteal', buffValue: 0.10, buffTurns: 3, buffIcon: '🩸',
+            desc: '3턴간 피해의 10% HP 회복', char: '묘인'
+        },
+        {
+            id: 'cat_brutal', name: '난폭한 힘', mpCost: 0, type: 'passive', subtype: 'always',
+            effect: 'critDmgUp', value: 25,
+            desc: '치명타 피해 +25%', char: '묘인'
+        },
+        {
+            id: 'cat_instinct', name: '야수의 본능', mpCost: 0, type: 'passive', subtype: 'conditional',
+            effect: 'beastInstinct', value: 10,
+            desc: '회피 시 다음 공격 치명타 +10%', char: '묘인'
         }
     ],
+    // 엘프: 마법사, MP 관리/지속 딜러
     elf: [
         {
-            id: 'elf_focus', name: '정신 집중', mpCost: 1, type: 'buff', cooldown: 3,
-            buffEffect: 'critBoost', buffValue: 20, buffTurns: 3, buffIcon: '🎯',
-            desc: '3턴간 치명타 확률 +20% (쿨타임 3턴)', char: '엘프'
+            id: 'elf_starshot', name: '별빛 화살', mpCost: 3, damageMult: 0.2, hits: 5, type: 'active', subtype: 'strong', cooldown: 2,
+            effect: 'magicDamage',
+            desc: '20% 마법 피해 x5회', char: '엘프'
         },
         {
-            id: 'elf_mana', name: '마나 순환', mpCost: 0, type: 'active', cooldown: 2,
-            effect: 'mpRecoverHalf', value: 3,
-            desc: 'MP 3 + 최대 MP의 절반 회복 (쿨타임 2턴)', char: '엘프'
+            id: 'elf_arrow', name: '마력 화살', mpCost: 0, damageMult: 0.4, type: 'active', subtype: 'sub', cooldown: 0,
+            effect: 'magicDamage', mpRestore: 1, mpRestoreChance: 10,
+            desc: '40% 마법 피해, MP 1 회복 (10%)', char: '엘프'
         },
         {
-            id: 'elf_nature', name: '자연의 축복', mpCost: 0, type: 'passive',
-            effect: 'mpRegen', value: 1,
-            desc: '[패시브] 매 턴 MP 1 자동 회복', char: '엘프'
+            id: 'elf_focus', name: '용감한 영혼', mpCost: 0, type: 'buff', cooldown: 3,
+            buffEffect: 'mpBurst', buffValue: 2, buffBonus: 50, buffIcon: '✨',
+            desc: 'MP 2 회복 (+50%)', char: '엘프'
+        },
+        {
+            id: 'elf_arrogant', name: '오만한 정신', mpCost: 0, type: 'passive', subtype: 'always',
+            effect: 'mpToHpRegen', value: 25,
+            desc: '매 턴 현재 MP의 25% HP 회복', char: '엘프'
+        },
+        {
+            id: 'elf_surge', name: '마력 폭발', mpCost: 0, type: 'passive', subtype: 'conditional',
+            effect: 'critMpRestore', value: 10,
+            desc: '치명타 시 MP 10% 회복', char: '엘프'
         }
     ],
+    // 드워프: 탱커, 생존/방어 특화
     dwarf: [
         {
-            id: 'dwarf_iron', name: '철벽 방어', mpCost: 2, type: 'buff', cooldown: 3,
-            buffEffect: 'defBoost', buffValue: 0.3, buffTurns: 2, buffIcon: '🛡️',
-            multiEffect: [
-                { effect: 'defBoost', value: 0.3 },
-                { effect: 'counterDef', value: 0.4 }
-            ],
-            desc: '2턴간 받는 피해 -30%, 반격 피해 -40% (쿨타임 3턴)', char: '드워프'
+            id: 'dwarf_bash', name: '방패 강타', mpCost: 2, type: 'active', subtype: 'strong', cooldown: 2,
+            effect: 'enemyMaxHpDamage', value: 15,
+            desc: '적 최대 체력의 15% 피해', char: '드워프'
         },
         {
-            id: 'dwarf_bash', name: '방패 강타', mpCost: 2, damage: 20, type: 'active', cooldown: 2,
-            effect: 'stun',
-            desc: '20 피해 + 적 1턴 스턴 (쿨타임 2턴)', char: '드워프'
+            id: 'dwarf_hammer', name: '해머 스윙', mpCost: 1, damageMult: 0.25, type: 'active', subtype: 'sub', cooldown: 0,
+            effect: 'counterBlock',
+            desc: '25% 피해, 반격 피해 -50%', char: '드워프'
         },
         {
-            id: 'dwarf_endure', name: '불굴', mpCost: 0, type: 'passive',
-            effect: 'endure', value: 0.15,
-            desc: '[패시브] 받는 모든 피해 -15%', char: '드워프'
+            id: 'dwarf_iron', name: '올바른 벽', mpCost: 2, type: 'buff', cooldown: 4,
+            buffEffect: 'defBoost', buffValue: 0.15, buffTurns: 4, buffIcon: '🛡️',
+            desc: '4턴간 받는 피해 -15%', char: '드워프'
+        },
+        {
+            id: 'dwarf_stupid', name: '멍청한 희생', mpCost: 0, type: 'passive', subtype: 'always',
+            effect: 'thorns', damageIncrease: 10, reflectPercent: 20,
+            desc: '받는 피해 +10%, 반사 피해 20%', char: '드워프'
+        },
+        {
+            id: 'dwarf_healthy', name: '건강한 신체', mpCost: 0, type: 'passive', subtype: 'conditional',
+            effect: 'mpToHpOnRestore', value: 50,
+            desc: 'MP 회복 시 50% HP 회복', char: '드워프'
         }
     ],
+    // 인간: 사냥꾼, 반격무시/처형 특화
     human: [
         {
-            id: 'human_snipe', name: '정밀 사격', mpCost: 2, damage: 25, type: 'active', cooldown: 0,
+            id: 'human_snipe', name: '저격', mpCost: 3, damageMult: 0.75, type: 'active', subtype: 'strong', cooldown: 2,
             effect: 'noCounter',
-            desc: '25 피해 (적 반격 없음)', char: '인간'
+            desc: '75% 피해, 반격 무시', char: '인간'
         },
         {
-            id: 'human_focus', name: '집중 사격', mpCost: 2, type: 'buff', cooldown: 3,
-            buffEffect: 'critBoost', buffValue: 20, buffTurns: 3, buffIcon: '🎯',
-            desc: '3턴간 치명타 확률 +20% (쿨타임 3턴)', char: '인간'
+            id: 'human_quickshot', name: '속사', mpCost: 1, damageMult: 0.15, type: 'active', subtype: 'sub', cooldown: 0,
+            effect: 'noCounter',
+            desc: '15% 피해, 반격 무시', char: '인간'
         },
         {
-            id: 'human_tactics', name: '전술적 우위', mpCost: 0, type: 'passive',
-            effect: 'critDmgBoost', value: 15,
-            desc: '[패시브] 치명타 데미지 +15%', char: '인간'
+            id: 'human_stealth', name: '약속과 의리', mpCost: 2, type: 'buff', cooldown: 3,
+            buffEffect: 'stealth', buffValue: 1, buffTurns: 1, buffIcon: '👤',
+            desc: '다음 공격 회피', char: '인간'
+        },
+        {
+            id: 'human_dirty', name: '비열한 사격', mpCost: 0, type: 'passive', subtype: 'always',
+            effect: 'firstHitBonus', value: 12,
+            desc: '첫 공격 피해 +12%', char: '인간'
+        },
+        {
+            id: 'human_execute', name: '처형자', mpCost: 0, type: 'passive', subtype: 'conditional',
+            effect: 'executioner', value: 0.2,
+            desc: '적 HP 30% 이하 시 피해 +20%', char: '인간'
         }
     ]
 };
@@ -833,6 +876,24 @@ function getWeaponBonus(character) {
     return weapon ? gameState.weapons[weapon] * 5 : 0;
 }
 
+// 패시브 스킬의 캐릭터 찾기
+function getSkillCharacter(skill) {
+    if (skill.char) {
+        const charMap = { '묘인': 'cat', '엘프': 'elf', '드워프': 'dwarf', '인간': 'human' };
+        return charMap[skill.char] || null;
+    }
+    return null;
+}
+
+// 패시브 값에 대장간 보너스 적용
+function getPassiveValue(skill, valueName = 'value') {
+    const baseValue = skill[valueName] || 0;
+    const character = getSkillCharacter(skill);
+    if (!character) return baseValue;
+    const weaponBonus = getWeaponBonus(character);
+    return baseValue * (1 + weaponBonus / 100);
+}
+
 function getMaxHp() {
     const baseHp = 50 + (gameState.player.level - 1) * 5;
     const strHp = getEffectiveStat('str') * 1;
@@ -852,6 +913,13 @@ function getMaxHp() {
 
     // 퍼센트 강화 (상점)
     totalHp *= (1 + gameState.percentBonus.hp / 100);
+
+    // 패시브 최대 체력 증가 (멍청한 신념)
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'maxHpUp') {
+            totalHp *= (1 + skill.value / 100);
+        }
+    });
 
     return Math.floor(totalHp);
 }
@@ -882,6 +950,13 @@ function getMaxMp() {
 function getDodgeChance() {
     // 기본 10% + 행운으로 회피율 증가
     let dodge = 10 + getEffectiveStat('luk') * 0.5;
+
+    // 패시브 회피율 증가 (날렵함)
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'dodgeUp') {
+            dodge += skill.value;
+        }
+    });
 
     gameState.tempRelics.forEach(relic => {
         const val = getRelicEffectValue(relic, 'dodge');
@@ -928,6 +1003,9 @@ function getRawCritChance() {
         if (buff.effect === 'critBoost') chance += buff.value;
     });
 
+    // 야수의 본능 보너스 (회피 성공 시 치명타 +10%)
+    chance += gameState.beastInstinctBonus || 0;
+
     // 모든 스탯 보너스 (5% = 5%p 추가)
     chance += getAllStatsBonus() * 100;
 
@@ -949,8 +1027,8 @@ function getCritDamage() {
 
     // 패시브 스킬 치명타 데미지 보너스
     gameState.equippedSkills.forEach(skill => {
-        if (skill?.type === 'passive' && skill.effect === 'critDmgBoost') {
-            critDmg += skill.value;
+        if (skill?.type === 'passive' && (skill.effect === 'critDmgBoost' || skill.effect === 'critDmgUp')) {
+            critDmg += getPassiveValue(skill);
         }
     });
 
@@ -1034,11 +1112,11 @@ function getLifeStealInfo() {
     let chance = 0;
     let healPercent = 0.05; // 기본 5%
 
-    // 스킬 흡혈 효과 (묘인 패시브 등)
-    gameState.equippedSkills.forEach(skill => {
-        if (skill?.type === 'passive' && skill.effect === 'lifeSteal') {
-            chance += 1.0; // 스킬은 100% 확률
-            healPercent = Math.max(healPercent, skill.value);
+    // 버프 흡혈 효과 (피의 갈증 등)
+    gameState.activeBuffs.forEach(buff => {
+        if (buff.effect === 'lifeSteal') {
+            chance = 1.0; // 버프는 100% 확률
+            healPercent = Math.max(healPercent, buff.value);
         }
     });
 
@@ -1206,6 +1284,14 @@ function processDebuffDamage() {
         enemy.debuffs.bleed--;
     }
 
+    // 전투 함성: 턴마다 감소
+    if (enemy.debuffs?.warcry > 0) {
+        enemy.debuffs.warcry--;
+        if (enemy.debuffs.warcry <= 0) {
+            addBattleLog('📯 전투 함성 효과 종료');
+        }
+    }
+
     // 스턴은 반격 후 감소 (checkStunBlockCounter에서 처리)
     // 빙결은 지속 (전투 끝날 때까지)
 }
@@ -1217,8 +1303,13 @@ function getEnemyDebuffAtkReduction() {
 
     let reduction = 0;
     // 쇠약: 중첩당 10% 감소
-    const weakenStacks = enemy.debuffs.weaken || 0;
+    const weakenStacks = enemy.debuffs?.weaken || 0;
     reduction += weakenStacks * 10;
+
+    // 전투 함성: 20% 감소
+    if (enemy.debuffs?.warcry > 0) {
+        reduction += 20;
+    }
 
     return Math.max(0.1, 1 - reduction / 100); // 최소 10% 공격력
 }
@@ -1267,6 +1358,12 @@ function getExecuteBonus() {
         const val = getRelicEffectValue(relic, 'execute');
         if (val !== null) bonus += val;
     });
+    // 패시브 처형자 보너스
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'executioner') {
+            bonus += getPassiveValue(skill);
+        }
+    });
     return bonus;
 }
 
@@ -1276,6 +1373,12 @@ function getFirstHitBonus() {
     gameState.tempRelics.forEach(relic => {
         const val = getRelicEffectValue(relic, 'firstHit');
         if (val !== null) bonus += val;
+    });
+    // 패시브 첫 공격 보너스 (비열한 사격)
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'firstHitBonus') {
+            bonus += getPassiveValue(skill) / 100;
+        }
     });
     return bonus;
 }
@@ -1336,11 +1439,34 @@ function calculateDamageTaken(damage, guarding = false, isCounter = false) {
 
     if (guarding) finalDamage *= 0.3;
 
+    // 멍청한 희생 패시브 (받는 피해 증가)
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'thorns' && skill.damageIncrease) {
+            finalDamage *= (1 + getPassiveValue(skill, 'damageIncrease') / 100);
+        }
+    });
+
     return Math.floor(Math.max(1, finalDamage)); // 최소 1 데미지
 }
 
 // === 버프 시스템 ===
-function applyBuff(skill) {
+function applyBuff(skill, weaponBonus = 0) {
+    const bonusMult = 1 + weaponBonus / 100;
+
+    // 즉시 효과 버프 처리 (mpBurst 등)
+    if (skill.buffEffect === 'mpBurst') {
+        let mpRestore = skill.buffValue;
+        // 스킬 자체 보너스 적용
+        if (skill.buffBonus) {
+            mpRestore = Math.floor(mpRestore * (1 + skill.buffBonus / 100));
+        }
+        // 대장간 보너스 적용
+        mpRestore = Math.floor(mpRestore * bonusMult);
+        gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + mpRestore);
+        addBattleLog(`${skill.buffIcon} ${skill.name}! MP +${mpRestore}`);
+        return;
+    }
+
     // 기존 같은 버프 제거
     gameState.activeBuffs = gameState.activeBuffs.filter(b => b.id !== skill.id);
 
@@ -1353,7 +1479,7 @@ function applyBuff(skill) {
                 icon: skill.buffIcon,
                 turns: skill.buffTurns,
                 effect: eff.effect,
-                value: eff.value
+                value: eff.value * bonusMult
             });
         });
     } else {
@@ -1363,7 +1489,7 @@ function applyBuff(skill) {
             icon: skill.buffIcon,
             turns: skill.buffTurns,
             effect: skill.buffEffect,
-            value: skill.buffValue
+            value: skill.buffValue * bonusMult
         });
     }
 
@@ -1409,13 +1535,38 @@ function getCooldown(skillId) {
 
 // MP 자동 회복 (엘프 패시브)
 function tickMpRegen() {
+    let totalMpRestored = 0;
+
     gameState.equippedSkills.forEach(skill => {
         if (skill?.type === 'passive' && skill.effect === 'mpRegen') {
             const regen = skill.value;
+            const oldMp = gameState.player.mp;
             gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + regen);
-            if (regen > 0) addBattleLog(`MP +${regen} (자연의 축복)`);
+            totalMpRestored += gameState.player.mp - oldMp;
+            if (regen > 0) addBattleLog(`MP +${regen}`);
+        }
+        // 오만한 정신: 현재 MP의 일정 비율만큼 HP 회복
+        if (skill?.type === 'passive' && skill.effect === 'mpToHpRegen') {
+            const healAmount = Math.floor(gameState.player.mp * (getPassiveValue(skill) / 100));
+            if (healAmount > 0) {
+                gameState.player.hp = Math.min(getMaxHp(), gameState.player.hp + healAmount);
+                addBattleLog(`HP +${healAmount} (오만한 정신)`);
+            }
         }
     });
+
+    // 건강한 신체: MP 회복 시 일정 비율 HP 회복
+    if (totalMpRestored > 0) {
+        gameState.equippedSkills.forEach(skill => {
+            if (skill?.type === 'passive' && skill.effect === 'mpToHpOnRestore') {
+                const healAmount = Math.floor(totalMpRestored * (getPassiveValue(skill) / 100));
+                if (healAmount > 0) {
+                    gameState.player.hp = Math.min(getMaxHp(), gameState.player.hp + healAmount);
+                    addBattleLog(`HP +${healAmount} (건강한 신체)`);
+                }
+            }
+        });
+    }
 }
 
 function getExpForLevel(level) {
@@ -1858,10 +2009,26 @@ function checkEnemyPreemptiveAttack() {
     return false;
 }
 
+// 은신 버프 체크 (완전 회피)
+function checkAndConsumeStealthBuff() {
+    const stealthBuff = gameState.activeBuffs.find(b => b.effect === 'stealth');
+    if (stealthBuff) {
+        gameState.activeBuffs = gameState.activeBuffs.filter(b => b.effect !== 'stealth');
+        addBattleLog(`👤 은신으로 공격 회피!`);
+        return true;
+    }
+    return false;
+}
+
 function enemyPreemptiveAttack() {
     if (gameState.currentEnemy.stunned) {
         addBattleLog(`${gameState.currentEnemy.name}은(는) 스턴 상태! 선제공격 실패`);
         gameState.currentEnemy.stunned = false;
+        return;
+    }
+
+    // 은신 버프 체크
+    if (checkAndConsumeStealthBuff()) {
         return;
     }
 
@@ -1881,10 +2048,29 @@ function enemyPreemptiveAttack() {
     if (isDodge) logParts.push('(부분 회피!)');
     addBattleLog(logParts.join(' '));
 
+    // 반사 피해 (멍청한 희생)
+    applyThornsDamage(damage);
+
     if (gameState.player.hp <= 0) {
         playerDefeated();
     }
     updateBattleUI();
+}
+
+// 반사 피해 적용 (멍청한 희생 패시브)
+function applyThornsDamage(damageTaken) {
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'thorns' && skill.reflectPercent) {
+            const reflectDamage = Math.floor(damageTaken * (getPassiveValue(skill, 'reflectPercent') / 100));
+            if (reflectDamage > 0 && gameState.currentEnemy) {
+                gameState.currentEnemy.hp -= reflectDamage;
+                addBattleLog(`반사 피해 ${reflectDamage}!`);
+                if (gameState.currentEnemy.hp <= 0) {
+                    enemyDefeated();
+                }
+            }
+        }
+    });
 }
 
 function playerAttack() {
@@ -1922,6 +2108,12 @@ function executePlayerAttack(isSkill = false, skillDamage = 0) {
     const playerAtk = isSkill ? skillDamage : getPlayerAtk();
     const damageMultiplier = getDamageMultiplier();
     const isCrit = Math.random() * 100 < getCritChance();
+
+    // 야수의 본능 보너스 사용 후 리셋
+    if (gameState.beastInstinctBonus > 0) {
+        gameState.beastInstinctBonus = 0;
+    }
+
     const isEnemyDodge = gameState.currentEnemy.dodge && Math.random() * 100 < gameState.currentEnemy.dodge;
 
     let damage = Math.floor(playerAtk * damageMultiplier);
@@ -1971,10 +2163,28 @@ function executePlayerAttack(isSkill = false, skillDamage = 0) {
     // 흡혈 효과
     applyLifeSteal(damage);
 
+    // 치명타 시 MP 회복 (마력 폭발)
+    if (isCrit) {
+        applyCritMpRestore();
+    }
+
     // 디버프 적용 시도
     tryApplyDebuffs();
 
     return damage;
+}
+
+// 치명타 시 MP 회복 (마력 폭발 패시브)
+function applyCritMpRestore() {
+    gameState.equippedSkills.forEach(skill => {
+        if (skill?.type === 'passive' && skill.effect === 'critMpRestore') {
+            const mpRestore = Math.floor(gameState.player.maxMp * (getPassiveValue(skill) / 100));
+            if (mpRestore > 0) {
+                gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + mpRestore);
+                addBattleLog(`MP +${mpRestore} (마력 폭발)`);
+            }
+        }
+    });
 }
 
 // 턴 처리 (쿨타임 감소, MP 재생, 디버프 피해 등)
@@ -2011,6 +2221,12 @@ function enemyCounterAttack() {
         return;
     }
 
+    // 은신 버프 체크
+    if (checkAndConsumeStealthBuff()) {
+        endPlayerTurn();
+        return;
+    }
+
     // 디버프로 인한 공격력 감소 적용
     const enemyAtk = Math.floor(gameState.currentEnemy.atk * getEnemyDebuffAtkReduction());
     const enemyCrit = gameState.currentEnemy.crit || 0;
@@ -2018,14 +2234,29 @@ function enemyCounterAttack() {
     const isDodge = Math.random() * 100 < getDodgeChance();
 
     let baseDamage = isCrit ? Math.floor(enemyAtk * 1.5) : enemyAtk;
-    if (isDodge) baseDamage = Math.floor(baseDamage * 0.5);
-    const damage = calculateDamageTaken(baseDamage, isGuarding, true); // isCounter = true
+    if (isDodge) {
+        baseDamage = Math.floor(baseDamage * 0.5);
+        // 야수의 본능 패시브 체크
+        const beastInstinctSkill = gameState.equippedSkills.find(
+            s => s?.type === 'passive' && s.effect === 'beastInstinct'
+        );
+        if (beastInstinctSkill) {
+            gameState.beastInstinctBonus = getPassiveValue(beastInstinctSkill);
+        }
+    }
+    let damage = calculateDamageTaken(baseDamage, isGuarding, true); // isCounter = true
+
+    // 스킬로 인한 반격 피해 감소 (방패 강타 등)
+    if (gameState.skillCounterReduction > 0) {
+        damage = Math.floor(damage * (1 - gameState.skillCounterReduction));
+    }
 
     gameState.player.hp -= damage;
     const logParts = [`적의 반격! ${damage} 피해`];
     if (isCrit) logParts.push('(치명타!)');
     if (isDodge) logParts.push('(부분 회피!)');
     if (isGuarding) logParts.push('(방어!)');
+    if (gameState.skillCounterReduction > 0) logParts.push('(피해 감소!)');
     addBattleLog(logParts.join(' '));
     isGuarding = false;
 
@@ -2042,6 +2273,14 @@ function enemyCounterAttack() {
             enemyDefeated();
             return;
         }
+    }
+
+    // 반사 피해 (멍청한 희생)
+    applyThornsDamage(damage);
+    if (gameState.currentEnemy && gameState.currentEnemy.hp <= 0) {
+        endPlayerTurn();
+        enemyDefeated();
+        return;
     }
 
     endPlayerTurn();
@@ -2103,7 +2342,7 @@ function useSkill(slotIndex) {
 
     // === 버프 스킬 ===
     if (skill.type === 'buff') {
-        applyBuff(skill);
+        applyBuff(skill, weaponBonus);
         endPlayerTurn();
         updateBattleUI();
         return;
@@ -2131,6 +2370,76 @@ function useSkill(slotIndex) {
         return;
     }
 
+    // === 그림자 도약 (회피 버프 + 적 회피 무시) ===
+    if (skill.effect === 'shadowLeap') {
+        // 회피 버프 적용
+        gameState.activeBuffs = gameState.activeBuffs.filter(b => b.id !== skill.id);
+        gameState.activeBuffs.push({
+            id: skill.id,
+            name: skill.name,
+            icon: '🌑',
+            turns: skill.buffTurns,
+            effect: 'dodgeBoost',
+            value: 30
+        });
+        // 적 회피 무시 플래그 설정
+        gameState.ignoreEnemyDodge = true;
+        addBattleLog(`🌑 ${skill.name} 발동! (회피 +30%, ${skill.buffTurns}턴)`);
+        addBattleLog(`다음 공격 시 적 회피 무시!`);
+        endPlayerTurn();
+        updateBattleUI();
+        return;
+    }
+
+    // === 전투 함성 (적 약화 + 아군 방어) ===
+    if (skill.effect === 'warcry') {
+        // 적 공격력 감소 디버프
+        gameState.currentEnemy.debuffs = gameState.currentEnemy.debuffs || {};
+        gameState.currentEnemy.debuffs.warcry = skill.debuffTurns;
+        // 아군 피해감소 버프
+        gameState.activeBuffs = gameState.activeBuffs.filter(b => b.id !== skill.id);
+        gameState.activeBuffs.push({
+            id: skill.id,
+            name: skill.name,
+            icon: '📯',
+            turns: skill.debuffTurns,
+            effect: 'defBoost',
+            value: 0.1
+        });
+        addBattleLog(`📯 ${skill.name}! 적 공격력 -20%, 피해감소 +10% (${skill.debuffTurns}턴)`);
+        endPlayerTurn();
+        updateBattleUI();
+        return;
+    }
+
+    // === 응급 처치 (HP 회복) ===
+    if (skill.effect === 'heal') {
+        const healAmount = Math.floor(gameState.player.maxHp * skill.value * (1 + weaponBonus / 100));
+        gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + healAmount);
+        addBattleLog(`💚 HP +${healAmount} 회복!`);
+        endPlayerTurn();
+        updateBattleUI();
+        return;
+    }
+
+    // === 적 최대 체력 비례 데미지 스킬 (방패 강타) ===
+    if (skill.effect === 'enemyMaxHpDamage') {
+        const baseHpDamage = gameState.currentEnemy.maxHp * (skill.value / 100);
+        const hpDamage = Math.floor(baseHpDamage * (1 + weaponBonus / 100));
+        gameState.currentEnemy.hp -= hpDamage;
+        addBattleLog(`🛡️ ${skill.name}! ${hpDamage} 피해!`);
+
+        // 흡혈 효과
+        applyLifeSteal(hpDamage);
+
+        if (gameState.currentEnemy.hp <= 0) {
+            enemyDefeated();
+        } else {
+            enemyCounterAttack();
+        }
+        return;
+    }
+
     // === 데미지 스킬 ===
     if (skill.damage || skill.damageMult) {
         const hits = skill.hits || 1;
@@ -2138,15 +2447,40 @@ function useSkill(slotIndex) {
         const skillDmgBonus = 1 + getSkillDmgBonus(); // 스킬 데미지 보너스
         let totalDamage = 0;
 
+        // 마법 데미지나 적 회피 무시 효과 체크
+        const ignoresDodge = skill.effect === 'magicDamage' || gameState.ignoreEnemyDodge;
+        // 그림자 도약 사용 후 적 회피 무시 플래그 해제
+        if (gameState.ignoreEnemyDodge) {
+            gameState.ignoreEnemyDodge = false;
+        }
+
         for (let i = 0; i < hits; i++) {
-            const isCrit = Math.random() * 100 < getCritChance();
-            const enemyDodge = Math.max(0, (gameState.currentEnemy.dodge || 0) - getEnemyDebuffDodgeReduction());
-            const isEnemyDodge = enemyDodge > 0 && Math.random() * 100 < enemyDodge;
+            // 100% 치명타 스킬 체크
+            const isCrit = skill.effect === 'guaranteedCrit' ? true : (Math.random() * 100 < getCritChance());
+
+            // 야수의 본능 보너스 사용 후 리셋 (첫 타격에만 적용)
+            if (i === 0 && gameState.beastInstinctBonus > 0) {
+                gameState.beastInstinctBonus = 0;
+            }
+
+            // 회피 불가 스킬인지 체크
+            let isEnemyDodge = false;
+            if (!ignoresDodge) {
+                const enemyDodge = Math.max(0, (gameState.currentEnemy.dodge || 0) - getEnemyDebuffDodgeReduction());
+                isEnemyDodge = enemyDodge > 0 && Math.random() * 100 < enemyDodge;
+            }
 
             // damageMult가 있으면 플레이어 공격력 기반, 없으면 고정 데미지
-            const skillBaseDamage = skill.damageMult
+            let skillBaseDamage = skill.damageMult
                 ? getPlayerAtk() * skill.damageMult
                 : skill.damage;
+
+            // 최대 체력 비례 추가 피해 (해머 스윙)
+            if (skill.effect === 'maxHpDamage') {
+                const maxHpBonus = getMaxHp() * (skill.value / 100);
+                skillBaseDamage += maxHpBonus;
+            }
+
             let baseDamage = Math.floor(skillBaseDamage * (1 + weaponBonus / 100) * damageMultiplier * skillDmgBonus);
 
             // 보스킬러 보너스
@@ -2167,6 +2501,7 @@ function useSkill(slotIndex) {
             totalDamage += baseDamage;
 
             const logParts = [`${baseDamage} 피해!`];
+            if (skill.effect === 'magicDamage') logParts.unshift('✨');
             if (isCrit) logParts.push('(치명타!)');
             if (isEnemyDodge) logParts.push('(적 부분 회피!)');
             addBattleLog(logParts.join(' '));
@@ -2175,10 +2510,32 @@ function useSkill(slotIndex) {
         // 흡혈 효과
         applyLifeSteal(totalDamage);
 
+        // 스킬 자체 흡혈 효과 (물어 뜯기)
+        if (skill.effect === 'skillLifeSteal' && skill.healPercent) {
+            const heal = Math.floor(totalDamage * (skill.healPercent / 100));
+            if (heal > 0) {
+                gameState.player.hp = Math.min(getMaxHp(), gameState.player.hp + heal);
+                addBattleLog(`HP +${heal} (흡혈)`);
+            }
+        }
+
+        // 스킬 사용 시 MP 회복 (마력 화살)
+        if (skill.mpRestore && skill.mpRestoreChance) {
+            if (Math.random() * 100 < skill.mpRestoreChance) {
+                gameState.player.mp = Math.min(gameState.player.maxMp, gameState.player.mp + skill.mpRestore);
+                addBattleLog(`MP +${skill.mpRestore}`);
+            }
+        }
+
         // 스턴 효과
         if (skill.effect === 'stun') {
             gameState.currentEnemy.stunned = true;
             addBattleLog('적 스턴!');
+        }
+
+        // 반격 피해 감소 플래그 (방패 강타)
+        if (skill.effect === 'counterBlock') {
+            gameState.skillCounterReduction = 0.5; // 50% 감소
         }
 
         if (gameState.currentEnemy.hp <= 0) {
@@ -2189,6 +2546,9 @@ function useSkill(slotIndex) {
         } else {
             enemyCounterAttack();
         }
+
+        // 반격 피해 감소 플래그 리셋
+        gameState.skillCounterReduction = 0;
     }
 
     updateBattleUI();
@@ -2401,11 +2761,11 @@ function generateSkillChoices() {
 
 // 던전 시작 시 기본 스킬 4개 지급 (각 캐릭터의 고정 액티브 스킬)
 function generateStartingSkills() {
-    // 고정 시작 스킬: 각 캐릭터의 액티브 스킬
+    // 고정 시작 스킬: 각 캐릭터의 공격 액티브 스킬
     return [
-        { ...skillsData.cat[1], character: 'cat' },      // 폭렬참 (35 데미지)
-        { ...skillsData.elf[1], character: 'elf' },      // 마나 순환 (MP 회복)
-        { ...skillsData.dwarf[1], character: 'dwarf' },  // 방패 강타 (스턴)
+        { ...skillsData.cat[0], character: 'cat' },      // 폭렬참 (1.5배 데미지)
+        { ...skillsData.elf[0], character: 'elf' },      // 별빛 화살 (마법 데미지)
+        { ...skillsData.dwarf[0], character: 'dwarf' },  // 방패 강타 (스턴)
         { ...skillsData.human[0], character: 'human' }   // 정밀 사격 (반격없음)
     ];
 }
@@ -2526,7 +2886,8 @@ function updateRewardCombineUI() {
         item.innerHTML = `
             <div class="relic-icon">${relic.icon}</div>
             <div class="relic-name">${relic.name}</div>
-            <div class="relic-tag">${tags.join(', ')}</div>
+            <div class="relic-desc">${relic.desc}</div>
+            <div class="relic-tag">[${tags.join(', ')}]</div>
         `;
         item.addEventListener('click', () => toggleRewardCombineSelect(idx));
         grid.appendChild(item);
@@ -2738,8 +3099,10 @@ function showTier2RelicChoices() {
 // 2단계 유물 선택
 function selectTier2Relic(relic) {
     gameState.tempRelics.push({ ...relic });
-    gameState.rewardPhase = 'skill';
-    showSkillChoicesOnly();
+    // 합성 단계로 이동
+    gameState.rewardPhase = 'combine';
+    document.getElementById('relic-choice-section').classList.add('hidden');
+    showRewardCombinePhase();
 }
 
 // 스킬 선택지만 표시 (유물 선택 완료 후)
@@ -2750,13 +3113,30 @@ function showSkillChoicesOnly() {
     const skillGrid = document.getElementById('skill-choice-grid');
     skillGrid.innerHTML = '';
 
+    const charToWeapon = { cat: 'sword', elf: 'staff', dwarf: 'shield', human: 'bow' };
+    const weaponNames = { sword: '검', staff: '지팡이', shield: '방패', bow: '활' };
+    const typeNames = { attack: '공격', utility: '유틸', buff: '버프', passive: '패시브' };
+
     gameState.skillChoices.forEach(skill => {
         const btn = document.createElement('button');
         btn.className = 'skill-choice-btn';
+
+        // 스킬 타입 표시
+        const skillType = skill.subtype ? typeNames[skill.subtype] : typeNames[skill.type];
+        const typeLabel = skill.type === 'passive' ? '[패시브]' : `[${skillType}]`;
+
+        // 무기 보너스 표시
+        const weapon = charToWeapon[skill.character];
+        const weaponLevel = weapon ? gameState.weapons[weapon] : 0;
+        const weaponBonus = weaponLevel > 0 ? weaponLevel * 5 : 0;
+        const weaponName = weaponNames[weapon] || '';
+        const weaponText = weaponBonus > 0 ? `<div class="skill-choice-weapon">🔧 ${weaponName} +${weaponLevel} (효과 +${weaponBonus}%)</div>` : '';
+
         btn.innerHTML = `
-            <div class="skill-choice-name">${skill.name} ${skill.type === 'passive' ? '[패시브]' : `(MP ${skill.mpCost})`}</div>
+            <div class="skill-choice-name">${skill.name} ${typeLabel} ${skill.type !== 'passive' ? `(MP ${skill.mpCost})` : ''}</div>
             <div class="skill-choice-char">${skill.char}</div>
             <div class="skill-choice-desc">${skill.desc}</div>
+            ${weaponText}
         `;
         btn.addEventListener('click', () => selectSkillFinal(skill));
         skillGrid.appendChild(btn);
@@ -3311,6 +3691,10 @@ function returnToVillage(fromDeath = false) {
 
 // 스킬 UI
 function updateSkillButtons() {
+    const charToWeapon = { cat: 'sword', elf: 'staff', dwarf: 'shield', human: 'bow' };
+    const weaponNames = { sword: '검', staff: '지팡이', shield: '방패', bow: '활' };
+    const typeNames = { attack: '공격', utility: '유틸', buff: '버프', passive: '패시브' };
+
     for (let i = 0; i < 4; i++) {
         const btn = document.getElementById(`btn-skill-${i + 1}`);
         const skill = gameState.equippedSkills[i];
@@ -3328,24 +3712,34 @@ function updateSkillButtons() {
         const charName = charNames[skill.character] || skill.char || '';
         const cooldown = getCooldown(skill.id);
 
+        // 무기 보너스 계산
+        const weapon = charToWeapon[skill.character];
+        const weaponLevel = weapon ? gameState.weapons[weapon] : 0;
+        const weaponBonus = weaponLevel > 0 ? weaponLevel * 5 : 0;
+        const weaponName = weaponNames[weapon] || '';
+
+        // 스킬 타입 표시
+        const skillType = skill.subtype ? typeNames[skill.subtype] : typeNames[skill.type];
+
         if (skill.type === 'passive') {
             btn.textContent = `${skill.name} [P]`;
-            btn.title = `[${charName}] ${skill.name}\n${skill.desc}`;
+            btn.title = `[${charName}] ${skill.name} (${skillType})\n${skill.desc}`;
             btn.disabled = true;
             btn.classList.remove('on-cooldown');
         } else {
             // active 또는 buff 스킬
             const mpText = skill.mpCost > 0 ? `MP ${skill.mpCost}` : 'MP 0';
             const cdText = skill.cooldown > 0 ? `쿨타임 ${skill.cooldown}턴` : '쿨타임 없음';
+            const weaponText = weaponBonus > 0 ? `\n🔧 ${weaponName} +${weaponLevel} (효과 +${weaponBonus}%)` : '';
 
             if (cooldown > 0) {
                 btn.textContent = `${skill.name} (${cooldown})`;
-                btn.title = `[${charName}] ${skill.name}\n${mpText} | ${cdText}\n\n${skill.desc}\n\n⏳ 남은 쿨타임: ${cooldown}턴`;
+                btn.title = `[${charName}] ${skill.name} (${skillType})\n${mpText} | ${cdText}\n\n${skill.desc}${weaponText}\n\n⏳ 남은 쿨타임: ${cooldown}턴`;
                 btn.disabled = true;
                 btn.classList.add('on-cooldown');
             } else {
                 btn.textContent = `${skill.name} (${skill.mpCost})`;
-                btn.title = `[${charName}] ${skill.name}\n${mpText} | ${cdText}\n\n${skill.desc}`;
+                btn.title = `[${charName}] ${skill.name} (${skillType})\n${mpText} | ${cdText}\n\n${skill.desc}${weaponText}`;
                 btn.disabled = false;
                 btn.classList.remove('on-cooldown');
             }
