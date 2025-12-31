@@ -915,6 +915,57 @@ function getPassiveValue(skill, valueName = 'value') {
     return baseValue * (1 + weaponBonus / 100);
 }
 
+// 스킬 설명에 강화 수치 반영
+function getEnhancedSkillDesc(skill) {
+    const character = getSkillCharacter(skill);
+    const weaponBonus = character ? getWeaponBonus(character) : 0;
+    const mult = 1 + weaponBonus / 100;
+
+    if (weaponBonus === 0) return skill.desc;
+
+    let desc = skill.desc;
+
+    // 피해 배율 (125%, 25% 등)
+    if (skill.damageMult) {
+        const basePercent = Math.round(skill.damageMult * 100);
+        const enhancedPercent = Math.round(skill.damageMult * 100 * mult);
+        desc = desc.replace(`${basePercent}%`, `${enhancedPercent}%`);
+    }
+
+    // 패시브 value (치명타 피해 +35% 등)
+    if (skill.value && skill.type === 'passive') {
+        const enhanced = Math.round(skill.value * mult);
+        desc = desc.replace(`${skill.value}%`, `${enhanced}%`);
+    }
+
+    // 힐 퍼센트 (피해량 8% 회복 등)
+    if (skill.healPercent) {
+        const enhanced = Math.round(skill.healPercent * mult);
+        desc = desc.replace(`${skill.healPercent}%`, `${enhanced}%`);
+    }
+
+    // 반사 피해 (받은 피해의 35% 반사)
+    if (skill.reflectPercent) {
+        const enhanced = Math.round(skill.reflectPercent * mult);
+        desc = desc.replace(`${skill.reflectPercent}%`, `${enhanced}%`);
+    }
+
+    // 버프 값 (-15% 등)
+    if (skill.buffValue && skill.type === 'buff') {
+        const basePercent = Math.round(skill.buffValue * 100);
+        const enhancedPercent = Math.round(skill.buffValue * 100 * mult);
+        desc = desc.replace(`${basePercent}%`, `${enhancedPercent}%`);
+    }
+
+    // 적 최대 체력 피해 (15% 등)
+    if (skill.effect === 'enemyMaxHpDamage' && skill.value) {
+        const enhanced = Math.round(skill.value * mult);
+        desc = desc.replace(`${skill.value}%`, `${enhanced}%`);
+    }
+
+    return desc;
+}
+
 function getMaxHp() {
     const baseHp = 50 + (gameState.player.level - 1) * 5;
     const strHp = getEffectiveStat('str') * 1;
@@ -3185,7 +3236,7 @@ function showSkillChoicesOnly() {
         btn.innerHTML = `
             <div class="skill-choice-name">${skill.name} ${typeLabel} ${skill.type !== 'passive' ? `(MP ${skill.mpCost})` : ''}</div>
             <div class="skill-choice-char">${skill.char}</div>
-            <div class="skill-choice-desc">${skill.desc}</div>
+            <div class="skill-choice-desc">${getEnhancedSkillDesc(skill)}</div>
             ${weaponText}
         `;
         btn.addEventListener('click', () => selectSkillFinal(skill));
@@ -3775,9 +3826,11 @@ function updateSkillButtons() {
         // 스킬 타입 표시
         const skillType = skill.subtype ? typeNames[skill.subtype] : typeNames[skill.type];
 
+        const enhancedDesc = getEnhancedSkillDesc(skill);
+
         if (skill.type === 'passive') {
             btn.textContent = `${skill.name} [P]`;
-            btn.title = `[${charName}] ${skill.name} (${skillType})\n${skill.desc}`;
+            btn.title = `[${charName}] ${skill.name} (${skillType})\n${enhancedDesc}`;
             btn.disabled = true;
             btn.classList.remove('on-cooldown');
         } else {
@@ -3788,7 +3841,7 @@ function updateSkillButtons() {
 
             if (cooldown > 0) {
                 btn.textContent = `${skill.name} [⏳${cooldown}]`;
-                btn.title = `[${charName}] ${skill.name} (${skillType})\n${mpText} | ${cdText}\n\n${skill.desc}${weaponText}\n\n⏳ 남은 쿨타임: ${cooldown}턴`;
+                btn.title = `[${charName}] ${skill.name} (${skillType})\n${mpText} | ${cdText}\n\n${enhancedDesc}${weaponText}\n\n⏳ 남은 쿨타임: ${cooldown}턴`;
                 btn.disabled = true;
                 btn.classList.add('on-cooldown');
             } else {
@@ -3796,7 +3849,7 @@ function updateSkillButtons() {
                 const cdDisplay = skill.cooldown > 0 ? `CD${skill.cooldown}` : '';
                 const btnInfo = cdDisplay ? `${skill.mpCost}/${cdDisplay}` : `${skill.mpCost}`;
                 btn.textContent = `${skill.name} (${btnInfo})`;
-                btn.title = `[${charName}] ${skill.name} (${skillType})\n${mpText} | ${cdText}\n\n${skill.desc}${weaponText}`;
+                btn.title = `[${charName}] ${skill.name} (${skillType})\n${mpText} | ${cdText}\n\n${enhancedDesc}${weaponText}`;
                 btn.disabled = false;
                 btn.classList.remove('on-cooldown');
             }
@@ -3896,7 +3949,7 @@ function updateInfoPanel() {
                     <span class="skill-info-type ${typeClass}">${typeText}</span>
                 </div>
                 ${metaText ? `<div class="skill-info-meta">${metaText}</div>` : ''}
-                <div class="skill-info-desc">${skill.desc}</div>
+                <div class="skill-info-desc">${getEnhancedSkillDesc(skill)}</div>
                 ${cooldown > 0 ? `<div class="skill-info-cooldown">⏳ 남은 쿨타임: ${cooldown}턴</div>` : ''}
             </div>
         `;
