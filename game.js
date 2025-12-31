@@ -4125,6 +4125,10 @@ function initEventListeners() {
         showScreen('village-screen');
     });
 
+    // 세이브/로드
+    document.getElementById('btn-save-game').addEventListener('click', saveGame);
+    document.getElementById('btn-load-game').addEventListener('click', loadGame);
+
     // 전투
     document.getElementById('btn-attack').addEventListener('click', playerAttack);
 
@@ -4180,6 +4184,160 @@ function resetStats() {
     gameState.player.maxMp = getMaxMp();
 
     updateVillageUI();
+}
+
+// === 세이브/로드 시스템 ===
+const SAVE_KEY = 'grayMercenary_save';
+const SAVE_VERSION = 1;
+
+// 스킬 ID로 스킬 찾기
+function findSkillById(skillId) {
+    if (!skillId) return null;
+    for (const charSkills of Object.values(skillsData)) {
+        const skill = charSkills.find(s => s.id === skillId);
+        if (skill) return skill;
+    }
+    return null;
+}
+
+// 저장할 데이터 추출
+function getSaveData() {
+    return {
+        version: SAVE_VERSION,
+        timestamp: Date.now(),
+        player: {
+            level: gameState.player.level,
+            exp: gameState.player.exp,
+            gold: gameState.player.gold,
+            statPoints: gameState.player.statPoints,
+            stats: { ...gameState.player.stats },
+            baseAtk: gameState.player.baseAtk
+        },
+        dungeon: {
+            highestFloor: gameState.dungeon.highestFloor
+        },
+        weapons: { ...gameState.weapons },
+        talismanPurchases: { ...gameState.talismanPurchases },
+        percentBonus: { ...gameState.percentBonus },
+        enhancementStones: gameState.enhancementStones,
+        originStones: gameState.originStones,
+        originEnhancement: gameState.originEnhancement,
+        statPointsPurchased: gameState.statPointsPurchased,
+        equippedSkills: gameState.equippedSkills.map(s => s?.id || null),
+        gameMode: gameState.gameMode
+    };
+}
+
+// 저장 데이터 적용
+function applySaveData(data) {
+    // 플레이어 정보
+    gameState.player.level = data.player.level;
+    gameState.player.exp = data.player.exp;
+    gameState.player.gold = data.player.gold;
+    gameState.player.statPoints = data.player.statPoints;
+    gameState.player.stats = { ...data.player.stats };
+    gameState.player.baseAtk = data.player.baseAtk;
+
+    // 던전 기록
+    gameState.dungeon.highestFloor = data.dungeon.highestFloor;
+    gameState.dungeon.currentFloor = 1;
+    gameState.dungeon.inBattle = false;
+
+    // 장비/자원
+    gameState.weapons = { ...data.weapons };
+    gameState.talismanPurchases = { ...data.talismanPurchases };
+    gameState.percentBonus = { ...data.percentBonus };
+    gameState.enhancementStones = data.enhancementStones;
+    gameState.originStones = data.originStones;
+    gameState.originEnhancement = data.originEnhancement;
+    gameState.statPointsPurchased = data.statPointsPurchased;
+    gameState.gameMode = data.gameMode;
+
+    // 스킬 복원
+    gameState.equippedSkills = data.equippedSkills.map(id => findSkillById(id));
+
+    // 상태 초기화
+    gameState.tempRelics = [];
+    gameState.activeBuffs = [];
+    gameState.skillCooldowns = {};
+    gameState.currentEnemy = null;
+
+    // HP/MP 재계산
+    gameState.player.maxHp = getMaxHp();
+    gameState.player.maxMp = getMaxMp();
+    gameState.player.hp = gameState.player.maxHp;
+    gameState.player.mp = gameState.player.maxMp;
+}
+
+// 게임 저장
+function saveGame() {
+    try {
+        const saveData = getSaveData();
+        localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+
+        const statusEl = document.getElementById('save-status');
+        if (statusEl) {
+            const date = new Date();
+            const timeStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+            statusEl.textContent = `저장 완료! (${timeStr})`;
+            statusEl.className = 'save-status success';
+        }
+        return true;
+    } catch (e) {
+        const statusEl = document.getElementById('save-status');
+        if (statusEl) {
+            statusEl.textContent = '저장 실패: ' + e.message;
+            statusEl.className = 'save-status error';
+        }
+        return false;
+    }
+}
+
+// 게임 불러오기
+function loadGame() {
+    try {
+        const saveStr = localStorage.getItem(SAVE_KEY);
+        if (!saveStr) {
+            const statusEl = document.getElementById('save-status');
+            if (statusEl) {
+                statusEl.textContent = '저장된 데이터가 없습니다.';
+                statusEl.className = 'save-status error';
+            }
+            return false;
+        }
+
+        if (!confirm('현재 진행을 덮어쓰고 저장된 데이터를 불러올까요?')) {
+            return false;
+        }
+
+        const saveData = JSON.parse(saveStr);
+        applySaveData(saveData);
+
+        // UI 업데이트
+        updateSkillButtons();
+        updateVillageUI();
+        updateInnUI();
+        showScreen('village-screen');
+
+        const statusEl = document.getElementById('save-status');
+        if (statusEl) {
+            statusEl.textContent = '불러오기 완료!';
+            statusEl.className = 'save-status success';
+        }
+        return true;
+    } catch (e) {
+        const statusEl = document.getElementById('save-status');
+        if (statusEl) {
+            statusEl.textContent = '불러오기 실패: ' + e.message;
+            statusEl.className = 'save-status error';
+        }
+        return false;
+    }
+}
+
+// 저장 데이터 존재 여부 확인
+function hasSaveData() {
+    return localStorage.getItem(SAVE_KEY) !== null;
 }
 
 // 초기화

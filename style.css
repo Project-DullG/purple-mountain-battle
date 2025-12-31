@@ -2569,6 +2569,72 @@ h2 {
     color: #a29bfe !important;
 }
 
+/* 세이브/로드 섹션 */
+.save-section {
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.15) 0%, rgba(50, 50, 80, 0.4) 100%);
+    border: 1px solid rgba(162, 155, 254, 0.3);
+}
+
+.save-desc {
+    color: #d4c4ff;
+    font-style: italic;
+    margin-bottom: 15px;
+    text-shadow: 0 0 8px rgba(162, 155, 254, 0.4);
+}
+
+.save-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.btn-save, .btn-load {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+}
+
+.btn-save:hover {
+    background: linear-gradient(135deg, #7d6df0, #b3acff);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+}
+
+.btn-load {
+    background: linear-gradient(135deg, #00b894, #55efc4);
+    color: #1a1a2e;
+}
+
+.btn-load:hover {
+    background: linear-gradient(135deg, #00d4a8, #66ffd6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
+}
+
+.save-status {
+    font-size: 0.9rem;
+    min-height: 1.2em;
+    transition: color 0.3s ease;
+}
+
+.save-status.success {
+    color: #55efc4;
+}
+
+.save-status.error {
+    color: #ff6b6b;
+}
+
 /* 퍼센트 강화 그리드 */
 .percent-upgrade-grid {
     display: grid;
