@@ -2415,17 +2415,25 @@ function showBossRewardChoices() {
     }
 }
 
-// 유물 선택 (수동 합성 - 유물은 바로 추가)
+// 유물 선택 (보상 다 받은 후 합성)
 function selectRelic(relic) {
-    // 유물 바로 추가 (합성은 수동으로)
+    // 유물 바로 추가
     gameState.tempRelics.push({ ...relic });
 
-    // 보상 페이즈에 따라 합성 단계로 이동
+    // 보상 페이즈에 따라 다음 단계로 이동
     if (gameState.rewardPhase === 'tier1') {
-        gameState.rewardPhase = 'combine1';
-        showRewardCombinePhase();
+        if (gameState.isBossReward) {
+            // 보스: 2단계 유물 선택으로
+            gameState.rewardPhase = 'tier2';
+            showTier2RelicChoices();
+        } else {
+            // 일반: 합성 단계로
+            gameState.rewardPhase = 'combine';
+            showRewardCombinePhase();
+        }
     } else if (gameState.rewardPhase === 'tier2') {
-        gameState.rewardPhase = 'combine2';
+        // 2단계 유물 받은 후 합성 단계로
+        gameState.rewardPhase = 'combine';
         showRewardCombinePhase();
     }
 }
@@ -2522,7 +2530,11 @@ function updateRewardCombineButton() {
     }
 }
 
-// 보상 합성 실행
+// 합성 결과 선택지 저장
+let combineResultChoices = [];
+let combineRemoveIndices = [];
+
+// 보상 합성 실행 - 3개 선택지 표시
 function executeRewardCombine() {
     if (rewardCombineSelected.length !== 2) return;
 
@@ -2538,43 +2550,107 @@ function executeRewardCombine() {
     if (commonTags.length === 0 || r1.rarity !== r2.rarity) return;
 
     const nextRarity = getNextRarity(r1.rarity);
-    const newRelic = getRandomRelicWithTag(commonTags[0], nextRarity);
 
-    // 기존 유물 제거 (인덱스 큰 것부터)
-    const toRemove = [idx1, idx2].sort((a, b) => b - a);
-    toRemove.forEach(i => gameState.tempRelics.splice(i, 1));
+    // 3개의 선택지 생성 (중복 방지)
+    combineResultChoices = [];
+    const usedIds = new Set();
+    for (let i = 0; i < 3; i++) {
+        let relic;
+        let attempts = 0;
+        do {
+            relic = getRandomRelicWithTag(commonTags[0], nextRarity);
+            attempts++;
+        } while (usedIds.has(relic.id) && attempts < 10);
+        usedIds.add(relic.id);
+        combineResultChoices.push({ ...relic });
+    }
 
-    // 새 유물 추가
-    gameState.tempRelics.push({ ...newRelic });
+    // 제거할 인덱스 저장
+    combineRemoveIndices = [idx1, idx2].sort((a, b) => b - a);
 
-    // UI 업데이트
+    // 합성 결과 선택 UI 표시
+    showCombineResultChoices();
+}
+
+// 합성 결과 선택 UI 표시
+function showCombineResultChoices() {
+    document.getElementById('reward-combine-section').classList.add('hidden');
+
+    // 합성 결과 섹션이 없으면 동적으로 생성
+    let resultSection = document.getElementById('combine-result-section');
+    if (!resultSection) {
+        resultSection = document.createElement('div');
+        resultSection.id = 'combine-result-section';
+        resultSection.className = 'reward-section';
+        document.getElementById('reward-screen').appendChild(resultSection);
+    }
+
+    resultSection.innerHTML = `
+        <h2>합성 결과 선택</h2>
+        <p style="color: #888; margin-bottom: 15px;">3개 중 1개를 선택하세요</p>
+        <div id="combine-result-grid" class="relic-choice-grid"></div>
+    `;
+    resultSection.classList.remove('hidden');
+
+    const grid = document.getElementById('combine-result-grid');
+
+    combineResultChoices.forEach((relic, idx) => {
+        const tags = getRelicTags(relic);
+        const tagsHtml = tags.map(t => `<span class="tag tag-${t}">태그 | ${t}</span>`).join('');
+        const btn = document.createElement('button');
+        btn.className = `relic-choice-btn rarity-${relic.rarity}`;
+        btn.innerHTML = `
+            <div class="relic-rarity rarity-${relic.rarity}">${rarityNames[relic.rarity]}</div>
+            <div class="relic-icon">${relic.icon}</div>
+            <div class="relic-name">${relic.name}</div>
+            <div class="relic-desc">${getRelicDescWithEnhancement(relic)}</div>
+            <div class="relic-tags">${tagsHtml}</div>
+        `;
+        btn.addEventListener('click', () => selectCombineResult(idx));
+        grid.appendChild(btn);
+    });
+}
+
+// 합성 결과 선택
+function selectCombineResult(idx) {
+    const selectedRelic = combineResultChoices[idx];
+
+    // 기존 유물 제거
+    combineRemoveIndices.forEach(i => gameState.tempRelics.splice(i, 1));
+
+    // 선택한 유물 추가
+    gameState.tempRelics.push({ ...selectedRelic });
+
+    // UI 초기화
+    document.getElementById('combine-result-section').classList.add('hidden');
+    combineResultChoices = [];
+    combineRemoveIndices = [];
     rewardCombineSelected = [];
+
+    // 합성 UI로 돌아가서 계속 합성 가능
+    document.getElementById('reward-combine-section').classList.remove('hidden');
     updateRewardCombineUI();
 
-    // 합성 결과 표시
+    // 결과 표시
     const selected = document.getElementById('reward-combine-selected');
-    selected.innerHTML = `<span style="color: #50fa7b;">✨ ${newRelic.icon} ${newRelic.name} 획득!</span>`;
+    selected.innerHTML = `<span style="color: #50fa7b;">✨ ${selectedRelic.icon} ${selectedRelic.name} 획득!</span>`;
 }
 
 // 다음 보상 단계로 이동
 function proceedToNextRewardPhase() {
     document.getElementById('reward-combine-section').classList.add('hidden');
+    document.getElementById('combine-result-section')?.classList.add('hidden');
 
-    if (gameState.rewardPhase === 'combine1') {
+    if (gameState.rewardPhase === 'combine') {
         if (gameState.isBossReward) {
-            // 보스: 2단계 유물 선택으로
-            gameState.rewardPhase = 'tier2';
-            document.getElementById('relic-choice-section').classList.remove('hidden');
-            showTier2RelicChoices();
+            // 보스: 스킬 선택으로
+            gameState.rewardPhase = 'skill';
+            showSkillChoicesOnly();
         } else {
             // 중간보스: 30% 회복 후 종료
             applyRewardHeal();
             proceedAfterRelicChoice();
         }
-    } else if (gameState.rewardPhase === 'combine2') {
-        // 보스: 스킬 선택으로
-        gameState.rewardPhase = 'skill';
-        showSkillChoicesOnly();
     }
 }
 
