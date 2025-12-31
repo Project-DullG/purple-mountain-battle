@@ -1301,10 +1301,23 @@ function getEnemyDebuffDamageTaken() {
 
     let increase = 0;
     // 쇠약: 중첩당 10% 증가
-    const weakenStacks = enemy.debuffs.weaken || 0;
+    const weakenStacks = enemy.debuffs?.weaken || 0;
     increase += weakenStacks * 10;
 
     return 1 + increase / 100;
+}
+
+// 디버프로 인한 적 회피 감소
+function getEnemyDebuffDodgeReduction() {
+    const enemy = gameState.currentEnemy;
+    if (!enemy) return 0;
+
+    let reduction = 0;
+    // 빙결: 중첩당 5% 회피 감소
+    const freezeStacks = enemy.debuffs?.freeze || 0;
+    reduction += freezeStacks * 5;
+
+    return reduction;
 }
 
 // 스턴으로 인한 반격 불가 체크
@@ -2425,6 +2438,7 @@ function useSkill(slotIndex) {
         } else {
             enemyCounterAttack();
         }
+        updateBattleUI();
         return;
     }
 
