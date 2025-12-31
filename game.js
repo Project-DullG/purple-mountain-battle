@@ -1596,6 +1596,14 @@ function getEnhanceGoldCost(level) {
     return 50 + level * 30;
 }
 
+function getEnhanceStoneCost(level) {
+    // 강화석 비용: 레벨에 따라 증가 (1-5: 1개, 6-10: 2개, 11-15: 3개, 16-20: 5개)
+    if (level < 5) return 1;
+    if (level < 10) return 2;
+    if (level < 15) return 3;
+    return 5;
+}
+
 function showEnhanceResult(weapon, success, level) {
     const weaponNames = {
         sword: '대검',
@@ -1628,13 +1636,15 @@ function updateBlacksmithUI() {
         const level = gameState.weapons[weapon];
         const successRate = getEnhanceSuccessRate(level);
         const goldCost = getEnhanceGoldCost(level);
+        const stoneCost = getEnhanceStoneCost(level);
         const isMaxLevel = level >= 20;
-        const canAfford = gameState.enhancementStones >= 1 && gameState.player.gold >= goldCost;
+        const canAfford = gameState.enhancementStones >= stoneCost && gameState.player.gold >= goldCost;
 
         document.getElementById(`${weapon}-level`).textContent = level;
         document.getElementById(`${weapon}-bonus`).textContent = (level * 5).toFixed(0);
         document.getElementById(`${weapon}-rate`).textContent = successRate;
         document.getElementById(`${weapon}-gold`).textContent = goldCost;
+        document.getElementById(`${weapon}-stone`).textContent = stoneCost;
 
         const btn = document.querySelector(`.btn-upgrade[data-weapon="${weapon}"]`);
         btn.disabled = !canAfford || isMaxLevel;
@@ -3626,8 +3636,9 @@ function initEventListeners() {
             const currentLevel = gameState.weapons[weapon];
             const goldCost = getEnhanceGoldCost(currentLevel);
 
-            if (gameState.enhancementStones >= 1 && gameState.player.gold >= goldCost && currentLevel < 100) {
-                gameState.enhancementStones--;
+            const stoneCost = getEnhanceStoneCost(currentLevel);
+            if (gameState.enhancementStones >= stoneCost && gameState.player.gold >= goldCost && currentLevel < 20) {
+                gameState.enhancementStones -= stoneCost;
                 gameState.player.gold -= goldCost;
                 const successRate = getEnhanceSuccessRate(currentLevel);
                 const roll = Math.random() * 100;
