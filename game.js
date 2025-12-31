@@ -1678,24 +1678,20 @@ function updateShopUI() {
     document.getElementById('shop-stones').textContent = gameState.enhancementStones;
     document.getElementById('shop-origins').textContent = gameState.originStones;
 
-    // 부적 (경험치, 골드) - 2%씩, 최대 100회 (200%)
+    // 부적 (경험치, 골드) - 2%씩, 무제한
     const expBonus = gameState.talismanPurchases.exp * 2;
     const expCost = getTalismanCost('exp', gameState.talismanPurchases.exp);
-    const isExpMax = gameState.talismanPurchases.exp >= 100;
     document.getElementById('exp-bonus').textContent = expBonus;
-    document.getElementById('cost-exp').textContent = isExpMax ? 'MAX' : expCost;
+    document.getElementById('cost-exp').textContent = expCost;
     const expBtn = document.querySelector('.btn-talisman[data-talisman="exp"]');
-    expBtn.disabled = isExpMax || gameState.player.gold < expCost;
-    if (isExpMax) expBtn.textContent = 'MAX';
+    expBtn.disabled = gameState.player.gold < expCost;
 
     const goldBonus = gameState.talismanPurchases.gold * 2;
     const goldTalismanCost = getTalismanCost('gold', gameState.talismanPurchases.gold);
-    const isGoldMax = gameState.talismanPurchases.gold >= 100;
     document.getElementById('gold-bonus').textContent = goldBonus;
-    document.getElementById('cost-gold-talisman').textContent = isGoldMax ? 'MAX' : goldTalismanCost;
+    document.getElementById('cost-gold-talisman').textContent = goldTalismanCost;
     const goldBtn = document.querySelector('.btn-talisman[data-talisman="gold"]');
-    goldBtn.disabled = isGoldMax || gameState.player.gold < goldTalismanCost;
-    if (isGoldMax) goldBtn.textContent = 'MAX';
+    goldBtn.disabled = gameState.player.gold < goldTalismanCost;
 
     // 재화 교환
     const stoneCost = getTalismanCost('stone', gameState.talismanPurchases.stone);
@@ -1708,7 +1704,8 @@ function updateShopUI() {
 
     // 능력 부적 (스탯별 다른 증가량)
     const increments = { atk: 1, hp: 1, crit: 0.5, critDmg: 2, dodge: 0.5, def: 0.15 };
-    const maxValues = { atk: 100, hp: 100, crit: 100, critDmg: 200, dodge: 100, def: 15 };
+    // 공격력, 체력, 치명타피해, 골드, 경험치는 무제한
+    const maxValues = { atk: Infinity, hp: Infinity, crit: 100, critDmg: Infinity, dodge: 100, def: 15 };
     const stats = ['atk', 'hp', 'crit', 'critDmg', 'dodge', 'def'];
 
     stats.forEach(stat => {
@@ -1717,12 +1714,13 @@ function updateShopUI() {
         const maxValue = maxValues[stat];
         const purchases = Math.round(current / increment);
         const cost = getPercentUpgradeCost(purchases, stat);
-        const isMax = current >= maxValue;
+        const isMax = maxValue !== Infinity && current >= maxValue;
 
         document.getElementById(`percent-${stat}`).textContent = current.toFixed(1);
         document.getElementById(`cost-${stat}`).textContent = isMax ? 'MAX' : cost;
-        // 진행바: 각 스탯의 최대값 기준
-        const fillPercent = (current / maxValue) * 100;
+        // 진행바: 무제한 스탯은 100을 기준으로, 유한 스탯은 최대값 기준
+        const barMax = maxValue === Infinity ? Math.max(100, current) : maxValue;
+        const fillPercent = Math.min(100, (current / barMax) * 100);
         document.getElementById(`fill-${stat}`).style.width = `${fillPercent}%`;
 
         const btn = document.querySelector(`.btn-percent-upgrade[data-stat="${stat}"]`);
@@ -3746,12 +3744,15 @@ function updateSkillButtons() {
             const weaponText = weaponBonus > 0 ? `\n🔧 ${weaponName} +${weaponLevel} (효과 +${weaponBonus}%)` : '';
 
             if (cooldown > 0) {
-                btn.textContent = `${skill.name} (${cooldown})`;
+                btn.textContent = `${skill.name} [⏳${cooldown}]`;
                 btn.title = `[${charName}] ${skill.name} (${skillType})\n${mpText} | ${cdText}\n\n${skill.desc}${weaponText}\n\n⏳ 남은 쿨타임: ${cooldown}턴`;
                 btn.disabled = true;
                 btn.classList.add('on-cooldown');
             } else {
-                btn.textContent = `${skill.name} (${skill.mpCost})`;
+                // MP와 쿨타임 모두 표시
+                const cdDisplay = skill.cooldown > 0 ? `CD${skill.cooldown}` : '';
+                const btnInfo = cdDisplay ? `${skill.mpCost}/${cdDisplay}` : `${skill.mpCost}`;
+                btn.textContent = `${skill.name} (${btnInfo})`;
                 btn.title = `[${charName}] ${skill.name} (${skillType})\n${mpText} | ${cdText}\n\n${skill.desc}${weaponText}`;
                 btn.disabled = false;
                 btn.classList.remove('on-cooldown');
