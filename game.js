@@ -101,7 +101,7 @@ const relicsData = [
     { id: 'relic_killmana_c', name: '마나 이빨', desc: '처치 시 MP 5% 회복', effect: 'killMana', value: 0.05, icon: '✨', rarity: 'common', tag: '특수' },
     { id: 'relic_bleed_c', name: '톱니', desc: '공격 시 25% 출혈 부여', effect: 'bleed', value: 0.25, icon: '✨', rarity: 'common', tag: '특수' },
     { id: 'relic_weaken_c', name: '쇠약의 부적', desc: '공격 시 25% 쇠약 부여', effect: 'weaken', value: 0.25, icon: '✨', rarity: 'common', tag: '특수' },
-    { id: 'relic_stun_c', name: '망치 조각', desc: '공격 시 25% 스턴 부여', effect: 'stun', value: 0.25, icon: '✨', rarity: 'common', tag: '특수' },
+    { id: 'relic_stun_c', name: '망치 조각', desc: '공격 시 10% 스턴 부여', effect: 'stun', value: 0.10, icon: '✨', rarity: 'common', tag: '특수' },
     { id: 'relic_freeze_c', name: '얼음 조각', desc: '공격 시 25% 빙결 부여', effect: 'freeze', value: 0.25, icon: '✨', rarity: 'common', tag: '특수' },
 
     // ========== 희귀 등급 (10% 수준, 디버프 50%) ==========
@@ -130,7 +130,7 @@ const relicsData = [
     { id: 'relic_killmana_r', name: '마나 회복의 송곳니', desc: '처치 시 MP 10% 회복', effect: 'killMana', value: 0.10, icon: '✨', rarity: 'rare', tag: '특수' },
     { id: 'relic_bleed_r', name: '야수의 발톱', desc: '공격 시 50% 출혈 부여', effect: 'bleed', value: 0.50, icon: '✨', rarity: 'rare', tag: '특수' },
     { id: 'relic_weaken_r', name: '쇠약의 주문서', desc: '공격 시 50% 쇠약 부여', effect: 'weaken', value: 0.50, icon: '✨', rarity: 'rare', tag: '특수' },
-    { id: 'relic_stun_r', name: '강철 망치', desc: '공격 시 50% 스턴 부여', effect: 'stun', value: 0.50, icon: '✨', rarity: 'rare', tag: '특수' },
+    { id: 'relic_stun_r', name: '강철 망치', desc: '공격 시 30% 스턴 부여', effect: 'stun', value: 0.30, icon: '✨', rarity: 'rare', tag: '특수' },
     { id: 'relic_freeze_r', name: '서리 수정', desc: '공격 시 50% 빙결 부여', effect: 'freeze', value: 0.50, icon: '✨', rarity: 'rare', tag: '특수' },
 
     // ========== 영웅 등급 (25% 수준, 디버프 100%) ==========
@@ -159,7 +159,7 @@ const relicsData = [
     { id: 'relic_killmana_e', name: '마나 착취자', desc: '처치 시 MP 25% 회복', effect: 'killMana', value: 0.25, icon: '✨', rarity: 'epic', tag: '특수' },
     { id: 'relic_bleed_e', name: '피의 칼날', desc: '공격 시 출혈 부여', effect: 'bleed', value: 1.0, icon: '✨', rarity: 'epic', tag: '특수' },
     { id: 'relic_weaken_e', name: '쇠약의 인장', desc: '공격 시 쇠약 부여', effect: 'weaken', value: 1.0, icon: '✨', rarity: 'epic', tag: '특수' },
-    { id: 'relic_stun_e', name: '번개 망치', desc: '공격 시 스턴 부여', effect: 'stun', value: 1.0, icon: '✨', rarity: 'epic', tag: '특수' },
+    { id: 'relic_stun_e', name: '번개 망치', desc: '공격 시 65% 스턴 부여', effect: 'stun', value: 0.65, icon: '✨', rarity: 'epic', tag: '특수' },
     { id: 'relic_freeze_e', name: '빙결 수정', desc: '공격 시 빙결 부여', effect: 'freeze', value: 1.0, icon: '✨', rarity: 'epic', tag: '특수' },
 
     // ========== 전설 등급 (80% 수준, 디버프 복합) ==========
@@ -1310,17 +1310,20 @@ function getEnemyDebuffDodgeReduction() {
     return reduction;
 }
 
-// 스턴으로 인한 반격 불가 체크
-function checkStunBlockCounter() {
+// 스턴으로 인한 반격 피해 감소 (기본 25%, 근원 강화로 최대 50%)
+function getStunCounterReduction() {
     const enemy = gameState.currentEnemy;
-    if (!enemy) return false;
+    if (!enemy || enemy.debuffs.stun <= 0) return 0;
 
-    if (enemy.debuffs.stun > 0) {
-        enemy.debuffs.stun--;
-        addBattleLog(`스턴으로 적의 반격이 무효화됨!`);
-        return true; // 반격 불가
-    }
-    return false;
+    // 스턴 스택 소모
+    enemy.debuffs.stun--;
+
+    // 기본 25% 감소, 근원 강화로 추가 감소 (최대 50%)
+    const baseReduction = 0.25;
+    const originBonus = getOriginEnhancementBonus();
+    const reduction = baseReduction * (1 + originBonus);
+
+    return Math.min(reduction, 0.50); // 최대 50%
 }
 
 // 디버프로 인한 적 선제공격 증가 (빙결 +2)
@@ -2196,11 +2199,8 @@ function applyLifeSteal(damage) {
 }
 
 function enemyCounterAttack() {
-    // 스턴으로 인한 반격 불가 체크
-    if (checkStunBlockCounter()) {
-        endPlayerTurn();
-        return;
-    }
+    // 스턴으로 인한 반격 피해 감소 체크
+    const stunReduction = getStunCounterReduction();
 
     if (gameState.currentEnemy.stunned) {
         addBattleLog(`${gameState.currentEnemy.name}은(는) 스턴 상태!`);
@@ -2240,12 +2240,18 @@ function enemyCounterAttack() {
         damage = Math.floor(damage * (1 - gameState.skillCounterReduction));
     }
 
+    // 스턴으로 인한 반격 피해 감소
+    if (stunReduction > 0) {
+        damage = Math.floor(damage * (1 - stunReduction));
+    }
+
     gameState.player.hp -= damage;
     const logParts = [`적의 반격! ${damage} 피해`];
     if (isCrit) logParts.push('(치명타!)');
     if (isDodge) logParts.push('(부분 회피!)');
     if (isGuarding) logParts.push('(방어!)');
     if (gameState.skillCounterReduction > 0) logParts.push('(피해 감소!)');
+    if (stunReduction > 0) logParts.push(`(스턴 -${Math.floor(stunReduction * 100)}%)`);
     addBattleLog(logParts.join(' '));
     isGuarding = false;
 
@@ -3430,7 +3436,7 @@ function getEffectExplanation(effectType) {
         // 특수 용어가 필요한 효과들만
         'bleed': '출혈: 매 턴 (공격력×50%×중첩) 피해, 턴마다 1중첩 감소',
         'weaken': '쇠약: 중첩당 적 공격력 -10%, 받는 피해 +10%',
-        'stun': '스턴: 적 반격 1회 무효화',
+        'stun': '스턴: 반격 피해 25~50% 감소 (근원 강화 영향)',
         'freeze': '빙결: 적 선제공격 +2턴 (중첩 가능)',
         'execute': '처형: 적 HP 30% 이하일 때만 추가 피해',
         'firstHit': '첫타: 전투의 첫 번째 공격에만 적용',
