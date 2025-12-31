@@ -181,6 +181,7 @@
                         <div class="upgrade-icon">⚔️</div>
                         <div class="upgrade-name">공격력</div>
                         <div class="upgrade-percent">+<span id="percent-atk">0</span>%</div>
+                        <div class="upgrade-desc">+1%씩 증가</div>
                         <div class="upgrade-bar"><div class="upgrade-fill" id="fill-atk"></div></div>
                         <button class="btn-percent-upgrade" data-stat="atk"><span id="cost-atk">100</span>G</button>
                     </div>
@@ -188,6 +189,7 @@
                         <div class="upgrade-icon">❤️</div>
                         <div class="upgrade-name">체력</div>
                         <div class="upgrade-percent">+<span id="percent-hp">0</span>%</div>
+                        <div class="upgrade-desc">+1%씩 증가</div>
                         <div class="upgrade-bar"><div class="upgrade-fill" id="fill-hp"></div></div>
                         <button class="btn-percent-upgrade" data-stat="hp"><span id="cost-hp">100</span>G</button>
                     </div>
@@ -195,30 +197,32 @@
                         <div class="upgrade-icon">🎯</div>
                         <div class="upgrade-name">치명타 확률</div>
                         <div class="upgrade-percent">+<span id="percent-crit">0</span>%</div>
+                        <div class="upgrade-desc">+0.5%씩 증가</div>
                         <div class="upgrade-bar"><div class="upgrade-fill" id="fill-crit"></div></div>
                         <button class="btn-percent-upgrade" data-stat="crit"><span id="cost-crit">100</span>G</button>
                     </div>
                     <div class="percent-upgrade-card">
                         <div class="upgrade-icon">💥</div>
-                        <div class="upgrade-name">치명타 데미지</div>
+                        <div class="upgrade-name">치명타 피해</div>
                         <div class="upgrade-percent">+<span id="percent-critDmg">0</span>%</div>
+                        <div class="upgrade-desc">+2%씩 증가</div>
                         <div class="upgrade-bar"><div class="upgrade-fill" id="fill-critDmg"></div></div>
                         <button class="btn-percent-upgrade" data-stat="critDmg"><span id="cost-critDmg">100</span>G</button>
                     </div>
-                    <div class="percent-upgrade-card capped">
+                    <div class="percent-upgrade-card">
                         <div class="upgrade-icon">💨</div>
                         <div class="upgrade-name">회피율</div>
                         <div class="upgrade-percent">+<span id="percent-dodge">0</span>%</div>
+                        <div class="upgrade-desc">+0.5%씩 증가</div>
                         <div class="upgrade-bar"><div class="upgrade-fill" id="fill-dodge"></div></div>
-                        <div class="upgrade-cap">총합 최대 80%</div>
                         <button class="btn-percent-upgrade" data-stat="dodge"><span id="cost-dodge">100</span>G</button>
                     </div>
-                    <div class="percent-upgrade-card capped">
+                    <div class="percent-upgrade-card">
                         <div class="upgrade-icon">🛡️</div>
                         <div class="upgrade-name">피해 감소</div>
                         <div class="upgrade-percent">+<span id="percent-def">0</span>%</div>
+                        <div class="upgrade-desc">+0.15%씩 증가</div>
                         <div class="upgrade-bar"><div class="upgrade-fill" id="fill-def"></div></div>
-                        <div class="upgrade-cap">상점 최대 15% (총합 50%)</div>
                         <button class="btn-percent-upgrade" data-stat="def"><span id="cost-def">100</span>G</button>
                     </div>
                 </div>
@@ -409,20 +413,44 @@
                             <span class="stat-val" id="panel-crit">10%</span>
                         </div>
                         <div class="stat-row">
-                            <span class="stat-label">치명타 데미지</span>
+                            <span class="stat-label">치명타 피해</span>
                             <span class="stat-val" id="panel-crit-dmg">130%</span>
                         </div>
                         <div class="stat-row">
-                            <span class="stat-label">회피 (50%감소)</span>
+                            <span class="stat-label">회피 (최대80%)</span>
                             <span class="stat-val" id="panel-dodge">10%</span>
                         </div>
                         <div class="stat-row">
-                            <span class="stat-label">피해 감소</span>
+                            <span class="stat-label">피해 감소 (최대50%)</span>
                             <span class="stat-val" id="panel-def">0%</span>
                         </div>
                         <div class="stat-row">
                             <span class="stat-label">피해 반사</span>
                             <span class="stat-val" id="panel-reflect">0%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">추가 공격</span>
+                            <span class="stat-val" id="panel-multihit">0%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">흡혈</span>
+                            <span class="stat-val" id="panel-lifesteal">0%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">출혈 부여</span>
+                            <span class="stat-val" id="panel-bleed">0%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">쇠약 부여</span>
+                            <span class="stat-val" id="panel-weaken">0%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">스턴 부여</span>
+                            <span class="stat-val" id="panel-stun">0%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">빙결 부여</span>
+                            <span class="stat-val" id="panel-freeze">0%</span>
                         </div>
                     </div>
                     <div class="stats-section rewards-section">

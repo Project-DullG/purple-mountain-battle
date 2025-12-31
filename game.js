@@ -1055,6 +1055,10 @@ function getLifeStealInfo() {
     return { chance, healPercent }; // 원본 확률 반환
 }
 
+// 흡혈 확률만 반환 (UI 표시용)
+function getLifeStealChance() {
+    return getLifeStealInfo().chance;
+}
 
 // === 새 유물 효과 헬퍼 함수들 ===
 
@@ -1491,19 +1495,18 @@ function updateVillageUI() {
     }
 }
 
-function getPercentUpgradeCost(currentPercent) {
-    // 비용: 50번까지 적당히, 이후 급격히 증가 (0.5%씩 증가하므로 단계 = currentPercent * 2)
-    const purchases = currentPercent * 2;
+function getPercentUpgradeCost(purchases, stat) {
+    // 비용: 50번까지 적당히, 이후 급격히 증가
     const base = 50;
 
-    if (purchases < 100) {
-        // 100번(50%)까지: 적당한 증가
+    if (purchases < 50) {
+        // 50번까지: 적당한 증가
         return Math.floor(base * (1 + purchases * 0.05) + purchases * 5);
     } else {
-        // 100번 이후: 급격한 비용 증가
-        const over100 = purchases - 100;
-        const base100Cost = Math.floor(base * (1 + 99 * 0.05) + 99 * 5);
-        return Math.floor(base100Cost * (1 + over100 * 0.3) + over100 * 50);
+        // 50번 이후: 급격한 비용 증가
+        const over50 = purchases - 50;
+        const base50Cost = Math.floor(base * (1 + 49 * 0.05) + 49 * 5);
+        return Math.floor(base50Cost * (1 + over50 * 0.3) + over50 * 50);
     }
 }
 
@@ -1556,19 +1559,23 @@ function updateShopUI() {
     document.getElementById('cost-origin').textContent = originCost;
     document.querySelector('.btn-talisman[data-talisman="origin"]').disabled = gameState.player.gold < originCost;
 
-    // 능력 부적 (퍼센트 강화) - 기본 0.5%씩, def는 0.15%씩 증가
+    // 능력 부적 (스탯별 다른 증가량)
+    const increments = { atk: 1, hp: 1, crit: 0.5, critDmg: 2, dodge: 0.5, def: 0.15 };
+    const maxValues = { atk: 100, hp: 100, crit: 100, critDmg: 200, dodge: 100, def: 15 };
     const stats = ['atk', 'hp', 'crit', 'critDmg', 'dodge', 'def'];
+
     stats.forEach(stat => {
         const current = gameState.percentBonus[stat];
-        const cost = getPercentUpgradeCost(current);
-        // def는 최대 15% (100회 구매), 나머지는 100%
-        const maxValue = stat === 'def' ? 15 : 100;
+        const increment = increments[stat];
+        const maxValue = maxValues[stat];
+        const purchases = Math.round(current / increment);
+        const cost = getPercentUpgradeCost(purchases, stat);
         const isMax = current >= maxValue;
 
         document.getElementById(`percent-${stat}`).textContent = current.toFixed(1);
         document.getElementById(`cost-${stat}`).textContent = isMax ? 'MAX' : cost;
-        // 진행바: def는 15% 기준, 나머지는 100% 기준
-        const fillPercent = stat === 'def' ? (current / 15) * 100 : current;
+        // 진행바: 각 스탯의 최대값 기준
+        const fillPercent = (current / maxValue) * 100;
         document.getElementById(`fill-${stat}`).style.width = `${fillPercent}%`;
 
         const btn = document.querySelector(`.btn-percent-upgrade[data-stat="${stat}"]`);
@@ -1709,6 +1716,13 @@ function updateBattleUI() {
     document.getElementById('panel-dodge').textContent = getDodgeChance() + '%';
     document.getElementById('panel-def').textContent = Math.floor(getTotalDamageReduction()) + '%';
     document.getElementById('panel-reflect').textContent = Math.floor(getReflectPercent() * 100) + '%';
+    // 추가 공격, 흡혈, 디버프 확률
+    document.getElementById('panel-multihit').textContent = Math.floor(getMultiHitChance() * 100) + '%';
+    document.getElementById('panel-lifesteal').textContent = Math.floor(getLifeStealChance() * 100) + '%';
+    document.getElementById('panel-bleed').textContent = Math.floor(getDebuffChance('bleed') * 100) + '%';
+    document.getElementById('panel-weaken').textContent = Math.floor(getDebuffChance('weaken') * 100) + '%';
+    document.getElementById('panel-stun').textContent = Math.floor(getDebuffChance('stun') * 100) + '%';
+    document.getElementById('panel-freeze').textContent = Math.floor(getDebuffChance('freeze') * 100) + '%';
 
     // 근원 강화 보너스 표시
     const originBonus = Math.floor(getOriginEnhancementBonus() * 100);
@@ -3652,15 +3666,18 @@ function initEventListeners() {
         });
     });
 
-    // 상점 - 퍼센트 능력 강화 (골드 사용, 기본 0.5%씩, def는 0.15%씩)
+    // 상점 - 퍼센트 능력 강화 (스탯별 다른 증가량)
     document.querySelectorAll('.btn-percent-upgrade').forEach(btn => {
         btn.addEventListener('click', () => {
             const stat = btn.dataset.stat;
             const current = gameState.percentBonus[stat];
-            const cost = getPercentUpgradeCost(current);
-            // def는 최대 15% (100회 구매), 나머지는 100%
-            const maxValue = stat === 'def' ? 15 : 100;
-            const increment = stat === 'def' ? 0.15 : 0.5;
+            // 스탯별 증가량: 공격력/체력 1%, 치명타확률/회피율 0.5%, 치명타피해 2%, 피해감소 0.15%
+            const increments = { atk: 1, hp: 1, crit: 0.5, critDmg: 2, dodge: 0.5, def: 0.15 };
+            const maxValues = { atk: 100, hp: 100, crit: 100, critDmg: 200, dodge: 100, def: 15 };
+            const increment = increments[stat];
+            const maxValue = maxValues[stat];
+            const purchases = Math.round(current / increment);
+            const cost = getPercentUpgradeCost(purchases, stat);
 
             if (current < maxValue && gameState.player.gold >= cost) {
                 gameState.player.gold -= cost;
