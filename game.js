@@ -4481,6 +4481,13 @@ async function submitScore() {
     }
 }
 
+// HTML 이스케이프 (XSS 방지)
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // 리더보드 렌더링
 function renderLeaderboard(data) {
     const listEl = document.getElementById('leaderboard-list');
@@ -4497,10 +4504,11 @@ function renderLeaderboard(data) {
     data.leaderboard.forEach((entry, idx) => {
         const rankClass = idx < 3 ? `rank-${idx + 1}` : '';
         const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}`;
+        const safeNickname = escapeHtml(entry.nickname || '');
         html += `
             <div class="leaderboard-row ${rankClass}">
                 <span class="rank">${rankIcon}</span>
-                <span class="nickname">${entry.nickname}</span>
+                <span class="nickname">${safeNickname}</span>
                 <span class="floor">${entry.floor}층</span>
                 <span class="level">Lv.${entry.level}</span>
             </div>
