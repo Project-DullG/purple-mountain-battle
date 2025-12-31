@@ -2895,6 +2895,7 @@ function updateRewardCombineUI() {
             item.classList.add('selected');
         }
         item.innerHTML = `
+            <div class="relic-rarity rarity-${relic.rarity}">${rarityNames[relic.rarity]}</div>
             <div class="relic-icon">${relic.icon}</div>
             <div class="relic-name">${relic.name}</div>
             <div class="relic-desc">${relic.desc}</div>
