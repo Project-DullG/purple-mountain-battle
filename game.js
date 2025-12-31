@@ -83,7 +83,7 @@ const relicsData = [
     { id: 'relic_firstHit_c', name: '기습의 단검', desc: '첫 공격 피해 +10%', effect: 'firstHit', value: 0.10, icon: '⚔️', rarity: 'common', tag: '공격' },
     { id: 'relic_bossKiller_c', name: '사냥꾼의 눈', desc: '보스에게 피해 +10%', effect: 'bossKiller', value: 0.10, icon: '⚔️', rarity: 'common', tag: '공격' },
     { id: 'relic_multiHit_c', name: '연속의 팔찌', desc: '7% 확률로 추가 공격', effect: 'multiHit', value: 0.07, icon: '⚔️', rarity: 'common', tag: '공격' },
-    { id: 'relic_lifesteal_c', name: '흡혈 이빨', desc: '25% 확률로 피해의 5% 흡혈', effect: 'lifeSteal', value: 0.25, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_lifesteal_c', name: '흡혈 이빨', desc: '15% 확률로 피해의 10% 흡혈', effect: 'lifeSteal', value: 0.15, icon: '⚔️', rarity: 'common', tag: '공격' },
     { id: 'relic_execute_c', name: '사형집행인', desc: '적 HP 30% 이하 시 피해 +10%', effect: 'execute', value: 0.10, icon: '⚔️', rarity: 'common', tag: '공격' },
     // 방어 (8개): 체력, 피해감소, 회피, 반사, 힘, 민첩, 활력, 처치회복
     { id: 'relic_hp_c', name: '생명의 구슬', desc: '최대 체력 +5%', effect: 'hpMult', value: 0.05, icon: '🛡️', rarity: 'common', tag: '방어' },
@@ -112,7 +112,7 @@ const relicsData = [
     { id: 'relic_firstHit_r', name: '암습의 단검', desc: '첫 공격 피해 +20%', effect: 'firstHit', value: 0.20, icon: '⚔️', rarity: 'rare', tag: '공격' },
     { id: 'relic_bossKiller_r', name: '사냥꾼의 표식', desc: '보스에게 피해 +20%', effect: 'bossKiller', value: 0.20, icon: '⚔️', rarity: 'rare', tag: '공격' },
     { id: 'relic_multiHit_r', name: '연쇄의 고리', desc: '16% 확률로 추가 공격', effect: 'multiHit', value: 0.16, icon: '⚔️', rarity: 'rare', tag: '공격' },
-    { id: 'relic_lifesteal_r', name: '흡혈의 송곳니', desc: '50% 확률로 피해의 5% 흡혈', effect: 'lifeSteal', value: 0.50, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_lifesteal_r', name: '흡혈의 송곳니', desc: '30% 확률로 피해의 10% 흡혈', effect: 'lifeSteal', value: 0.30, icon: '⚔️', rarity: 'rare', tag: '공격' },
     { id: 'relic_execute_r', name: '처형인의 검', desc: '적 HP 30% 이하 시 피해 +20%', effect: 'execute', value: 0.20, icon: '⚔️', rarity: 'rare', tag: '공격' },
     // 방어 (8개)
     { id: 'relic_hp_r', name: '생명의 목걸이', desc: '최대 체력 +10%', effect: 'hpMult', value: 0.10, icon: '🛡️', rarity: 'rare', tag: '방어' },
@@ -141,7 +141,7 @@ const relicsData = [
     { id: 'relic_firstHit_e', name: '기습의 장검', desc: '첫 공격 피해 +50%', effect: 'firstHit', value: 0.50, icon: '⚔️', rarity: 'epic', tag: '공격' },
     { id: 'relic_bossKiller_e', name: '드래곤 슬레이어', desc: '보스에게 피해 +50%', effect: 'bossKiller', value: 0.50, icon: '⚔️', rarity: 'epic', tag: '공격' },
     { id: 'relic_multiHit_e', name: '연쇄의 사슬', desc: '35% 확률로 추가 공격', effect: 'multiHit', value: 0.35, icon: '⚔️', rarity: 'epic', tag: '공격' },
-    { id: 'relic_lifesteal_e', name: '흡혈왕의 송곳니', desc: '피해의 5% 흡혈', effect: 'lifeSteal', value: 1.0, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_lifesteal_e', name: '흡혈왕의 송곳니', desc: '65% 확률로 피해의 10% 흡혈', effect: 'lifeSteal', value: 0.65, icon: '⚔️', rarity: 'epic', tag: '공격' },
     { id: 'relic_execute_e', name: '광전사의 도끼', desc: '적 HP 30% 이하 시 피해 +50%', effect: 'execute', value: 0.50, icon: '⚔️', rarity: 'epic', tag: '공격' },
     // 방어 (8개)
     { id: 'relic_hp_e', name: '거인의 심장', desc: '최대 체력 +25%', effect: 'hpMult', value: 0.25, icon: '🛡️', rarity: 'epic', tag: '방어' },
@@ -170,7 +170,7 @@ const relicsData = [
     { id: 'relic_firstHit_l', name: '광기의 가면', desc: '첫 공격 피해 +160%', effect: 'firstHit', value: 1.60, icon: '⚔️', rarity: 'legendary', tag: '공격' },
     { id: 'relic_bossKiller_l', name: '신 사냥꾼', desc: '보스에게 피해 +160%', effect: 'bossKiller', value: 1.60, icon: '⚔️', rarity: 'legendary', tag: '공격' },
     { id: 'relic_multiHit_l', name: '폭풍의 눈', desc: '70% 확률로 추가 공격', effect: 'multiHit', value: 0.70, icon: '⚔️', rarity: 'legendary', tag: '공격' },
-    { id: 'relic_lifesteal_l', name: '흡혈 군주', desc: '피해의 10% 흡혈', effect: 'lifeSteal', value: 2.0, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_lifesteal_l', name: '흡혈 군주', desc: '피해의 10% 흡혈', effect: 'lifeSteal', value: 1.0, icon: '⚔️', rarity: 'legendary', tag: '공격' },
     { id: 'relic_execute_l', name: '처형자의 도끼', desc: '적 HP 30% 이하 시 피해 +160%', effect: 'execute', value: 1.60, icon: '⚔️', rarity: 'legendary', tag: '공격' },
     // 방어 (8개)
     { id: 'relic_hp_l', name: '타이탄의 심장', desc: '최대 체력 +80%', effect: 'hpMult', value: 0.80, icon: '🛡️', rarity: 'legendary', tag: '방어' },
@@ -1076,30 +1076,31 @@ function getTotalDamageReduction() {
     return Math.min(totalReduction, 80);
 }
 
-// 흡혈 효과 체크 (확률 + 흡혈량 반환, 근원 강화는 재판정으로 적용)
+// 흡혈 효과 체크 (확률 + 흡혈량 반환)
 function getLifeStealInfo() {
     let chance = 0;
-    let healPercent = 0.05; // 기본 5%
+    const baseHealPercent = 0.10; // 기본 10% 고정
 
     // 버프 흡혈 효과 (피의 갈증 등)
     gameState.activeBuffs.forEach(buff => {
         if (buff.effect === 'lifeSteal') {
             chance = 1.0; // 버프는 100% 확률
-            healPercent = Math.max(healPercent, buff.value);
         }
     });
 
-    // 유물 흡혈 효과 (원본 확률 합산)
+    // 유물 흡혈 효과 (확률 합산)
     gameState.tempRelics.forEach(relic => {
         const val = getRelicEffectValueRaw(relic, 'lifeSteal');
         if (val !== null) {
             chance += val;
-            // 2.0 이상이면 10% 흡혈 (전설급)
-            if (val >= 2.0) healPercent = 0.10;
         }
     });
 
-    return { chance, healPercent }; // 원본 확률 반환
+    // 근원 강화 적용 (회복량에 보너스)
+    const originBonus = getOriginEnhancementBonus();
+    const healPercent = baseHealPercent * (1 + originBonus);
+
+    return { chance, healPercent, baseHealPercent }; // 원본 확률 + 강화된 회복량
 }
 
 // 흡혈 확률만 반환 (UI 표시용)
@@ -3336,10 +3337,14 @@ function getRelicDescWithEnhancement(relic) {
                     return rerollChance > 0
                         ? `${basePercent}% 추가공격 (+${rerollPercent}%)`
                         : `${basePercent}% 추가공격`;
-                case 'lifeSteal':
-                    return rerollChance > 0
-                        ? `${basePercent}% 흡혈 (+${rerollPercent}%)`
-                        : `${basePercent}% 흡혈`;
+                case 'lifeSteal': {
+                    // 확률 표시 (100% 초과면 100%로 표시)
+                    const chanceDisplay = Math.min(baseValue * 100, 100).toFixed(0);
+                    // 기본 회복량 10% 고정, 근원 강화 적용
+                    const baseHeal = 10;
+                    const healBonus = enhancementBonus > 0 ? ` (+${(baseHeal * enhancementBonus).toFixed(1)}%)` : '';
+                    return `${chanceDisplay}% 확률, 피해의 ${baseHeal}%${healBonus} 흡혈`;
+                }
                 case 'bleed':
                     return rerollChance > 0
                         ? `${basePercent}% 출혈 (+${rerollPercent}%)`
