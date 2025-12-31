@@ -1256,7 +1256,7 @@ function processDebuffDamage() {
 
     // 출혈: 플레이어 공격력의 50% * 중첩 수
     if (enemy.debuffs.bleed > 0) {
-        const playerAtk = calculatePlayerAtk();
+        const playerAtk = getPlayerAtk();
         const bleedDamage = Math.floor(playerAtk * 0.5 * enemy.debuffs.bleed);
         enemy.hp -= bleedDamage;
         addBattleLog(`출혈 피해: ${bleedDamage} (${enemy.debuffs.bleed}중첩)`);
