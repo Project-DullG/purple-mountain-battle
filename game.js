@@ -914,13 +914,6 @@ function getMaxHp() {
     // 퍼센트 강화 (상점)
     totalHp *= (1 + gameState.percentBonus.hp / 100);
 
-    // 패시브 최대 체력 증가 (멍청한 신념)
-    gameState.equippedSkills.forEach(skill => {
-        if (skill?.type === 'passive' && skill.effect === 'maxHpUp') {
-            totalHp *= (1 + skill.value / 100);
-        }
-    });
-
     return Math.floor(totalHp);
 }
 
@@ -950,13 +943,6 @@ function getMaxMp() {
 function getDodgeChance() {
     // 기본 10% + 행운으로 회피율 증가
     let dodge = 10 + getEffectiveStat('luk') * 0.5;
-
-    // 패시브 회피율 증가 (날렵함)
-    gameState.equippedSkills.forEach(skill => {
-        if (skill?.type === 'passive' && skill.effect === 'dodgeUp') {
-            dodge += skill.value;
-        }
-    });
 
     gameState.tempRelics.forEach(relic => {
         const val = getRelicEffectValue(relic, 'dodge');
@@ -1059,14 +1045,7 @@ function getDamageMultiplier() {
 function getDefenseMultiplier() {
     let mult = 1.0;
 
-    // 패시브: 불굴 (드워프)
-    gameState.equippedSkills.forEach(skill => {
-        if (skill?.type === 'passive' && skill.effect === 'endure') {
-            mult *= (1 - skill.value);
-        }
-    });
-
-    // 버프 효과
+    // 버프 효과 (올바른 벽 등)
     gameState.activeBuffs.forEach(buff => {
         if (buff.effect === 'defBoost') mult *= (1 - buff.value);
     });
@@ -1104,7 +1083,7 @@ function getTotalDamageReduction() {
     // 퍼센트 강화 (상점)
     totalReduction += gameState.percentBonus.def;
 
-    return Math.min(totalReduction, 50);
+    return Math.min(totalReduction, 80);
 }
 
 // 흡혈 효과 체크 (확률 + 흡혈량 반환, 근원 강화는 재판정으로 적용)
@@ -1413,10 +1392,11 @@ function getSkillDmgBonus() {
     return bonus;
 }
 
-function calculateDamageTaken(damage, guarding = false, isCounter = false) {
+function calculateDamageTaken(damage, guarding = false, isCounter = false, originalDamage = null) {
     let finalDamage = damage;
+    const baseDamageForMin = originalDamage || damage; // 최소 데미지 계산용
 
-    // 총 피해 감소율 계산 (최대 50%)
+    // 총 피해 감소율 계산 (최대 80%)
     let totalReduction = 0;
 
     // 방어 배율 (패시브/버프)
@@ -1428,8 +1408,8 @@ function calculateDamageTaken(damage, guarding = false, isCounter = false) {
     // 퍼센트 강화 (상점)
     totalReduction += gameState.percentBonus.def;
 
-    // 최대 50%로 제한
-    totalReduction = Math.min(totalReduction, 50);
+    // 최대 80%로 제한
+    totalReduction = Math.min(totalReduction, 80);
     finalDamage *= (1 - totalReduction / 100);
 
     // 반격일 경우 추가 감소 (별도 계산)
@@ -1446,7 +1426,9 @@ function calculateDamageTaken(damage, guarding = false, isCounter = false) {
         }
     });
 
-    return Math.floor(Math.max(1, finalDamage)); // 최소 1 데미지
+    // 최소 데미지: 원래 피해량의 10% (최소 1)
+    const minDamage = Math.max(1, Math.floor(baseDamageForMin * 0.1));
+    return Math.floor(Math.max(minDamage, finalDamage));
 }
 
 // === 버프 시스템 ===
@@ -2038,9 +2020,10 @@ function enemyPreemptiveAttack() {
     const isCrit = Math.random() * 100 < enemyCrit;
     const isDodge = Math.random() * 100 < getDodgeChance();
 
-    let baseDamage = isCrit ? Math.floor(enemyAtk * 1.5) : enemyAtk;
+    const originalDamage = isCrit ? Math.floor(enemyAtk * 1.5) : enemyAtk;
+    let baseDamage = originalDamage;
     if (isDodge) baseDamage = Math.floor(baseDamage * 0.5);
-    const damage = calculateDamageTaken(baseDamage, false);
+    const damage = calculateDamageTaken(baseDamage, false, false, originalDamage);
 
     gameState.player.hp -= damage;
     const logParts = [`${damage} 피해를 받았다!`];
@@ -2048,8 +2031,8 @@ function enemyPreemptiveAttack() {
     if (isDodge) logParts.push('(부분 회피!)');
     addBattleLog(logParts.join(' '));
 
-    // 반사 피해 (멍청한 희생)
-    applyThornsDamage(damage);
+    // 반사 피해 (멍청한 희생) - 감소 이전 피해량 기준
+    applyThornsDamage(originalDamage);
 
     if (gameState.player.hp <= 0) {
         playerDefeated();
@@ -2233,7 +2216,8 @@ function enemyCounterAttack() {
     const isCrit = Math.random() * 100 < enemyCrit;
     const isDodge = Math.random() * 100 < getDodgeChance();
 
-    let baseDamage = isCrit ? Math.floor(enemyAtk * 1.5) : enemyAtk;
+    const originalDamage = isCrit ? Math.floor(enemyAtk * 1.5) : enemyAtk;
+    let baseDamage = originalDamage;
     if (isDodge) {
         baseDamage = Math.floor(baseDamage * 0.5);
         // 야수의 본능 패시브 체크
@@ -2244,7 +2228,7 @@ function enemyCounterAttack() {
             gameState.beastInstinctBonus = getPassiveValue(beastInstinctSkill);
         }
     }
-    let damage = calculateDamageTaken(baseDamage, isGuarding, true); // isCounter = true
+    let damage = calculateDamageTaken(baseDamage, isGuarding, true, originalDamage); // isCounter = true
 
     // 스킬로 인한 반격 피해 감소 (방패 강타 등)
     if (gameState.skillCounterReduction > 0) {
@@ -2260,10 +2244,10 @@ function enemyCounterAttack() {
     addBattleLog(logParts.join(' '));
     isGuarding = false;
 
-    // 피해 반사 (reflect)
+    // 피해 반사 (reflect) - 감소 이전 피해량 기준
     const reflectPercent = getReflectPercent();
-    if (reflectPercent > 0 && damage > 0) {
-        const reflectDamage = Math.floor(damage * reflectPercent);
+    if (reflectPercent > 0 && originalDamage > 0) {
+        const reflectDamage = Math.floor(originalDamage * reflectPercent);
         gameState.currentEnemy.hp -= reflectDamage;
         addBattleLog(`🦔 ${reflectDamage} 피해 반사!`);
 
@@ -2275,8 +2259,8 @@ function enemyCounterAttack() {
         }
     }
 
-    // 반사 피해 (멍청한 희생)
-    applyThornsDamage(damage);
+    // 반사 피해 (멍청한 희생) - 감소 이전 피해량 기준
+    applyThornsDamage(originalDamage);
     if (gameState.currentEnemy && gameState.currentEnemy.hp <= 0) {
         endPlayerTurn();
         enemyDefeated();
@@ -2505,6 +2489,11 @@ function useSkill(slotIndex) {
             if (isCrit) logParts.push('(치명타!)');
             if (isEnemyDodge) logParts.push('(적 부분 회피!)');
             addBattleLog(logParts.join(' '));
+
+            // 치명타 시 MP 회복 (마력 폭발)
+            if (isCrit) {
+                applyCritMpRestore();
+            }
         }
 
         // 흡혈 효과
@@ -2512,7 +2501,8 @@ function useSkill(slotIndex) {
 
         // 스킬 자체 흡혈 효과 (물어 뜯기)
         if (skill.effect === 'skillLifeSteal' && skill.healPercent) {
-            const heal = Math.floor(totalDamage * (skill.healPercent / 100));
+            const effectiveHealPercent = skill.healPercent * (1 + weaponBonus / 100);
+            const heal = Math.floor(totalDamage * (effectiveHealPercent / 100));
             if (heal > 0) {
                 gameState.player.hp = Math.min(getMaxHp(), gameState.player.hp + heal);
                 addBattleLog(`HP +${heal} (흡혈)`);
