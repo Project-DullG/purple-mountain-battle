@@ -120,15 +120,12 @@
             <!-- 마을 시설 -->
             <div class="village-facilities">
                 <button id="btn-shop" class="btn-facility btn-shop">
-                    <span class="facility-icon">🏪</span>
                     <span class="facility-name">상점</span>
                 </button>
                 <button id="btn-blacksmith" class="btn-facility btn-blacksmith">
-                    <span class="facility-icon">⚒️</span>
                     <span class="facility-name">대장간</span>
                 </button>
                 <button id="btn-inn" class="btn-facility btn-inn">
-                    <span class="facility-icon">🔮</span>
                     <span class="facility-name">숙소</span>
                 </button>
             </div>
@@ -137,12 +134,12 @@
             <div class="section">
                 <h2>던전 입장</h2>
                 <div class="mode-select-grid">
-                    <button class="btn-mode-select selected" data-mode="easy">이지</button>
-                    <button class="btn-mode-select" data-mode="normal">노말</button>
-                    <button class="btn-mode-select" data-mode="hard">하드</button>
-                    <button class="btn-mode-select" data-mode="infinite">무한</button>
+                    <button class="btn-mode-select selected" data-mode="easy">전장 초입부</button>
+                    <button class="btn-mode-select" data-mode="normal">전장 중심부</button>
+                    <button class="btn-mode-select" data-mode="hard">전장의 끝</button>
+                    <button class="btn-mode-select" data-mode="infinite">무한의 전장</button>
                 </div>
-                <p class="mode-desc-text" id="mode-desc-text">적 능력치 x0.5 / 보상 x1 / 입문자용</p>
+                <p class="mode-desc-text" id="mode-desc-text">보상 x1</p>
                 <div class="dungeon-entry">
                     <button id="btn-dungeon" class="btn-enter">던전 입장 (1층~)</button>
                     <button id="btn-skip" class="btn-skip">스킵 (50% HP)</button>
@@ -153,7 +150,7 @@
 
         <!-- 상점 화면 (부적 상점) -->
         <div id="shop-screen" class="screen hidden">
-            <h1>🏪 부적 상점</h1>
+            <h1>부적 상점</h1>
             <div class="resource-display shop-resources">
                 <span>골드: <span id="shop-gold">0</span></span>
                 <span>💎: <span id="shop-stones">0</span></span>
@@ -272,7 +269,7 @@
 
         <!-- 대장간 화면 (무기 강화) -->
         <div id="blacksmith-screen" class="screen hidden">
-            <h1>⚒️ 대장간</h1>
+            <h1>대장간</h1>
             <div class="resource-display">
                 <span>골드: <span id="blacksmith-gold">0</span></span>
                 <span>강화석 💎: <span id="blacksmith-stones">0</span></span>
@@ -328,7 +325,7 @@
 
         <!-- 숙소 화면 (근원 강화) -->
         <div id="inn-screen" class="screen hidden">
-            <h1>🔮 숙소 - 잿빛 소녀</h1>
+            <h1>숙소 - 잿빛 소녀</h1>
             <div class="resource-display inn-resource">
                 <span>근원석 🔮: <span id="inn-origin-stones">0</span></span>
             </div>
@@ -456,6 +453,10 @@
                         <div class="stat-row">
                             <span class="stat-label">⭐ 경험치</span>
                             <span class="stat-val" id="panel-exp">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">보상 증가</span>
+                            <span class="stat-val" id="panel-reward-bonus">+0%</span>
                         </div>
                     </div>
                 </div>

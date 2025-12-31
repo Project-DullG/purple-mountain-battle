@@ -76,12 +76,12 @@ const relicsData = [
     // 공격 (8개): 공격력, 치명타, 치명타피해, 첫공격, 보스피해, 추가공격, 흡혈, 처형
     { id: 'relic_atk_c', name: '녹슨 검', desc: '공격력 +5%', effect: 'atkMult', value: 0.05, icon: '⚔️', rarity: 'common', tag: '공격' },
     { id: 'relic_crit_c', name: '날카로운 눈', desc: '치명타 확률 +5%', effect: 'crit', value: 5, icon: '⚔️', rarity: 'common', tag: '공격' },
-    { id: 'relic_critdmg_c', name: '이빨 목걸이', desc: '치명타 피해 +5%', effect: 'critDmg', value: 5, icon: '⚔️', rarity: 'common', tag: '공격' },
-    { id: 'relic_firstHit_c', name: '기습의 단검', desc: '첫 공격 피해 +5%', effect: 'firstHit', value: 0.05, icon: '⚔️', rarity: 'common', tag: '공격' },
-    { id: 'relic_bossKiller_c', name: '사냥꾼의 눈', desc: '보스에게 피해 +5%', effect: 'bossKiller', value: 0.05, icon: '⚔️', rarity: 'common', tag: '공격' },
-    { id: 'relic_multiHit_c', name: '연속의 팔찌', desc: '5% 확률로 추가 공격', effect: 'multiHit', value: 0.05, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_critdmg_c', name: '이빨 목걸이', desc: '치명타 피해 +10%', effect: 'critDmg', value: 10, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_firstHit_c', name: '기습의 단검', desc: '첫 공격 피해 +10%', effect: 'firstHit', value: 0.10, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_bossKiller_c', name: '사냥꾼의 눈', desc: '보스에게 피해 +10%', effect: 'bossKiller', value: 0.10, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_multiHit_c', name: '연속의 팔찌', desc: '7% 확률로 추가 공격', effect: 'multiHit', value: 0.07, icon: '⚔️', rarity: 'common', tag: '공격' },
     { id: 'relic_lifesteal_c', name: '흡혈 이빨', desc: '25% 확률로 피해의 5% 흡혈', effect: 'lifeSteal', value: 0.25, icon: '⚔️', rarity: 'common', tag: '공격' },
-    { id: 'relic_execute_c', name: '사형집행인', desc: '적 HP 30% 이하 시 피해 +5%', effect: 'execute', value: 0.05, icon: '⚔️', rarity: 'common', tag: '공격' },
+    { id: 'relic_execute_c', name: '사형집행인', desc: '적 HP 30% 이하 시 피해 +10%', effect: 'execute', value: 0.10, icon: '⚔️', rarity: 'common', tag: '공격' },
     // 방어 (8개): 체력, 피해감소, 회피, 반사, 힘, 민첩, 활력, 처치회복
     { id: 'relic_hp_c', name: '생명의 구슬', desc: '최대 체력 +5%', effect: 'hpMult', value: 0.05, icon: '🛡️', rarity: 'common', tag: '방어' },
     { id: 'relic_def_c', name: '가죽 조끼', desc: '받는 피해 -2.5%', effect: 'def', value: 0.975, icon: '🛡️', rarity: 'common', tag: '방어' },
@@ -105,12 +105,12 @@ const relicsData = [
     // 공격 (8개)
     { id: 'relic_atk_r', name: '강철 검', desc: '공격력 +10%', effect: 'atkMult', value: 0.10, icon: '⚔️', rarity: 'rare', tag: '공격' },
     { id: 'relic_crit_r', name: '행운의 부적', desc: '치명타 확률 +10%', effect: 'crit', value: 10, icon: '⚔️', rarity: 'rare', tag: '공격' },
-    { id: 'relic_critdmg_r', name: '파괴의 송곳니', desc: '치명타 피해 +10%', effect: 'critDmg', value: 10, icon: '⚔️', rarity: 'rare', tag: '공격' },
-    { id: 'relic_firstHit_r', name: '암습의 단검', desc: '첫 공격 피해 +10%', effect: 'firstHit', value: 0.10, icon: '⚔️', rarity: 'rare', tag: '공격' },
-    { id: 'relic_bossKiller_r', name: '사냥꾼의 표식', desc: '보스에게 피해 +10%', effect: 'bossKiller', value: 0.10, icon: '⚔️', rarity: 'rare', tag: '공격' },
-    { id: 'relic_multiHit_r', name: '연쇄의 고리', desc: '10% 확률로 추가 공격', effect: 'multiHit', value: 0.10, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_critdmg_r', name: '파괴의 송곳니', desc: '치명타 피해 +20%', effect: 'critDmg', value: 20, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_firstHit_r', name: '암습의 단검', desc: '첫 공격 피해 +20%', effect: 'firstHit', value: 0.20, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_bossKiller_r', name: '사냥꾼의 표식', desc: '보스에게 피해 +20%', effect: 'bossKiller', value: 0.20, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_multiHit_r', name: '연쇄의 고리', desc: '16% 확률로 추가 공격', effect: 'multiHit', value: 0.16, icon: '⚔️', rarity: 'rare', tag: '공격' },
     { id: 'relic_lifesteal_r', name: '흡혈의 송곳니', desc: '50% 확률로 피해의 5% 흡혈', effect: 'lifeSteal', value: 0.50, icon: '⚔️', rarity: 'rare', tag: '공격' },
-    { id: 'relic_execute_r', name: '처형인의 검', desc: '적 HP 30% 이하 시 피해 +10%', effect: 'execute', value: 0.10, icon: '⚔️', rarity: 'rare', tag: '공격' },
+    { id: 'relic_execute_r', name: '처형인의 검', desc: '적 HP 30% 이하 시 피해 +20%', effect: 'execute', value: 0.20, icon: '⚔️', rarity: 'rare', tag: '공격' },
     // 방어 (8개)
     { id: 'relic_hp_r', name: '생명의 목걸이', desc: '최대 체력 +10%', effect: 'hpMult', value: 0.10, icon: '🛡️', rarity: 'rare', tag: '방어' },
     { id: 'relic_def_r', name: '수호의 방패', desc: '받는 피해 -6%', effect: 'def', value: 0.94, icon: '🛡️', rarity: 'rare', tag: '방어' },
@@ -134,12 +134,12 @@ const relicsData = [
     // 공격 (8개)
     { id: 'relic_atk_e', name: '전쟁의 검', desc: '공격력 +25%', effect: 'atkMult', value: 0.25, icon: '⚔️', rarity: 'epic', tag: '공격' },
     { id: 'relic_crit_e', name: '암살자의 장갑', desc: '치명타 확률 +25%', effect: 'crit', value: 25, icon: '⚔️', rarity: 'epic', tag: '공격' },
-    { id: 'relic_critdmg_e', name: '파멸의 해골', desc: '치명타 피해 +25%', effect: 'critDmg', value: 25, icon: '⚔️', rarity: 'epic', tag: '공격' },
-    { id: 'relic_firstHit_e', name: '기습의 장검', desc: '첫 공격 피해 +25%', effect: 'firstHit', value: 0.25, icon: '⚔️', rarity: 'epic', tag: '공격' },
-    { id: 'relic_bossKiller_e', name: '드래곤 슬레이어', desc: '보스에게 피해 +25%', effect: 'bossKiller', value: 0.25, icon: '⚔️', rarity: 'epic', tag: '공격' },
-    { id: 'relic_multiHit_e', name: '연쇄의 사슬', desc: '15% 확률로 추가 공격', effect: 'multiHit', value: 0.15, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_critdmg_e', name: '파멸의 해골', desc: '치명타 피해 +50%', effect: 'critDmg', value: 50, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_firstHit_e', name: '기습의 장검', desc: '첫 공격 피해 +50%', effect: 'firstHit', value: 0.50, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_bossKiller_e', name: '드래곤 슬레이어', desc: '보스에게 피해 +50%', effect: 'bossKiller', value: 0.50, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_multiHit_e', name: '연쇄의 사슬', desc: '35% 확률로 추가 공격', effect: 'multiHit', value: 0.35, icon: '⚔️', rarity: 'epic', tag: '공격' },
     { id: 'relic_lifesteal_e', name: '흡혈왕의 송곳니', desc: '피해의 5% 흡혈', effect: 'lifeSteal', value: 1.0, icon: '⚔️', rarity: 'epic', tag: '공격' },
-    { id: 'relic_execute_e', name: '광전사의 도끼', desc: '적 HP 30% 이하 시 피해 +25%', effect: 'execute', value: 0.25, icon: '⚔️', rarity: 'epic', tag: '공격' },
+    { id: 'relic_execute_e', name: '광전사의 도끼', desc: '적 HP 30% 이하 시 피해 +50%', effect: 'execute', value: 0.50, icon: '⚔️', rarity: 'epic', tag: '공격' },
     // 방어 (8개)
     { id: 'relic_hp_e', name: '거인의 심장', desc: '최대 체력 +25%', effect: 'hpMult', value: 0.25, icon: '🛡️', rarity: 'epic', tag: '방어' },
     { id: 'relic_def_e', name: '강철 갑옷', desc: '받는 피해 -15%', effect: 'def', value: 0.85, icon: '🛡️', rarity: 'epic', tag: '방어' },
@@ -163,12 +163,12 @@ const relicsData = [
     // 공격 (8개)
     { id: 'relic_atk_l', name: '파괴의 검', desc: '공격력 +80%', effect: 'atkMult', value: 0.80, icon: '⚔️', rarity: 'legendary', tag: '공격' },
     { id: 'relic_crit_l', name: '예언자의 눈', desc: '치명타 확률 +50%', effect: 'crit', value: 50, icon: '⚔️', rarity: 'legendary', tag: '공격' },
-    { id: 'relic_critdmg_l', name: '심판의 보석', desc: '치명타 피해 +80%', effect: 'critDmg', value: 80, icon: '⚔️', rarity: 'legendary', tag: '공격' },
-    { id: 'relic_firstHit_l', name: '광기의 가면', desc: '첫 공격 피해 +80%', effect: 'firstHit', value: 0.80, icon: '⚔️', rarity: 'legendary', tag: '공격' },
-    { id: 'relic_bossKiller_l', name: '신 사냥꾼', desc: '보스에게 피해 +80%', effect: 'bossKiller', value: 0.80, icon: '⚔️', rarity: 'legendary', tag: '공격' },
-    { id: 'relic_multiHit_l', name: '폭풍의 눈', desc: '30% 확률로 추가 공격', effect: 'multiHit', value: 0.30, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_critdmg_l', name: '심판의 보석', desc: '치명타 피해 +160%', effect: 'critDmg', value: 160, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_firstHit_l', name: '광기의 가면', desc: '첫 공격 피해 +160%', effect: 'firstHit', value: 1.60, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_bossKiller_l', name: '신 사냥꾼', desc: '보스에게 피해 +160%', effect: 'bossKiller', value: 1.60, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_multiHit_l', name: '폭풍의 눈', desc: '70% 확률로 추가 공격', effect: 'multiHit', value: 0.70, icon: '⚔️', rarity: 'legendary', tag: '공격' },
     { id: 'relic_lifesteal_l', name: '흡혈 군주', desc: '피해의 10% 흡혈', effect: 'lifeSteal', value: 2.0, icon: '⚔️', rarity: 'legendary', tag: '공격' },
-    { id: 'relic_execute_l', name: '처형자의 도끼', desc: '적 HP 30% 이하 시 피해 +80%', effect: 'execute', value: 0.80, icon: '⚔️', rarity: 'legendary', tag: '공격' },
+    { id: 'relic_execute_l', name: '처형자의 도끼', desc: '적 HP 30% 이하 시 피해 +160%', effect: 'execute', value: 1.60, icon: '⚔️', rarity: 'legendary', tag: '공격' },
     // 방어 (8개)
     { id: 'relic_hp_l', name: '타이탄의 심장', desc: '최대 체력 +80%', effect: 'hpMult', value: 0.80, icon: '🛡️', rarity: 'legendary', tag: '방어' },
     { id: 'relic_def_l', name: '드래곤의 심장', desc: '받는 피해 -30%', effect: 'def', value: 0.70, icon: '🛡️', rarity: 'legendary', tag: '방어' },
@@ -340,7 +340,7 @@ function updateTagCombineUI() {
             <div class="relic-icon">${relic.icon}</div>
             <div class="relic-name">${relic.name}</div>
             <div class="relic-rarity">[${rarityNames[relic.rarity]}]</div>
-            <div class="relic-desc">${relic.desc}</div>
+            <div class="relic-desc">${getRelicDescWithEnhancement(relic)}</div>
             <div class="relic-tags">${tagsHtml}</div>
         `;
 
@@ -714,12 +714,40 @@ function getRelicEffectValue(relic, effectType) {
         if (found) value = found.value;
     }
 
-    // 근원 강화 보너스 적용 (수치형 효과에만)
-    if (value !== null && typeof value === 'number') {
+    // 근원 강화 보너스 적용 (수치형 효과에만, 확률형 제외)
+    const probabilityEffects = ['multiHit', 'lifeSteal', 'bleed', 'weaken', 'stun', 'freeze'];
+    if (value !== null && typeof value === 'number' && !probabilityEffects.includes(effectType)) {
         value *= (1 + getOriginEnhancementBonus());
     }
 
     return value;
+}
+
+// 확률형 효과의 원본 값 (근원 강화 미적용, 합산용)
+function getRelicEffectValueRaw(relic, effectType) {
+    let value = null;
+    if (relic.effect === effectType) {
+        value = relic.value;
+    }
+    if (relic.effects) {
+        const found = relic.effects.find(e => e.effect === effectType);
+        if (found) value = found.value;
+    }
+    return value;
+}
+
+// 확률형 효과 판정 (기본 확률 + 근원 강화 재판정)
+// 기본 확률로 체크 후 실패하면 근원 강화 확률로 재판정
+function checkProbabilityWithReroll(baseChance) {
+    // 기본 확률 체크
+    if (Math.random() < Math.min(baseChance, 1.0)) return true;
+
+    // 근원 강화 재판정 (기본확률 * 근원강화레벨/100)
+    const enhancementLevel = gameState.originEnhancement || 0;
+    const rerollChance = baseChance * (enhancementLevel / 100);
+    if (rerollChance > 0 && Math.random() < Math.min(rerollChance, 1.0)) return true;
+
+    return false;
 }
 
 // 모든 스탯 보너스 계산
@@ -1001,7 +1029,7 @@ function getTotalDamageReduction() {
     return Math.min(totalReduction, 50);
 }
 
-// 흡혈 효과 체크 (확률 + 흡혈량 반환)
+// 흡혈 효과 체크 (확률 + 흡혈량 반환, 근원 강화는 재판정으로 적용)
 function getLifeStealInfo() {
     let chance = 0;
     let healPercent = 0.05; // 기본 5%
@@ -1014,9 +1042,9 @@ function getLifeStealInfo() {
         }
     });
 
-    // 유물 흡혈 효과 (value가 확률)
+    // 유물 흡혈 효과 (원본 확률 합산)
     gameState.tempRelics.forEach(relic => {
-        const val = getRelicEffectValue(relic, 'lifeSteal');
+        const val = getRelicEffectValueRaw(relic, 'lifeSteal');
         if (val !== null) {
             chance += val;
             // 2.0 이상이면 10% 흡혈 (전설급)
@@ -1024,7 +1052,7 @@ function getLifeStealInfo() {
         }
     });
 
-    return { chance: Math.min(chance, 1.0), healPercent };
+    return { chance, healPercent }; // 원본 확률 반환
 }
 
 
@@ -1070,6 +1098,26 @@ function getKillManaPercent() {
     return percent;
 }
 
+// 보상 증가율 계산 (행운 + 유물 + 부적)
+function getTotalRewardBonus() {
+    // 행운 스탯 보너스 (1% per point)
+    let bonus = getEffectiveStat('luk') * 1;
+
+    // 유물 효과
+    gameState.tempRelics.forEach(relic => {
+        const rewardVal = getRelicEffectValue(relic, 'reward');
+        if (rewardVal !== null) {
+            bonus += (rewardVal - 1) * 100; // 1.05 -> 5%
+        }
+    });
+
+    // 부적 효과 (3% per purchase, 둘 중 평균 사용)
+    const talismanBonus = ((gameState.talismanPurchases.exp + gameState.talismanPurchases.gold) / 2) * 3;
+    bonus += talismanBonus;
+
+    return Math.floor(bonus);
+}
+
 // 쿨타임 감소량
 function getCooldownReduce() {
     let reduce = 0;
@@ -1080,17 +1128,17 @@ function getCooldownReduce() {
     return reduce;
 }
 
-// 디버프 확률 계산 (value가 확률, 1.0 이상이면 중첩 수)
+// 디버프 확률 계산 (원본 값 합산, 근원 강화는 재판정으로 적용)
 function getDebuffChance(debuffType) {
     let chance = 0;
     gameState.tempRelics.forEach(relic => {
-        const val = getRelicEffectValue(relic, debuffType);
+        const val = getRelicEffectValueRaw(relic, debuffType);
         if (val !== null) chance += val;
     });
     return chance;
 }
 
-// 공격 후 디버프 적용 시도
+// 공격 후 디버프 적용 시도 - 기본 확률 + 근원 강화 재판정으로 연쇄 중첩
 function tryApplyDebuffs() {
     const enemy = gameState.currentEnemy;
     if (!enemy || enemy.hp <= 0) return;
@@ -1102,19 +1150,20 @@ function tryApplyDebuffs() {
         const chance = getDebuffChance(type);
         if (chance <= 0) return;
 
-        // 확률 적용 (1.0 이상이면 확정 적용, 나머지는 확률)
-        const baseChance = Math.min(chance, 1.0);
-        const stacks = Math.floor(chance); // 1.0 이상이면 중첩 수
+        // 연쇄 적용: 기본 확률 + 근원 강화 재판정으로 계속 시도
+        let appliedStacks = 0;
+        while (checkProbabilityWithReroll(chance)) {
+            appliedStacks++;
+        }
 
-        if (Math.random() < baseChance) {
-            const applyStacks = stacks > 0 ? stacks : 1;
+        if (appliedStacks > 0) {
             const prevStacks = enemy.debuffs[type];
-            enemy.debuffs[type] += applyStacks;
+            enemy.debuffs[type] += appliedStacks;
 
-            if (prevStacks === 0) {
+            if (prevStacks === 0 && appliedStacks === 1) {
                 addBattleLog(`${enemy.name}에게 ${debuffNames[type]} 적용!`);
-            } else if (applyStacks > 1 || prevStacks > 0) {
-                addBattleLog(`${debuffNames[type]} ${enemy.debuffs[type]}중첩!`);
+            } else {
+                addBattleLog(`${debuffNames[type]} ${enemy.debuffs[type]}중첩! (+${appliedStacks})`);
             }
         }
     });
@@ -1219,14 +1268,14 @@ function getBossKillerBonus() {
     return bonus;
 }
 
-// 추가 공격 확률
+// 추가 공격 확률 (원본 값 합산, 근원 강화는 재판정으로 적용)
 function getMultiHitChance() {
     let chance = 0;
     gameState.tempRelics.forEach(relic => {
-        const val = getRelicEffectValue(relic, 'multiHit');
+        const val = getRelicEffectValueRaw(relic, 'multiHit');
         if (val !== null) chance += val;
     });
-    return Math.min(chance, 0.5); // 최대 50%
+    return chance; // 합산된 원본 확률 반환
 }
 
 // 스킬 데미지 증가율
@@ -1641,6 +1690,7 @@ function updateBattleUI() {
     // 획득 보상 표시
     document.getElementById('panel-gold').textContent = gameState.dungeon.pendingGold || 0;
     document.getElementById('panel-exp').textContent = gameState.dungeon.pendingExp || 0;
+    document.getElementById('panel-reward-bonus').textContent = '+' + getTotalRewardBonus() + '%';
 
     // 적 정보 업데이트 (적이 있을 때만)
     const enemy = gameState.currentEnemy;
@@ -1794,10 +1844,12 @@ function playerAttack() {
     // 공격 실행
     const totalDamage = executePlayerAttack(false);
 
-    // 추가 공격 (multiHit)
+    // 추가 공격 (multiHit) - 기본 확률 + 근원 강화 재판정으로 연쇄 발동
     const multiHitChance = getMultiHitChance();
-    if (multiHitChance > 0 && Math.random() < multiHitChance && gameState.currentEnemy.hp > 0) {
-        addBattleLog('⚡ 추가 공격!');
+    let multiHitCount = 0;
+    while (multiHitChance > 0 && checkProbabilityWithReroll(multiHitChance) && gameState.currentEnemy.hp > 0) {
+        multiHitCount++;
+        addBattleLog(`⚡ 추가 공격! (${multiHitCount}연속)`);
         executePlayerAttack(false);
     }
 
@@ -1877,10 +1929,10 @@ function processPlayerTurn() {
     processDebuffDamage();
 }
 
-// 흡혈 효과 (확률 기반)
+// 흡혈 효과 (기본 확률 + 근원 강화 재판정)
 function applyLifeSteal(damage) {
     const { chance, healPercent } = getLifeStealInfo();
-    if (chance > 0 && Math.random() < chance) {
+    if (chance > 0 && checkProbabilityWithReroll(chance)) {
         const heal = Math.floor(damage * healPercent);
         if (heal > 0) {
             gameState.player.hp = Math.min(gameState.player.maxHp, gameState.player.hp + heal);
@@ -2350,7 +2402,7 @@ function showBossRewardChoices() {
                 <div class="relic-rarity rarity-${relic.rarity}">${rarityNames[relic.rarity]}</div>
                 <div class="relic-icon">${relic.icon}</div>
                 <div class="relic-name">${relic.name}</div>
-                <div class="relic-desc">${relic.desc}</div>
+                <div class="relic-desc">${getRelicDescWithEnhancement(relic)}</div>
                 <div class="relic-tags">${tagsHtml}</div>
                 ${ownedCount > 0 ? `<div class="relic-owned">보유: ${ownedCount}개</div>` : ''}
             `;
@@ -2542,7 +2594,7 @@ function showTier2RelicChoices() {
             <div class="relic-rarity rarity-${relic.rarity}">${rarityNames[relic.rarity]}</div>
             <div class="relic-icon">${relic.icon}</div>
             <div class="relic-name">${relic.name}</div>
-            <div class="relic-desc">${relic.desc}</div>
+            <div class="relic-desc">${getRelicDescWithEnhancement(relic)}</div>
             <div class="relic-tags">${tagsHtml}</div>
             ${ownedCount > 0 ? `<div class="relic-owned">보유: ${ownedCount}개</div>` : ''}
         `;
@@ -2743,6 +2795,115 @@ function generateRelicDesc(relic) {
     // 단일 효과 유물 처리
     const descFn = effectDescs[relic.effect];
     return descFn ? descFn(relic.value) : relic.desc;
+}
+
+// 유물 설명 + 근원 강화 보정 수치 표시
+function getRelicDescWithEnhancement(relic) {
+    const enhancementBonus = getOriginEnhancementBonus();
+    const enhancementLevel = gameState.originEnhancement || 0;
+
+    // 확률형 효과 목록
+    const probabilityEffects = ['multiHit', 'lifeSteal', 'bleed', 'weaken', 'stun', 'freeze'];
+
+    // 효과 값 포맷팅 (소수점 1자리)
+    const formatValue = (v, multiplier = 100) => (v * multiplier).toFixed(1);
+
+    // 효과별 설명 생성 (근원 강화 보정 포함)
+    const getEnhancedDesc = (effect, baseValue) => {
+        const isProbability = probabilityEffects.includes(effect);
+
+        if (isProbability) {
+            // 확률형: 기본확률 (+재판정확률)
+            const rerollChance = baseValue * (enhancementLevel / 100);
+            const basePercent = formatValue(baseValue);
+            const rerollPercent = formatValue(rerollChance);
+
+            switch(effect) {
+                case 'multiHit':
+                    return rerollChance > 0
+                        ? `${basePercent}% 추가공격 (+${rerollPercent}%)`
+                        : `${basePercent}% 추가공격`;
+                case 'lifeSteal':
+                    return rerollChance > 0
+                        ? `${basePercent}% 흡혈 (+${rerollPercent}%)`
+                        : `${basePercent}% 흡혈`;
+                case 'bleed':
+                    return rerollChance > 0
+                        ? `${basePercent}% 출혈 (+${rerollPercent}%)`
+                        : `${basePercent}% 출혈`;
+                case 'weaken':
+                    return rerollChance > 0
+                        ? `${basePercent}% 쇠약 (+${rerollPercent}%)`
+                        : `${basePercent}% 쇠약`;
+                case 'stun':
+                    return rerollChance > 0
+                        ? `${basePercent}% 스턴 (+${rerollPercent}%)`
+                        : `${basePercent}% 스턴`;
+                case 'freeze':
+                    return rerollChance > 0
+                        ? `${basePercent}% 빙결 (+${rerollPercent}%)`
+                        : `${basePercent}% 빙결`;
+            }
+        } else {
+            // 비확률형: 기본값 (→강화값)
+            const enhancedValue = baseValue * (1 + enhancementBonus);
+
+            switch(effect) {
+                case 'atkMult':
+                    return enhancementBonus > 0
+                        ? `공격력 +${formatValue(baseValue)}% (→${formatValue(enhancedValue)}%)`
+                        : `공격력 +${formatValue(baseValue)}%`;
+                case 'critDmg':
+                    return enhancementBonus > 0
+                        ? `치명타 피해 +${formatValue(baseValue, 1)}% (→${formatValue(enhancedValue, 1)}%)`
+                        : `치명타 피해 +${formatValue(baseValue, 1)}%`;
+                case 'crit':
+                    return enhancementBonus > 0
+                        ? `치명타 확률 +${formatValue(baseValue, 1)}% (→${formatValue(enhancedValue, 1)}%)`
+                        : `치명타 확률 +${formatValue(baseValue, 1)}%`;
+                case 'execute':
+                    return enhancementBonus > 0
+                        ? `처형 +${formatValue(baseValue)}% (→${formatValue(enhancedValue)}%)`
+                        : `처형 +${formatValue(baseValue)}%`;
+                case 'firstHit':
+                    return enhancementBonus > 0
+                        ? `첫타 +${formatValue(baseValue)}% (→${formatValue(enhancedValue)}%)`
+                        : `첫타 +${formatValue(baseValue)}%`;
+                case 'bossKiller':
+                    return enhancementBonus > 0
+                        ? `보스킬러 +${formatValue(baseValue)}% (→${formatValue(enhancedValue)}%)`
+                        : `보스킬러 +${formatValue(baseValue)}%`;
+                case 'reward':
+                    const baseReward = (baseValue - 1) * 100;
+                    const enhancedReward = baseReward * (1 + enhancementBonus);
+                    return enhancementBonus > 0
+                        ? `보상 +${baseReward.toFixed(1)}% (→${enhancedReward.toFixed(1)}%)`
+                        : `보상 +${baseReward.toFixed(1)}%`;
+                case 'hpMult':
+                    return enhancementBonus > 0
+                        ? `체력 +${formatValue(baseValue)}% (→${formatValue(enhancedValue)}%)`
+                        : `체력 +${formatValue(baseValue)}%`;
+                case 'killHeal':
+                    return enhancementBonus > 0
+                        ? `처치회복 ${formatValue(baseValue)}% (→${formatValue(enhancedValue)}%)`
+                        : `처치회복 ${formatValue(baseValue)}%`;
+                case 'killMana':
+                    return enhancementBonus > 0
+                        ? `처치MP ${formatValue(baseValue)}% (→${formatValue(enhancedValue)}%)`
+                        : `처치MP ${formatValue(baseValue)}%`;
+                default:
+                    return relic.desc;
+            }
+        }
+        return relic.desc;
+    };
+
+    // 단일 효과
+    if (relic.effect) {
+        return getEnhancedDesc(relic.effect, relic.value);
+    }
+
+    return relic.desc;
 }
 
 // 합성 결과 확인 후 진행
@@ -3142,7 +3303,7 @@ function updateInfoPanel() {
                             <span class="relic-info-name">${relic.name}</span>
                             <span class="relic-info-rarity rarity-${relic.rarity}">${rarityName}</span>
                         </div>
-                        <div class="relic-info-desc">${relic.desc}</div>
+                        <div class="relic-info-desc">${getRelicDescWithEnhancement(relic)}</div>
                     </div>
                 </div>
             `;
