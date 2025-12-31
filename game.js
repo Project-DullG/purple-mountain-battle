@@ -3014,8 +3014,8 @@ function showCombineResultChoices() {
     }
 
     resultSection.innerHTML = `
-        <h2>합성 결과 선택</h2>
-        <p style="color: #888; margin-bottom: 15px;">3개 중 1개를 선택하세요</p>
+        <h2>✨ 근원 합성 결과</h2>
+        <p style="color: #aaa; margin-bottom: 15px;">"3개 중 하나를 선택해." - 잿빛 소녀</p>
         <div id="combine-result-grid" class="relic-choice-grid"></div>
     `;
     resultSection.classList.remove('hidden');
@@ -3202,7 +3202,7 @@ function showCombineResult(oldRelic, newRelic) {
                 <span class="combine-desc">${newRelic.desc}</span>
             </div>
         </div>
-        <p class="combine-success-msg">합성 성공!</p>
+        <p class="combine-success-msg">"근원 합성 완료." - 잿빛 소녀</p>
     `;
 
     // 확인 버튼만 표시
@@ -3815,7 +3815,7 @@ function updateInfoPanel() {
     if (!gameState.dungeon.inBattle && gameState.tempRelics.length >= 3) {
         html += `
             <div class="info-combine-section">
-                <button id="btn-info-tag-combine" class="btn-info-tag-combine">🔮 태그 합성 열기</button>
+                <button id="btn-info-tag-combine" class="btn-info-tag-combine">✨ 근원 합성</button>
             </div>
         `;
     }
